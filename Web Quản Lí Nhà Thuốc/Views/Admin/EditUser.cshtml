@@ -1,0 +1,138 @@
+@model Web_Quản_Lí_Nhà_Thuốc.Controllers.EditUserViewModel
+@{
+    ViewData["Title"] = "Chỉnh sửa tài khoản";
+}
+
+<div class="container py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/" class="text-decoration-none text-muted">Trang chủ</a></li>
+            <li class="breadcrumb-item"><a href="/Admin/Users" class="text-decoration-none text-muted">Quản lý tài khoản</a></li>
+            <li class="breadcrumb-item active fw-medium text-dark" aria-current="page">Chỉnh sửa tài khoản</li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-8">
+            <div class="card border-0 shadow-sm" style="border-radius: 16px;">
+                <div class="card-header bg-transparent border-0 pt-4 px-4 pb-0">
+                    <h4 class="fw-bold mb-1 text-dark">Chỉnh sửa tài khoản & Phân quyền</h4>
+                    <p class="text-muted small mb-0">Cập nhật thông tin chi tiết, điểm thành viên, hoặc thay đổi quyền truy cập của tài khoản.</p>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-action="EditUser" method="post">
+                        @Html.AntiForgeryToken()
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3" role="alert"></div>
+                        <input type="hidden" asp-for="Id" />
+
+                        <!-- Read Only Info -->
+                        <div class="mb-3">
+                            <label class="form-label small fw-semibold text-secondary">Tên đăng nhập (Email)</label>
+                            <input asp-for="Email" class="form-control bg-light border-0 py-2.5 px-3" readonly style="border-radius: 10px;" />
+                            <input type="hidden" asp-for="Email" />
+                        </div>
+
+                        <!-- Editable Fields -->
+                        <div class="row g-3 mb-3">
+                            <div class="col-12 col-md-6">
+                                <label asp-for="HoTen" class="form-label small fw-semibold text-secondary">Họ và tên <span class="text-danger">*</span></label>
+                                <input asp-for="HoTen" class="form-control border-light-subtle py-2.5 px-3" style="border-radius: 10px;" placeholder="Nhập họ và tên" />
+                                <span asp-validation-for="HoTen" class="text-danger small"></span>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label asp-for="NgaySinh" class="form-label small fw-semibold text-secondary">Ngày sinh <span class="text-danger">*</span></label>
+                                <input asp-for="NgaySinh" type="date" class="form-control border-light-subtle py-2.5 px-3" style="border-radius: 10px;" />
+                                <span asp-validation-for="NgaySinh" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Role" class="form-label small fw-semibold text-secondary">Vai trò hệ thống <span class="text-danger">*</span></label>
+                            @if (Model.IsSelfEditing)
+                            {
+                                <select asp-for="Role" class="form-select border-light-subtle py-2.5 px-3" style="border-radius: 10px;" disabled>
+                                    <option value="Admin" selected>Admin</option>
+                                </select>
+                                <input type="hidden" asp-for="Role" />
+                                <div class="form-text text-warning small mt-1">
+                                    <i class="bi bi-info-circle me-1"></i> Bạn không thể tự thay đổi vai trò Admin của chính mình.
+                                </div>
+                            }
+                            else
+                            {
+                                <select asp-for="Role" class="form-select border-light-subtle py-2.5 px-3" style="border-radius: 10px;">
+                                    @foreach (var role in Model.AvailableRoles)
+                                    {
+                                        <option value="@role">@role</option>
+                                    }
+                                </select>
+                            }
+                            <span asp-validation-for="Role" class="text-danger small"></span>
+                        </div>
+
+                        <!-- User Specific Fields (Hidden for Admin) -->
+                        <div id="userFieldsContainer" style="display: none;">
+                            <div class="row g-3 mb-3">
+                                <div class="col-12 col-md-6">
+                                    <label asp-for="PhoneNumber" class="form-label small fw-semibold text-secondary">Số điện thoại</label>
+                                    <input asp-for="PhoneNumber" class="form-control border-light-subtle py-2.5 px-3" style="border-radius: 10px;" placeholder="Nhập số điện thoại" />
+                                    <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <label asp-for="DiemTichLuy" class="form-label small fw-semibold text-secondary">Điểm tích lũy thành viên <span class="text-danger">*</span></label>
+                                    <input asp-for="DiemTichLuy" type="number" class="form-control border-light-subtle py-2.5 px-3" style="border-radius: 10px;" />
+                                    <span asp-validation-for="DiemTichLuy" class="text-danger small"></span>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label asp-for="DiaChi" class="form-label small fw-semibold text-secondary">Địa chỉ giao hàng</label>
+                                <textarea asp-for="DiaChi" rows="3" class="form-control border-light-subtle py-2.5 px-3" style="border-radius: 10px;" placeholder="Nhập địa chỉ giao hàng"></textarea>
+                                <span asp-validation-for="DiaChi" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="d-flex justify-content-end gap-2 border-top pt-4">
+                            <a href="/Admin/Users" class="btn btn-outline-secondary px-4 py-2" style="border-radius: 10px;">Hủy bỏ</a>
+                            <button type="submit" class="btn btn-primary px-4 py-2" style="border-radius: 10px; background-color: var(--primary-color); border-color: var(--primary-color);">
+                                <i class="bi bi-save me-1"></i> Lưu thay đổi
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    :root {
+        --primary-color: #0d9488;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: var(--primary-color) !important;
+        box-shadow: 0 0 0 0.25rem rgba(13, 148, 136, 0.15) !important;
+    }
+</style>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        $(document).ready(function() {
+            function toggleUserFields() {
+                var role = $('#Role').val();
+                if (role === 'Admin') {
+                    $('#userFieldsContainer').slideUp(200);
+                } else {
+                    $('#userFieldsContainer').slideDown(200);
+                }
+            }
+
+            $('#Role').change(toggleUserFields);
+            toggleUserFields(); // run initially
+        });
+    </script>
+}

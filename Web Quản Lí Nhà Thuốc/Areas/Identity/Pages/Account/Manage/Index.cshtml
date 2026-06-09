@@ -1,0 +1,282 @@
+@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Hồ sơ cá nhân";
+    
+    // Determine membership tier and styling
+    string tierName = "Thành viên Đồng";
+    string tierClass = "tier-bronze";
+    string tierIcon = "bi-award";
+    int nextTierPoints = 100;
+    int prevTierPoints = 0;
+    
+    if (Model.DiemTichLuy >= 1000)
+    {
+        tierName = "Thành viên Bạch Kim";
+        tierClass = "tier-platinum";
+        tierIcon = "bi-gem";
+        nextTierPoints = 1000; // Max tier
+        prevTierPoints = 1000;
+    }
+    else if (Model.DiemTichLuy >= 500)
+    {
+        tierName = "Thành viên Vàng";
+        tierClass = "tier-gold";
+        tierIcon = "bi-trophy";
+        nextTierPoints = 1000;
+        prevTierPoints = 500;
+    }
+    else if (Model.DiemTichLuy >= 100)
+    {
+        tierName = "Thành viên Bạc";
+        tierClass = "tier-silver";
+        tierIcon = "bi-shield-shaded";
+        nextTierPoints = 500;
+        prevTierPoints = 100;
+    }
+
+    double progressPercent = 100;
+    if (nextTierPoints > prevTierPoints)
+    {
+        progressPercent = (double)(Model.DiemTichLuy - prevTierPoints) / (nextTierPoints - prevTierPoints) * 100;
+        if (progressPercent < 0) progressPercent = 0;
+        if (progressPercent > 100) progressPercent = 100;
+    }
+}
+
+<div class="container-fluid py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/" class="text-decoration-none text-muted">Trang chủ</a></li>
+            <li class="breadcrumb-item active fw-medium text-dark" aria-current="page">Hồ sơ cá nhân</li>
+        </ol>
+    </nav>
+
+    @if (!string.IsNullOrEmpty(Model.StatusMessage))
+    {
+        var isError = Model.StatusMessage.StartsWith("Lỗi", StringComparison.OrdinalIgnoreCase);
+        <div class="alert alert-@(isError ? "danger" : "success") alert-dismissible fade show border-0 shadow-sm mb-4" role="alert" style="border-radius: 12px;">
+            <i class="bi @(isError ? "bi-exclamation-triangle-fill" : "bi-check-circle-fill") me-2"></i>
+            @Model.StatusMessage
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="row g-4">
+        @if (!Model.IsAdmin)
+        {
+            <!-- Left Column: Membership & Quick Stats -->
+            <div class="col-12 col-lg-4">
+                <!-- Premium Membership Card -->
+                <div class="card border-0 shadow-sm overflow-hidden mb-4 @tierClass" style="border-radius: 20px; position: relative;">
+                    <div class="card-body p-4 text-white position-relative" style="z-index: 2; background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%);">
+                        <div class="d-flex justify-content-between align-items-start mb-4">
+                            <div>
+                                <span class="badge bg-white bg-opacity-20 text-white rounded-pill px-3 py-1 mb-2" style="font-size: 0.75rem; backdrop-filter: blur(5px);">
+                                    HỘI VIÊN NHÀ THUỐC
+                                </span>
+                                <h4 class="fw-bold mb-0">@Model.Input.HoTen</h4>
+                                <small class="text-white text-opacity-75">Tham gia: @DateTime.Now.ToString("MM/yyyy")</small>
+                            </div>
+                            <div class="tier-badge-icon d-flex align-items-center justify-content-center bg-white bg-opacity-20 rounded-circle" style="width: 50px; height: 50px; backdrop-filter: blur(5px);">
+                                <i class="bi @tierIcon" style="font-size: 1.75rem;"></i>
+                            </div>
+                        </div>
+
+                        <div class="mt-5 mb-4">
+                            <div class="text-white text-opacity-75 small">Điểm tích lũy hiện tại</div>
+                            <div class="d-flex align-items-baseline">
+                                <span class="display-5 fw-bold">@Model.DiemTichLuy</span>
+                                <span class="ms-2">điểm</span>
+                            </div>
+                        </div>
+
+                        @if (Model.DiemTichLuy < 1000)
+                        {
+                            <div class="mb-2">
+                                <div class="d-flex justify-content-between small text-white text-opacity-75 mb-1">
+                                    <span>Tiến trình lên hạng kế tiếp</span>
+                                    <span>@Model.DiemTichLuy/@nextTierPoints</span>
+                                </div>
+                                <div class="progress bg-white bg-opacity-20" style="height: 6px; border-radius: 3px;">
+                                    <div class="progress-bar bg-white" role="progressbar" style="width: @(progressPercent)%; border-radius: 3px;" aria-valuenow="@progressPercent" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+                            </div>
+                            <div class="small text-white text-opacity-75 text-end">
+                                <i class="bi bi-info-circle me-1"></i> Tích thêm @(nextTierPoints - Model.DiemTichLuy) điểm để thăng hạng
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="small text-white text-opacity-90 fw-semibold">
+                                <i class="bi bi-patch-check-fill me-1"></i> Bạn đã đạt cấp độ thành viên cao nhất!
+                            </div>
+                        }
+                    </div>
+                    <!-- Card Background Pattern decoration -->
+                    <div class="card-bg-overlay"></div>
+                </div>
+
+                <!-- Privileges Card -->
+                <div class="card border-0 shadow-sm mb-4" style="border-radius: 16px;">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-3 text-dark"><i class="bi bi-gift me-2 text-primary"></i>Đặc quyền Hội viên</h5>
+                        
+                        <div class="d-flex align-items-start mb-3 pb-3 border-bottom">
+                            <div class="bg-primary bg-opacity-10 text-primary p-2 rounded-3 me-3">
+                                <i class="bi bi-truck" style="font-size: 1.25rem;"></i>
+                            </div>
+                            <div>
+                                <div class="fw-semibold text-dark">Miễn phí vận chuyển</div>
+                                <div class="text-muted small">Nhận ưu đãi miễn phí vận chuyển 0đ cho mọi đơn hàng từ 150.000đ.</div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex align-items-start mb-3 pb-3 border-bottom">
+                            <div class="bg-success bg-opacity-10 text-success p-2 rounded-3 me-3">
+                                <i class="bi bi-percent" style="font-size: 1.25rem;"></i>
+                            </div>
+                            <div>
+                                <div class="fw-semibold text-dark">Tích điểm 2% đơn hàng</div>
+                                <div class="text-muted small">Hoàn tiền 2% dưới dạng điểm thưởng để khấu trừ vào đơn hàng tiếp theo.</div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex align-items-start">
+                            <div class="bg-warning bg-opacity-10 text-warning p-2 rounded-3 me-3">
+                                <i class="bi bi-headset" style="font-size: 1.25rem;"></i>
+                            </div>
+                            <div>
+                                <div class="fw-semibold text-dark">Hỗ trợ Dược sĩ VIP</div>
+                                <div class="text-muted small">Ưu tiên kết nối trực tiếp với dược sĩ chuyên môn cao 24/7.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+        <!-- Right Column: Profile Form -->
+        <div class="col-12 @(Model.IsAdmin ? "col-lg-8 offset-lg-2" : "col-lg-8")">
+            <div class="card border-0 shadow-sm" style="border-radius: 16px;">
+                <div class="card-header bg-transparent border-0 pt-4 px-4 pb-0">
+                    <div class="d-flex align-items-center">
+                        <h4 class="fw-bold mb-0 text-dark">Thông tin tài khoản</h4>
+                        @if (!Model.IsAdmin)
+                        {
+                            <span class="badge bg-secondary bg-opacity-10 text-secondary ms-3 px-3 py-2 rounded-pill fw-medium" style="font-size: 0.8rem;">
+                                @Model.NhomTuoi (@Model.Tuoi tuổi)
+                            </span>
+                        }
+                    </div>
+                    <p class="text-muted small mt-1 mb-0">Cập nhật thông tin cá nhân của bạn để nhận dịch vụ chăm sóc tốt nhất.</p>
+                </div>
+                <div class="card-body p-4">
+                    <form id="profile-form" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3" role="alert"></div>
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-12 @(Model.IsAdmin ? "col-md-12" : "col-md-6")">
+                                <label asp-for="Username" class="form-label small fw-semibold text-secondary">Tên đăng nhập (Email)</label>
+                                <input asp-for="Username" class="form-control bg-light border-0 py-2.5 px-3" disabled style="border-radius: 10px;" />
+                            </div>
+                            <div class="col-12 @(Model.IsAdmin ? "col-md-12" : "col-md-6")">
+                                <label asp-for="Input.HoTen" class="form-label small fw-semibold text-secondary">Họ và tên <span class="text-danger">*</span></label>
+                                <input asp-for="Input.HoTen" class="form-control border-light-subtle py-2.5 px-3" style="border-radius: 10px;" placeholder="Nhập họ và tên" />
+                                <span asp-validation-for="Input.HoTen" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        @if (!Model.IsAdmin)
+                        {
+                            <div class="row g-3 mb-3">
+                                <div class="col-12 col-md-6">
+                                    <label asp-for="Input.PhoneNumber" class="form-label small fw-semibold text-secondary">Số điện thoại</label>
+                                    <input asp-for="Input.PhoneNumber" class="form-control border-light-subtle py-2.5 px-3" style="border-radius: 10px;" placeholder="Nhập số điện thoại" />
+                                    <span asp-validation-for="Input.PhoneNumber" class="text-danger small"></span>
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <label asp-for="Input.NgaySinh" class="form-label small fw-semibold text-secondary">Ngày sinh <span class="text-danger">*</span></label>
+                                    <input asp-for="Input.NgaySinh" type="date" class="form-control border-light-subtle py-2.5 px-3" style="border-radius: 10px;" />
+                                    <span asp-validation-for="Input.NgaySinh" class="text-danger small"></span>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label asp-for="Input.DiaChi" class="form-label small fw-semibold text-secondary">Địa chỉ giao hàng</label>
+                                <textarea asp-for="Input.DiaChi" rows="3" class="form-control border-light-subtle py-2.5 px-3" style="border-radius: 10px;" placeholder="Nhập địa chỉ nhận hàng chi tiết (Số nhà, tên đường, phường/xã, quận/huyện...)"></textarea>
+                                <span asp-validation-for="Input.DiaChi" class="text-danger small"></span>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="row g-3 mb-4">
+                                <div class="col-12">
+                                    <label asp-for="Input.NgaySinh" class="form-label small fw-semibold text-secondary">Ngày sinh <span class="text-danger">*</span></label>
+                                    <input asp-for="Input.NgaySinh" type="date" class="form-control border-light-subtle py-2.5 px-3" style="border-radius: 10px;" />
+                                    <span asp-validation-for="Input.NgaySinh" class="text-danger small"></span>
+                                </div>
+                            </div>
+                        }
+
+                        <div class="d-flex justify-content-end gap-2 border-top pt-4">
+                            <a href="/" class="btn btn-outline-secondary px-4 py-2" style="border-radius: 10px;">Quay lại</a>
+                            <button id="update-profile-button" type="submit" class="btn btn-primary px-4 py-2" style="border-radius: 10px; background-color: var(--primary-color); border-color: var(--primary-color);">Lưu thay đổi</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* CSS custom variables and styling specifically for membership tiers */
+    :root {
+        --primary-color: #0d9488;
+    }
+
+    /* Membership tiers styles */
+    .tier-bronze {
+        background: linear-gradient(135deg, #a75d34 0%, #d97706 100%) !important;
+        box-shadow: 0 10px 20px rgba(217, 119, 6, 0.2) !important;
+    }
+    
+    .tier-silver {
+        background: linear-gradient(135deg, #64748b 0%, #94a3b8 100%) !important;
+        box-shadow: 0 10px 20px rgba(100, 116, 139, 0.2) !important;
+    }
+    
+    .tier-gold {
+        background: linear-gradient(135deg, #b45309 0%, #eab308 100%) !important;
+        box-shadow: 0 10px 20px rgba(234, 179, 8, 0.2) !important;
+    }
+    
+    .tier-platinum {
+        background: linear-gradient(135deg, #1e1b4b 0%, #4f46e5 100%) !important;
+        box-shadow: 0 10px 20px rgba(79, 70, 229, 0.2) !important;
+    }
+
+    .card-bg-overlay {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        background-image: radial-gradient(circle at 90% 10%, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0) 60%),
+                          linear-gradient(to right, rgba(0, 0, 0, 0.05) 0%, rgba(0, 0, 0, 0) 100%);
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    /* Form control styling */
+    .form-control:focus {
+        border-color: var(--primary-color) !important;
+        box-shadow: 0 0 0 0.25rem rgba(13, 148, 136, 0.15) !important;
+    }
+</style>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

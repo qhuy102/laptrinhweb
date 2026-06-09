@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
 
 namespace Web_Quản_Lí_Nhà_Thuốc.Models
@@ -12,6 +12,8 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Models
         public DateTime NgaySinh { get; set; }
 
         public string? DiaChi { get; set; }
+
+        public int DiemTichLuy { get; set; } = 0;
 
         public int Tuoi
         {

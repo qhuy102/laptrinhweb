@@ -1,0 +1,125 @@
+@model IEnumerable<Web_Quản_Lí_Nhà_Thuốc.Controllers.UserViewModel>
+@{
+    ViewData["Title"] = "Quản lý tài khoản";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="page-title mb-1">Quản lý tài khoản</h1>
+        <p class="text-muted small mb-0">Xem thông tin chi tiết, cấp quyền và quản lý điểm tích lũy của thành viên hệ thống.</p>
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm mb-4" role="alert" style="border-radius: 12px;">
+        <i class="bi bi-check-circle-fill me-2"></i>
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="custom-table-container shadow-sm border-0" style="border-radius: 16px; background: white; padding: 1.5rem;">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead>
+                <tr class="text-muted small" style="border-bottom: 2px solid #f1f5f9;">
+                    <th class="pb-3" style="font-weight: 600;">Họ và Tên</th>
+                    <th class="pb-3" style="font-weight: 600;">Tài khoản (Email)</th>
+                    <th class="pb-3" style="font-weight: 600;">Số điện thoại</th>
+                    <th class="pb-3" style="font-weight: 600;">Tuổi</th>
+                    <th class="pb-3" style="font-weight: 600;">Điểm tích lũy</th>
+                    <th class="pb-3" style="font-weight: 600;">Địa chỉ</th>
+                    <th class="pb-3" style="font-weight: 600;">Vai trò</th>
+                    <th class="pb-3 text-end" style="font-weight: 600;">Hành động</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var user in Model)
+                {
+                    <tr style="border-bottom: 1px solid #f8fafc;">
+                        <td class="py-3">
+                            <div class="d-flex align-items-center">
+                                <div class="avatar-sm me-3 d-flex align-items-center justify-content-center fw-bold text-teal bg-teal bg-opacity-10 rounded-circle" style="width: 40px; height: 40px; color: #0d9488; background-color: rgba(13, 148, 136, 0.1);">
+                                    @user.HoTen.Substring(0, Math.Min(2, user.HoTen.Length)).ToUpper()
+                                </div>
+                                <div class="fw-semibold text-dark">@user.HoTen</div>
+                            </div>
+                        </td>
+                        <td class="py-3 text-muted">@user.Email</td>
+                        <td class="py-3 text-muted">@(user.Role == "Admin" ? "N/A" : user.PhoneNumber)</td>
+                        <td class="py-3 text-muted">@(user.Role == "Admin" ? "N/A" : $"{user.Tuoi} tuổi")</td>
+                        <td class="py-3">
+                            @if (user.Role == "Admin")
+                            {
+                                <span class="text-muted">N/A</span>
+                            }
+                            else
+                            {
+                                <span class="fw-bold text-dark"><i class="bi bi-award text-warning me-1"></i>@user.DiemTichLuy</span>
+                            }
+                        </td>
+                        <td class="py-3 text-muted text-truncate" style="max-width: 150px;" title="@(user.Role == "Admin" ? "" : user.DiaChi)">
+                            @(user.Role == "Admin" ? "N/A" : user.DiaChi)
+                        </td>
+                        <td class="py-3">
+                            @if (user.Role == "Admin")
+                            {
+                                <span class="badge bg-indigo bg-opacity-10 text-indigo border border-indigo-subtle rounded-pill px-3 py-1.5 small fw-semibold">
+                                    <i class="bi bi-shield-lock-fill me-1"></i>Quản trị viên
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-teal bg-opacity-10 text-teal border border-teal-subtle rounded-pill px-3 py-1.5 small fw-semibold">
+                                    <i class="bi bi-person-fill me-1"></i>Thành viên
+                                </span>
+                            }
+                        </td>
+                        <td class="py-3 text-end">
+                            <a href="/Admin/EditUser?id=@user.Id" class="btn btn-sm btn-light border btn-action-edit" style="border-radius: 8px;" title="Chỉnh sửa tài khoản">
+                                <i class="bi bi-pencil-square text-primary me-1"></i>Sửa / Phân quyền
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<style>
+    :root {
+        --primary-color: #0d9488;
+        --indigo-color: #4f46e5;
+    }
+
+    .text-teal {
+        color: var(--primary-color) !important;
+    }
+
+    .bg-teal {
+        background-color: var(--primary-color) !important;
+    }
+
+    .border-teal-subtle {
+        border-color: rgba(13, 148, 136, 0.2) !important;
+    }
+
+    .text-indigo {
+        color: var(--indigo-color) !important;
+    }
+
+    .bg-indigo {
+        background-color: var(--indigo-color) !important;
+    }
+
+    .border-indigo-subtle {
+        border-color: rgba(79, 70, 229, 0.2) !important;
+    }
+
+    .btn-action-edit:hover {
+        background-color: #f8fafc !important;
+        border-color: #cbd5e1 !important;
+    }
+</style>
