@@ -8074,7 +8074,7 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\HOA\\.nuget\\packages\\": {},
+    "C:\\Users\\ROG\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
@@ -8083,14 +8083,14 @@
       "projectUniqueName": "D:\\laptrinhweb\\Web Quản Lí Nhà Thuốc\\Web Quản Lí Nhà Thuốc.csproj",
       "projectName": "Web Quản Lí Nhà Thuốc",
       "projectPath": "D:\\laptrinhweb\\Web Quản Lí Nhà Thuốc\\Web Quản Lí Nhà Thuốc.csproj",
-      "packagesPath": "C:\\Users\\HOA\\.nuget\\packages\\",
+      "packagesPath": "C:\\Users\\ROG\\.nuget\\packages\\",
       "outputPath": "D:\\laptrinhweb\\Web Quản Lí Nhà Thuốc\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\HOA\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\ROG\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
@@ -8103,7 +8103,6 @@
       },
       "frameworks": {
         "net8.0": {
-          "framework": "net8.0",
           "targetAlias": "net8.0",
           "projectReferences": {}
         }
@@ -8118,11 +8117,10 @@
         "auditLevel": "low",
         "auditMode": "direct"
       },
-      "SdkAnalysisLevel": "10.0.200"
+      "SdkAnalysisLevel": "9.0.300"
     },
     "frameworks": {
       "net8.0": {
-        "framework": "net8.0",
         "targetAlias": "net8.0",
         "dependencies": {
           "Microsoft.AspNetCore.Identity.EntityFrameworkCore": {
@@ -8171,7 +8169,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.203/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.307/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

@@ -233,6 +233,100 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("Web_Quản_Lí_Nhà_Thuốc.Models.ChiTietHoaDon", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("DonGia")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("HoaDonMaHoaDon")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MaHoaDon")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MaThuoc")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SoLuong")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ThuocMaThuoc")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("HoaDonMaHoaDon");
+
+                    b.HasIndex("ThuocMaThuoc");
+
+                    b.ToTable("ChiTietHoaDons");
+                });
+
+            modelBuilder.Entity("Web_Quản_Lí_Nhà_Thuốc.Models.GioHang", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("MaThuoc")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SoLuong")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ThuocMaThuoc")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ThuocMaThuoc");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("GioHangs");
+                });
+
+            modelBuilder.Entity("Web_Quản_Lí_Nhà_Thuốc.Models.HoaDon", b =>
+                {
+                    b.Property<int>("MaHoaDon")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MaHoaDon"));
+
+                    b.Property<DateTime>("NgayDat")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("TongTien")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("TrangThai")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("MaHoaDon");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("HoaDons");
+                });
+
             modelBuilder.Entity("Web_Quản_Lí_Nhà_Thuốc.Models.LoaiThuoc", b =>
                 {
                     b.Property<int>("Id")
@@ -287,6 +381,33 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Migrations
                     b.ToTable("Thuocs");
                 });
 
+            modelBuilder.Entity("Web_Quản_Lí_Nhà_Thuốc.Models.YeuThich", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("MaThuoc")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ThuocMaThuoc")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ThuocMaThuoc");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("YeuThiches");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -338,6 +459,55 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Web_Quản_Lí_Nhà_Thuốc.Models.ChiTietHoaDon", b =>
+                {
+                    b.HasOne("Web_Quản_Lí_Nhà_Thuốc.Models.HoaDon", "HoaDon")
+                        .WithMany("ChiTietHoaDons")
+                        .HasForeignKey("HoaDonMaHoaDon")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Web_Quản_Lí_Nhà_Thuốc.Models.Thuoc", "Thuoc")
+                        .WithMany()
+                        .HasForeignKey("ThuocMaThuoc")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("HoaDon");
+
+                    b.Navigation("Thuoc");
+                });
+
+            modelBuilder.Entity("Web_Quản_Lí_Nhà_Thuốc.Models.GioHang", b =>
+                {
+                    b.HasOne("Web_Quản_Lí_Nhà_Thuốc.Models.Thuoc", "Thuoc")
+                        .WithMany()
+                        .HasForeignKey("ThuocMaThuoc")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Web_Quản_Lí_Nhà_Thuốc.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Thuoc");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Web_Quản_Lí_Nhà_Thuốc.Models.HoaDon", b =>
+                {
+                    b.HasOne("Web_Quản_Lí_Nhà_Thuốc.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Web_Quản_Lí_Nhà_Thuốc.Models.Thuoc", b =>
                 {
                     b.HasOne("Web_Quản_Lí_Nhà_Thuốc.Models.LoaiThuoc", "LoaiThuoc")
@@ -347,6 +517,30 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Migrations
                         .IsRequired();
 
                     b.Navigation("LoaiThuoc");
+                });
+
+            modelBuilder.Entity("Web_Quản_Lí_Nhà_Thuốc.Models.YeuThich", b =>
+                {
+                    b.HasOne("Web_Quản_Lí_Nhà_Thuốc.Models.Thuoc", "Thuoc")
+                        .WithMany()
+                        .HasForeignKey("ThuocMaThuoc")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Web_Quản_Lí_Nhà_Thuốc.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Thuoc");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Web_Quản_Lí_Nhà_Thuốc.Models.HoaDon", b =>
+                {
+                    b.Navigation("ChiTietHoaDons");
                 });
 #pragma warning restore 612, 618
         }

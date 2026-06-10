@@ -855,7 +855,6 @@ D:\laptrinhweb\Web Quản Lí Nhà Thuốc\obj\Debug\net8.0\staticwebassets.buil
 D:\laptrinhweb\Web Quản Lí Nhà Thuốc\obj\Debug\net8.0\staticwebassets.build.json.cache
 D:\laptrinhweb\Web Quản Lí Nhà Thuốc\obj\Debug\net8.0\staticwebassets.development.json
 D:\laptrinhweb\Web Quản Lí Nhà Thuốc\obj\Debug\net8.0\staticwebassets.build.endpoints.json
-D:\laptrinhweb\Web Quản Lí Nhà Thuốc\obj\Debug\net8.0\swae.build.ex.cache
 D:\laptrinhweb\Web Quản Lí Nhà Thuốc\obj\Debug\net8.0\Web Qu_n.07419B7F.Up2Date
 D:\laptrinhweb\Web Quản Lí Nhà Thuốc\obj\Debug\net8.0\Web Quản Lí Nhà Thuốc.dll
 D:\laptrinhweb\Web Quản Lí Nhà Thuốc\obj\Debug\net8.0\refint\Web Quản Lí Nhà Thuốc.dll
