@@ -22,6 +22,7 @@ wwwroot\js\custom.js
 wwwroot\js\jquery.min.js
 wwwroot\js\owl.carousel.min.js
 wwwroot\js\scrollspy.min.js
+wwwroot\js\site.js
 wwwroot\lib\jquery-validation-unobtrusive\jquery.validate.unobtrusive.js
 wwwroot\lib\jquery-validation-unobtrusive\jquery.validate.unobtrusive.min.js
 wwwroot\lib\jquery-validation-unobtrusive\LICENSE.txt

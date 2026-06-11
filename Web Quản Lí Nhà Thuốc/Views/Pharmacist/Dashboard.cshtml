@@ -1,0 +1,240 @@
+@model Web_Quản_Lí_Nhà_Thuốc.Controllers.PharmacistDashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard Dược Sĩ";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="page-title mb-1">Hệ Thống Dược Sĩ</h1>
+        <p class="text-muted mb-0">Quản lý bán lẻ, xử lý đơn thuốc và kiểm tra hạn sử dụng thời gian thực.</p>
+    </div>
+    <div>
+        <a href="/Pharmacist/Sell" class="btn btn-primary" style="background-color: var(--primary-color); border: none; border-radius: 10px;">
+            <i class="bi bi-cart-plus me-1"></i> Bán Thuốc POS
+        </a>
+    </div>
+</div>
+
+<!-- Key Alert Widgets -->
+<div class="row g-4 mb-4">
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="dashboard-card border-start border-4 border-warning h-100">
+            <div class="card-icon icon-yellow bg-warning bg-opacity-10 text-warning">
+                <i class="bi bi-file-earmark-medical"></i>
+            </div>
+            <div class="card-title">Đơn thuốc chưa duyệt</div>
+            <div class="card-value">@ViewBag.PendingPrescriptions</div>
+            <div class="card-trend text-muted small mt-1">Cần phê duyệt & bán thuốc</div>
+        </div>
+    </div>
+    
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="dashboard-card border-start border-4 border-danger h-100">
+            <div class="card-icon icon-red bg-danger bg-opacity-10 text-danger">
+                <i class="bi bi-boxes"></i>
+            </div>
+            <div class="card-title">Thuốc sắp hết hàng</div>
+            <div class="card-value text-danger">@ViewBag.LowStockDrugs</div>
+            <div class="card-trend text-muted small mt-1">Sản phẩm có số lượng < 20</div>
+        </div>
+    </div>
+
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="dashboard-card border-start border-4 border-info h-100">
+            <div class="card-icon icon-blue bg-info bg-opacity-10 text-info">
+                <i class="bi bi-calendar-x"></i>
+            </div>
+            <div class="card-title">Lô thuốc cận hạn</div>
+            <div class="card-value text-info">@ViewBag.NearExpiryBatches</div>
+            <div class="card-trend text-muted small mt-1">Hạn sử dụng dưới 30 ngày</div>
+        </div>
+    </div>
+
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="dashboard-card border-start border-4 border-dark h-100">
+            <div class="card-icon icon-purple bg-dark bg-opacity-10 text-dark">
+                <i class="bi bi-currency-dollar"></i>
+            </div>
+            <div class="card-title">Doanh thu hôm nay</div>
+            <div class="card-value">@string.Format("{0:N0}₫", ViewBag.TodaySales)</div>
+            <div class="card-trend text-success small mt-1">Đã đồng bộ thời gian thực</div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Low Stock warning list -->
+    <div class="col-12 col-lg-6">
+        <div class="dashboard-card h-100">
+            <h5 class="fw-bold text-danger mb-3"><i class="bi bi-exclamation-triangle-fill me-2"></i>Cảnh báo hết thuốc trong kho</h5>
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead>
+                        <tr>
+                            <th>Tên Thuốc</th>
+                            <th>Vị Trí Kệ</th>
+                            <th>Tồn Kho</th>
+                            <th>Hành Động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.LowStockDrugsList.Any())
+                        {
+                            @foreach (var drug in Model.LowStockDrugsList)
+                            {
+                                <tr>
+                                    <td class="fw-semibold">@drug.TenThuoc</td>
+                                    <td><span class="badge bg-light text-dark">@drug.ViTriKe</span></td>
+                                    <td class="text-danger fw-bold">@drug.SoLuong @drug.DonViCoBan</td>
+                                    <td>
+                                        <button onclick="openAdjustModal(@drug.MaThuoc, '@drug.TenThuoc', @drug.SoLuong)" class="btn btn-sm btn-outline-primary"><i class="bi bi-plus-slash-minus"></i> Sửa kho</button>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="4" class="text-center text-muted py-3">Không có thuốc nào sắp hết hàng.</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Near Expiry warning list -->
+    <div class="col-12 col-lg-6">
+        <div class="dashboard-card h-100">
+            <h5 class="fw-bold text-warning mb-3"><i class="bi bi-calendar-range-fill me-2"></i>Theo dõi Lô thuốc cận hạn sử dụng</h5>
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead>
+                        <tr>
+                            <th>Tên Thuốc</th>
+                            <th>Số Lô</th>
+                            <th>Hạn Sử Dụng</th>
+                            <th>Tồn Lô</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.NearExpiryBatchesList.Any())
+                        {
+                            @foreach (var batch in Model.NearExpiryBatchesList)
+                            {
+                                var daysLeft = (batch.HanSuDung - DateTime.Now).Days;
+                                <tr>
+                                    <td class="fw-semibold">@batch.Thuoc?.TenThuoc</td>
+                                    <td><code class="text-dark">@batch.SoLo</code></td>
+                                    <td>
+                                        <div class="fw-bold @(daysLeft <= 0 ? "text-danger" : "text-warning")">
+                                            @batch.HanSuDung.ToString("dd/MM/yyyy")
+                                        </div>
+                                        <span class="small text-muted">(@(daysLeft <= 0 ? "Đã hết hạn" : $"Còn {daysLeft} ngày"))</span>
+                                    </td>
+                                    <td class="fw-bold">@batch.SoLuong @batch.Thuoc?.DonViCoBan</td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="4" class="text-center text-muted py-3">Không phát hiện lô thuốc nào sắp hết hạn.</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal for Manual Adjust Stock (Fraud Detection simulation) -->
+<div class="modal fade" id="adjustStockModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 12px; border: none;">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold" id="modalDrugName">Điều chỉnh tồn kho thủ công</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted small">Lưu ý: Hành động thay đổi kho thủ công sẽ được ghi vết kiểm toán toàn diện để phát hiện gian lận.</p>
+                <input type="hidden" id="modalDrugId" />
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Số lượng tồn kho hiện tại</label>
+                    <input type="text" id="modalCurrentQty" class="form-control" disabled />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Nhập số lượng mới</label>
+                    <input type="number" id="modalNewQty" class="form-control" min="0" />
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Hủy bỏ</button>
+                <button type="button" onclick="submitAdjustStock()" class="btn btn-primary" style="background-color: var(--primary-color); border: none;">Xác nhận cập nhật</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
+    <script>
+        // Setup SignalR connection for Real-time Inventory Sync
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/inventoryHub")
+            .configureLogging(signalR.LogLevel.Information)
+            .build();
+
+        connection.on("ReceiveStockUpdate", function (drugId, newQuantity) {
+            console.log("Real-time stock update for drug " + drugId + " is now: " + newQuantity);
+            // In a real application, you can refresh components or update row elements directly.
+            // For this demonstration, we'll display a small notification banner or console log.
+        });
+
+        connection.start().then(function () {
+            console.log("SignalR Connected!");
+        }).catch(function (err) {
+            return console.error(err.toString());
+        });
+
+        function openAdjustModal(id, name, qty) {
+            document.getElementById("modalDrugId").value = id;
+            document.getElementById("modalDrugName").innerText = "Điều chỉnh tồn kho: " + name;
+            document.getElementById("modalCurrentQty").value = qty;
+            document.getElementById("modalNewQty").value = "";
+            var myModal = new bootstrap.Modal(document.getElementById('adjustStockModal'));
+            myModal.show();
+        }
+
+        function submitAdjustStock() {
+            var id = document.getElementById("modalDrugId").value;
+            var newQty = document.getElementById("modalNewQty").value;
+            if (newQty === "" || parseInt(newQty) < 0) {
+                alert("Vui lòng nhập số lượng hợp lệ.");
+                return;
+            }
+
+            fetch('/Pharmacist/ManualAdjustStock?drugId=' + id + '&newQuantity=' + newQty, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    window.location.reload();
+                } else {
+                    alert("Cập nhật thất bại.");
+                }
+            })
+            .catch(err => {
+                alert("Đã xảy ra lỗi.");
+                console.error(err);
+            });
+        }
+    </script>
+}

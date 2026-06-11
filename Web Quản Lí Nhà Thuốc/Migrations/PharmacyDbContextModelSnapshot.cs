@@ -233,6 +233,76 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
+            modelBuilder.Entity("Web_Quản_Lí_Nhà_Thuốc.Models.AuditLog", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Action")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("IpAddress")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<bool>("IsSuspicious")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("MoTa")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("ThoiGian")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserEmail")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AuditLogs");
+                });
+
+            modelBuilder.Entity("Web_Quản_Lí_Nhà_Thuốc.Models.ChiTietDonThuoc", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("DonThuocId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("LieuDung")
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<int>("MaThuoc")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SoLuong")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DonThuocId");
+
+                    b.HasIndex("MaThuoc");
+
+                    b.ToTable("ChiTietDonThuocs");
+                });
+
             modelBuilder.Entity("Web_Quản_Lí_Nhà_Thuốc.Models.ChiTietHoaDon", b =>
                 {
                     b.Property<int>("Id")
@@ -266,6 +336,74 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Migrations
                     b.HasIndex("ThuocMaThuoc");
 
                     b.ToTable("ChiTietHoaDons");
+                });
+
+            modelBuilder.Entity("Web_Quản_Lí_Nhà_Thuốc.Models.DonThuoc", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("BacSiKeDon")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("ChanDoan")
+                        .IsRequired()
+                        .HasMaxLength(250)
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("HinhAnhDonThuoc")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("NgayKeDon")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("TenBenhNhan")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("TrangThai")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("DonThuocs");
+                });
+
+            modelBuilder.Entity("Web_Quản_Lí_Nhà_Thuốc.Models.DonViQuyDoi", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("HeSoGia")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("MaThuoc")
+                        .HasColumnType("int");
+
+                    b.Property<string>("TenDonVi")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("TyLeQuyDoi")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MaThuoc");
+
+                    b.ToTable("DonViQuyDois");
                 });
 
             modelBuilder.Entity("Web_Quản_Lí_Nhà_Thuốc.Models.GioHang", b =>
@@ -327,6 +465,38 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Migrations
                     b.ToTable("HoaDons");
                 });
 
+            modelBuilder.Entity("Web_Quản_Lí_Nhà_Thuốc.Models.LoThuoc", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("HanSuDung")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("MaThuoc")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("NgaySanXuat")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("SoLo")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("SoLuong")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MaThuoc");
+
+                    b.ToTable("LoThuocs");
+                });
+
             modelBuilder.Entity("Web_Quản_Lí_Nhà_Thuốc.Models.LoaiThuoc", b =>
                 {
                     b.Property<int>("Id")
@@ -352,13 +522,31 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MaThuoc"));
 
+                    b.Property<string>("ChongChiDinh")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CongDung")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<decimal>("DonGia")
                         .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("DonViCoBan")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<DateTime>("HanSuDung")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("HinhAnh")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("HoatChat")
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<string>("LieuLuong")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("LoaiThuocId")
@@ -373,6 +561,10 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Migrations
                     b.Property<string>("TenThuoc")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ViTriKe")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.HasKey("MaThuoc");
 
@@ -459,6 +651,25 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Web_Quản_Lí_Nhà_Thuốc.Models.ChiTietDonThuoc", b =>
+                {
+                    b.HasOne("Web_Quản_Lí_Nhà_Thuốc.Models.DonThuoc", "DonThuoc")
+                        .WithMany("ChiTietDonThuocs")
+                        .HasForeignKey("DonThuocId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Web_Quản_Lí_Nhà_Thuốc.Models.Thuoc", "Thuoc")
+                        .WithMany()
+                        .HasForeignKey("MaThuoc")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("DonThuoc");
+
+                    b.Navigation("Thuoc");
+                });
+
             modelBuilder.Entity("Web_Quản_Lí_Nhà_Thuốc.Models.ChiTietHoaDon", b =>
                 {
                     b.HasOne("Web_Quản_Lí_Nhà_Thuốc.Models.HoaDon", "HoaDon")
@@ -474,6 +685,17 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Migrations
                         .IsRequired();
 
                     b.Navigation("HoaDon");
+
+                    b.Navigation("Thuoc");
+                });
+
+            modelBuilder.Entity("Web_Quản_Lí_Nhà_Thuốc.Models.DonViQuyDoi", b =>
+                {
+                    b.HasOne("Web_Quản_Lí_Nhà_Thuốc.Models.Thuoc", "Thuoc")
+                        .WithMany("DonViQuyDois")
+                        .HasForeignKey("MaThuoc")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Thuoc");
                 });
@@ -508,6 +730,17 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Web_Quản_Lí_Nhà_Thuốc.Models.LoThuoc", b =>
+                {
+                    b.HasOne("Web_Quản_Lí_Nhà_Thuốc.Models.Thuoc", "Thuoc")
+                        .WithMany("LoThuocs")
+                        .HasForeignKey("MaThuoc")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Thuoc");
+                });
+
             modelBuilder.Entity("Web_Quản_Lí_Nhà_Thuốc.Models.Thuoc", b =>
                 {
                     b.HasOne("Web_Quản_Lí_Nhà_Thuốc.Models.LoaiThuoc", "LoaiThuoc")
@@ -538,9 +771,21 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Web_Quản_Lí_Nhà_Thuốc.Models.DonThuoc", b =>
+                {
+                    b.Navigation("ChiTietDonThuocs");
+                });
+
             modelBuilder.Entity("Web_Quản_Lí_Nhà_Thuốc.Models.HoaDon", b =>
                 {
                     b.Navigation("ChiTietHoaDons");
+                });
+
+            modelBuilder.Entity("Web_Quản_Lí_Nhà_Thuốc.Models.Thuoc", b =>
+                {
+                    b.Navigation("DonViQuyDois");
+
+                    b.Navigation("LoThuocs");
                 });
 #pragma warning restore 612, 618
         }

@@ -1,0 +1,265 @@
+@model List<Web_Quản_Lí_Nhà_Thuốc.Models.DonThuoc>
+@{
+    ViewData["Title"] = "Xử Lý Đơn Thuốc Bằng Công Nghệ OCR";
+}
+
+<div class="row mb-4">
+    <div class="col-md-7">
+        <h1 class="page-title mb-1">Nhận diện & Quản lý Đơn Thuốc</h1>
+        <p class="text-muted mb-0">Tải đơn thuốc của bác sĩ lên (dạng hình ảnh), hệ thống sử dụng thuật toán giả lập OCR quét từ khóa để tự động kê đơn bán thuốc nhanh.</p>
+    </div>
+    <div class="col-md-5 text-md-end">
+        <button class="btn btn-primary" onclick="showScanModal()"><i class="bi bi-camera-fill me-1"></i> Quét Đơn Thuốc Mới</button>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Prescriptions List -->
+    <div class="col-12">
+        <div class="custom-table-container">
+            <div class="custom-table-header">
+                <h5 class="fw-bold mb-0">Vòng Đời Đơn Thuốc Toàn Hệ Thống</h5>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="table align-middle">
+                    <thead>
+                        <tr>
+                            <th>Mã Đơn</th>
+                            <th>Ngày Kê</th>
+                            <th>Bệnh Nhân</th>
+                            <th>Bác Sĩ Kê Đơn</th>
+                            <th>Chẩn Đoán</th>
+                            <th>Thuốc Kê Trong Đơn</th>
+                            <th>Trạng Thái</th>
+                            <th>Hành Động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var pres in Model)
+                        {
+                            <tr>
+                                <td class="fw-bold text-nowrap">#DT-@pres.Id</td>
+                                <td class="small text-muted">@pres.NgayKeDon.ToString("dd/MM/yyyy HH:mm")</td>
+                                <td class="fw-semibold">@pres.TenBenhNhan</td>
+                                <td>@pres.BacSiKeDon</td>
+                                <td><span class="text-secondary small fw-semibold">@pres.ChanDoan</span></td>
+                                <td>
+                                    <ul class="list-unstyled mb-0 pl-0">
+                                        @foreach (var det in pres.ChiTietDonThuocs ?? new List<ChiTietDonThuoc>())
+                                        {
+                                            <li class="small text-dark"><i class="bi bi-dot text-primary"></i> @det.Thuoc?.TenThuoc x @det.SoLuong (@det.Thuoc?.DonViCoBan)</li>
+                                        }
+                                    </ul>
+                                </td>
+                                <td>
+                                    <span class="badge @(pres.TrangThai switch {
+                                        "ChoDuyet" => "bg-warning text-dark",
+                                        "DaDuyet" => "bg-info text-white",
+                                        "DaBan" => "bg-success text-white",
+                                        "DaHuy" => "bg-danger text-white",
+                                        _ => "bg-secondary text-white"
+                                    }) px-2.5 py-1.5" style="border-radius: 6px;">
+                                        @(pres.TrangThai switch {
+                                            "ChoDuyet" => "Chờ duyệt",
+                                            "DaDuyet" => "Đã duyệt (Chờ bán)",
+                                            "DaBan" => "Đã bán thuốc",
+                                            "DaHuy" => "Đã hủy bỏ",
+                                            _ => pres.TrangThai
+                                        })
+                                    </span>
+                                </td>
+                                <td>
+                                    @if (pres.TrangThai == "ChoDuyet" || pres.TrangThai == "DaDuyet")
+                                    {
+                                        <a href="/Pharmacist/Sell?prescriptionId=@pres.Id" class="btn btn-sm btn-outline-success"><i class="bi bi-cart-check-fill me-1"></i> Xuất Bán</a>
+                                    }
+                                    else
+                                    {
+                                        <button class="btn btn-sm btn-light" disabled><i class="bi bi-check-lg"></i> Hoàn tất</button>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Scan & OCR Simulation -->
+<div class="modal fade" id="ocrScanModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content" style="border-radius: 16px; border: none;">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold"><i class="bi bi-camera-fill me-2 text-primary"></i>Trình Quét Đơn Thuốc AI</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="ocrUploadArea" class="p-5 border-2 border-dashed rounded text-center bg-light" style="cursor: pointer;" onclick="document.getElementById('ocrFile').click()">
+                    <i class="bi bi-cloud-arrow-up text-primary mb-3" style="font-size: 3.5rem;"></i>
+                    <h5 class="fw-bold">Kéo thả hoặc Click để tải ảnh đơn thuốc</h5>
+                    <p class="text-muted small">Hỗ trợ các file hình ảnh dạng JPG, PNG. Đặt tên file chứa "Panadol", "Amox" hoặc "Decolgen" để demo bóc tách OCR.</p>
+                    <input type="file" id="ocrFile" style="display: none;" accept="image/*" onchange="startOcrProcess()" />
+                </div>
+
+                <!-- Processing Scan Animation -->
+                <div id="ocrProcessing" class="text-center py-5" style="display: none;">
+                    <div class="spinner-border text-primary mb-3" style="width: 3rem; height: 3rem;" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <h5 class="fw-bold animate-pulse">Đang định hình ảnh & chạy giải thuật OCR AI...</h5>
+                    <p class="text-muted small">Hệ thống đang trích xuất văn bản và bóc tách tên thuốc trong đơn.</p>
+                </div>
+
+                <!-- Results Output -->
+                <div id="ocrResult" style="display: none;">
+                    <div class="alert alert-success d-flex align-items-center mb-4">
+                        <i class="bi bi-check-circle-fill me-2 fs-5"></i>
+                        <div>Nhận diện thành công đơn thuốc bằng OCR!</div>
+                    </div>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-4">
+                            <div class="p-3 bg-light rounded border h-100">
+                                <span class="small text-muted d-block">Bệnh Nhân</span>
+                                <strong class="text-dark" id="ocrPatientName">Nguyễn Văn A</strong>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="p-3 bg-light rounded border h-100">
+                                <span class="small text-muted d-block">Bác Sĩ Kê Đơn</span>
+                                <strong class="text-dark" id="ocrDoctorName">Dr. Trịnh Văn B</strong>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="p-3 bg-light rounded border h-100">
+                                <span class="small text-muted d-block">Chẩn Đoán</span>
+                                <strong class="text-dark" id="ocrDiagnosis">Sốt xuất huyết</strong>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h6 class="fw-bold mb-3 border-bottom pb-2">Danh Sách Thuốc Trích Xuất Được</h6>
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Mã thuốc</th>
+                                    <th>Tên thuốc</th>
+                                    <th>Số lượng kê</th>
+                                    <th>Liều lượng chỉ định</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ocrDrugsTable">
+                                <!-- Dynamic rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" id="ocrModalFooter">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Đóng</button>
+                <button type="button" id="ocrSubmitBtn" class="btn btn-success" style="display: none;" onclick="goToPOS()">Duyệt Đơn & Bán Thuốc POS <i class="bi bi-arrow-right"></i></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <style>
+        .border-dashed {
+            border-style: dashed !important;
+            border-width: 2px !important;
+            border-color: #cbd5e1 !important;
+            transition: all 0.3s;
+        }
+        .border-dashed:hover {
+            border-color: var(--primary-color) !important;
+            background-color: rgba(13, 148, 136, 0.03) !important;
+        }
+        .animate-pulse {
+            animation: pulse-text 2s infinite;
+        }
+        @@keyframes pulse-text {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+    </style>
+    <script>
+        var scanModal;
+        var detectedPrescriptionId = null;
+
+        function showScanModal() {
+            detectedPrescriptionId = null;
+            document.getElementById("ocrUploadArea").style.display = "block";
+            document.getElementById("ocrProcessing").style.display = "none";
+            document.getElementById("ocrResult").style.display = "none";
+            document.getElementById("ocrSubmitBtn").style.display = "none";
+            document.getElementById("ocrFile").value = "";
+            scanModal = new bootstrap.Modal(document.getElementById('ocrScanModal'));
+            scanModal.show();
+        }
+
+        function startOcrProcess() {
+            var fileInput = document.getElementById("ocrFile");
+            if (fileInput.files.length === 0) return;
+
+            document.getElementById("ocrUploadArea").style.display = "none";
+            document.getElementById("ocrProcessing").style.display = "block";
+
+            var formData = new FormData();
+            formData.append("file", fileInput.files[0]);
+
+            fetch('/Pharmacist/ProcessPrescriptionOCR', {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    detectedPrescriptionId = data.prescriptionId;
+                    
+                    // Display OCR results
+                    document.getElementById("ocrPatientName").innerText = data.patientName;
+                    document.getElementById("ocrDoctorName").innerText = data.doctorName;
+                    document.getElementById("ocrDiagnosis").innerText = data.diagnosis;
+
+                    var tableBody = document.getElementById("ocrDrugsTable");
+                    tableBody.innerHTML = "";
+
+                    data.items.forEach(function(item) {
+                        var tr = `
+                            <tr>
+                                <td class="font-monospace fw-bold">#${item.maThuoc}</td>
+                                <td class="fw-semibold text-dark">${item.tenThuoc}</td>
+                                <td class="fw-bold">${item.quantity}</td>
+                                <td class="small text-secondary">${item.lieuDung}</td>
+                            </tr>
+                        `;
+                        tableBody.innerHTML += tr;
+                    });
+
+                    document.getElementById("ocrProcessing").style.display = "none";
+                    document.getElementById("ocrResult").style.display = "block";
+                    document.getElementById("ocrSubmitBtn").style.display = "inline-block";
+                } else {
+                    alert("Quét đơn thất bại.");
+                    showScanModal();
+                }
+            })
+            .catch(err => {
+                alert("Đã xảy ra lỗi.");
+                console.error(err);
+                showScanModal();
+            });
+        }
+
+        function goToPOS() {
+            if (detectedPrescriptionId) {
+                scanModal.hide();
+                window.location.href = "/Pharmacist/Sell?prescriptionId=" + detectedPrescriptionId;
+            }
+        }
+    </script>
+}

@@ -72,12 +72,22 @@
     </div>
 
     <!-- Category Tabs -->
+    <div class="d-flex gap-2 overflow-x-auto pb-2 mb-2 scrollbar-hidden">
+        <button class="btn btn-teal-active category-filter-btn px-4 py-2 text-nowrap rounded-pill" onclick="filterProducts('category', 'All', this)">Tất cả danh mục</button>
+        <button class="btn btn-outline-secondary category-filter-btn px-4 py-2 text-nowrap rounded-pill" onclick="filterProducts('category', 'Thuốc kê đơn', this)">Thuốc kê đơn</button>
+        <button class="btn btn-outline-secondary category-filter-btn px-4 py-2 text-nowrap rounded-pill" onclick="filterProducts('category', 'Thuốc không kê đơn', this)">Không kê đơn</button>
+        <button class="btn btn-outline-secondary category-filter-btn px-4 py-2 text-nowrap rounded-pill" onclick="filterProducts('category', 'Thực phẩm chức năng', this)">Thực phẩm chức năng</button>
+        <button class="btn btn-outline-secondary category-filter-btn px-4 py-2 text-nowrap rounded-pill" onclick="filterProducts('category', 'Dược mỹ phẩm', this)">Dược mỹ phẩm</button>
+    </div>
+
+    <!-- Treatment Group Tabs -->
     <div class="d-flex gap-2 overflow-x-auto pb-3 mb-4 scrollbar-hidden">
-        <button class="btn btn-teal-active px-4 py-2 text-nowrap rounded-pill">Tất cả sản phẩm</button>
-        <button class="btn btn-outline-secondary px-4 py-2 text-nowrap rounded-pill">Thuốc kê đơn</button>
-        <button class="btn btn-outline-secondary px-4 py-2 text-nowrap rounded-pill">Không kê đơn</button>
-        <button class="btn btn-outline-secondary px-4 py-2 text-nowrap rounded-pill">Thực phẩm chức năng</button>
-        <button class="btn btn-outline-secondary px-4 py-2 text-nowrap rounded-pill">Dược mỹ phẩm</button>
+        <button class="btn btn-teal-active treatment-filter-btn px-4 py-2 text-nowrap rounded-pill" onclick="filterProducts('treatment', 'All', this)">Tất cả nhóm bệnh</button>
+        <button class="btn btn-outline-secondary treatment-filter-btn px-4 py-2 text-nowrap rounded-pill" onclick="filterProducts('treatment', 'Hạ sốt - Giảm đau', this)">Hạ sốt - Giảm đau</button>
+        <button class="btn btn-outline-secondary treatment-filter-btn px-4 py-2 text-nowrap rounded-pill" onclick="filterProducts('treatment', 'Hô hấp - Cảm cúm', this)">Hô hấp - Cảm cúm</button>
+        <button class="btn btn-outline-secondary treatment-filter-btn px-4 py-2 text-nowrap rounded-pill" onclick="filterProducts('treatment', 'Kháng sinh - Kháng viêm', this)">Kháng sinh - Kháng viêm</button>
+        <button class="btn btn-outline-secondary treatment-filter-btn px-4 py-2 text-nowrap rounded-pill" onclick="filterProducts('treatment', 'Bổ sung đề kháng - Vitamin', this)">Bổ sung đề kháng - Vitamin</button>
+        <button class="btn btn-outline-secondary treatment-filter-btn px-4 py-2 text-nowrap rounded-pill" onclick="filterProducts('treatment', 'Chăm sóc da - Dược mỹ phẩm', this)">Chăm sóc da - Dược mỹ phẩm</button>
     </div>
 
     @if (!Model.Any())
@@ -90,23 +100,42 @@
     }
     else
     {
-        <div class="row g-4">
+        <div class="row g-4" id="productGrid">
             @foreach (var item in Model)
             {
-                <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                <div class="col-12 col-sm-6 col-md-4 col-lg-3 product-item-card" data-category="@(item.LoaiThuoc?.TenLoai ?? "")" data-treatment="@(item.NhomDieuTri ?? "")">
                     <div class="card product-card border-0 shadow-2xs h-100 overflow-hidden" style="border-radius: 16px;">
-                        <!-- Product Image -->
+                        <!-- Product Image — auto-loaded via API cascade -->
                         <div class="product-img-wrapper bg-light text-center p-4 position-relative">
-                            @if (!string.IsNullOrEmpty(item.HinhAnh))
-                            {
-                                <img src="@item.HinhAnh" alt="@item.TenThuoc" class="img-fluid product-img">
-                            }
-                            else
-                            {
-                                <div class="text-teal bg-teal bg-opacity-10 rounded-3 d-flex align-items-center justify-content-center mx-auto" style="width: 120px; height: 120px;">
-                                    <i class="bi bi-capsule-capsules fs-1"></i>
-                                </div>
-                            }
+                            <div class="drug-img-area mx-auto"
+                                 data-drug-name="@item.TenThuoc"
+                                 data-hoat-chat="@item.HoatChat"
+                                 style="width:120px; height:120px; display:flex; align-items:center; justify-content:center;">
+
+                                @if (!string.IsNullOrEmpty(item.HinhAnh))
+                                {
+                                    <!-- If manually uploaded image exists, use it directly -->
+                                    <img src="@item.HinhAnh" alt="@item.TenThuoc" class="img-fluid product-img drug-loaded-img" />
+                                }
+                                else
+                                {
+                                    <!-- Spinner while loading -->
+                                    <div class="drug-spinner text-muted">
+                                        <div class="spinner-border spinner-border-sm text-secondary" role="status"></div>
+                                    </div>
+                                    <!-- Will be replaced by JS -->
+                                    <img class="img-fluid product-img drug-loaded-img" src="" alt="@item.TenThuoc"
+                                         style="display:none; max-height:120px; object-fit:contain;" />
+                                    <!-- Fallback placeholder if no API image -->
+                                    <div class="drug-placeholder position-relative overflow-hidden rounded-3 d-flex align-items-center justify-content-center"
+                                         style="width:120px; height:120px; background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); display:none; border: 1px solid #cbd5e1;">
+                                        <div class="position-absolute top-50 start-50 translate-middle" style="opacity: 0.5;">
+                                            <i class="bi bi-capsule" style="font-size: 3rem; color: #94a3b8; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.05));"></i>
+                                        </div>
+                                        <span class="position-absolute bottom-0 w-100 text-center pb-2 small fw-medium" style="color: #64748b; font-size: 0.65rem; letter-spacing: 0.5px;">PHARMACARE</span>
+                                    </div>
+                                }
+                            </div>
                             <span class="badge bg-teal bg-opacity-10 text-teal rounded-pill px-2.5 py-1 position-absolute top-0 start-0 m-3 small border border-teal-subtle">
                                 @(item.LoaiThuoc?.TenLoai ?? "Thuốc")
                             </span>
@@ -140,6 +169,186 @@
         </div>
     }
 </div>
+
+<!-- Auto-load drug images via API cascade -->
+<script>
+(function() {
+    // Cache to avoid duplicate API calls for same drug name
+    var imgCache = {};
+
+    function loadImgForArea(area) {
+        if (area.dataset.loaded) return;
+        area.dataset.loaded = '1';
+
+        var drugName = area.dataset.drugName || '';
+        var hoatChat = area.dataset.hoatChat || '';
+        var spinner  = area.querySelector('.drug-spinner');
+        var imgEl    = area.querySelector('.drug-loaded-img');
+        var holder   = area.querySelector('.drug-placeholder');
+
+        if (!imgEl) return; // has manual image already — skip
+
+        function showImg(url) {
+            var testImg = new Image();
+            testImg.referrerPolicy = "no-referrer";
+            testImg.onload = function() {
+                if (spinner) spinner.style.display = 'none';
+                imgEl.referrerPolicy = "no-referrer";
+                imgEl.src = url;
+                imgEl.style.display = 'block';
+                if (holder) holder.style.display = 'none';
+            };
+            testImg.onerror = function() { showPlaceholder(); };
+            testImg.src = url;
+        }
+
+        function showPlaceholder() {
+            if (spinner) spinner.style.display = 'none';
+            if (holder) { holder.style.display = 'flex'; holder.style.removeProperty('display'); holder.style.display = 'flex'; }
+        }
+
+        function tryFetch(name, fallbackName) {
+            if (imgCache[name] !== undefined) {
+                if (imgCache[name]) showImg(imgCache[name]);
+                else showPlaceholder();
+                return;
+            }
+
+            // Map Vietnamese brands to Wikipedia English terms that GUARANTEE images
+            var lowerName = name.toLowerCase();
+            var searchStr = name;
+            
+            if (lowerName.includes('panadol') || lowerName.includes('paracetamol') || lowerName.includes('hapacol') || lowerName.includes('decolgen')) {
+                searchStr = 'tylenol';
+            } else if (lowerName.includes('vitamin c') || lowerName.includes('enervon')) {
+                searchStr = 'ascorbic acid';
+            } else if (lowerName.includes('cetaphil')) {
+                searchStr = 'cetaphil';
+            } else if (lowerName.includes('amoxicillin')) {
+                searchStr = 'amoxil';
+            } else {
+                // Strip dosage for better match
+                searchStr = name.replace(/\s+\d+\s*(mg|ml|g|mcg|iu|%|UI)\b.*/gi, '').trim();
+            }
+
+            // Call Wikipedia API directly from the browser (Bypasses Backend DNS/SSL/Firewall issues)
+            var wikiUrl = 'https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&prop=pageimages&generator=search&gsrsearch=' + encodeURIComponent(searchStr) + '&pithumbsize=500';
+
+            fetch(wikiUrl)
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    if (data && data.query && data.query.pages) {
+                        var pages = data.query.pages;
+                        var firstPageId = Object.keys(pages)[0];
+                        if (pages[firstPageId] && pages[firstPageId].thumbnail && pages[firstPageId].thumbnail.source) {
+                            var imgUrl = pages[firstPageId].thumbnail.source;
+                            imgCache[name] = imgUrl;
+                            showImg(imgUrl);
+                            return;
+                        }
+                    }
+                    
+                    // Fallback to Backend Local DB if Wikipedia fails
+                    fetch('/Pharmacist/GetDrugImage?name=' + encodeURIComponent(name))
+                        .then(function(r2) { return r2.json(); })
+                        .then(function(d2) {
+                            if (d2 && d2.imageUrl) {
+                                imgCache[name] = d2.imageUrl;
+                                showImg(d2.imageUrl);
+                            } else {
+                                imgCache[name] = null;
+                                showPlaceholder();
+                            }
+                        }).catch(function() { showPlaceholder(); });
+                })
+                .catch(function() { 
+                    showPlaceholder(); 
+                });
+        }
+
+        tryFetch(drugName, hoatChat);
+    }
+
+    // Use IntersectionObserver for lazy loading (only fetch images when visible)
+    if ('IntersectionObserver' in window) {
+        var observer = new IntersectionObserver(function(entries) {
+            entries.forEach(function(entry) {
+                if (entry.isIntersecting) {
+                    loadImgForArea(entry.target);
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { rootMargin: '100px' });
+
+        document.querySelectorAll('.drug-img-area[data-drug-name]').forEach(function(el) {
+            observer.observe(el);
+        });
+    } else {
+        // Fallback: load all immediately
+        document.querySelectorAll('.drug-img-area[data-drug-name]').forEach(function(el) {
+            loadImgForArea(el);
+        });
+    }
+})();
+
+var activeCategory = 'All';
+var activeTreatment = 'All';
+
+function filterProducts(type, value, btn) {
+    if (type === 'category') {
+        activeCategory = value;
+        document.querySelectorAll('.category-filter-btn').forEach(b => {
+            b.classList.remove('btn-teal-active');
+            b.classList.add('btn-outline-secondary');
+        });
+    } else if (type === 'treatment') {
+        activeTreatment = value;
+        document.querySelectorAll('.treatment-filter-btn').forEach(b => {
+            b.classList.remove('btn-teal-active');
+            b.classList.add('btn-outline-secondary');
+        });
+    }
+    
+    btn.classList.remove('btn-outline-secondary');
+    btn.classList.add('btn-teal-active');
+
+    var items = document.querySelectorAll('.product-item-card');
+    var visibleCount = 0;
+
+    items.forEach(function(item) {
+        var cat = item.dataset.category || '';
+        var treat = item.dataset.treatment || '';
+        
+        var matchCat = (activeCategory === 'All' || cat === activeCategory);
+        var matchTreat = (activeTreatment === 'All' || treat === activeTreatment);
+
+        if (matchCat && matchTreat) {
+            item.style.display = 'block';
+            visibleCount++;
+        } else {
+            item.style.display = 'none';
+        }
+    });
+
+    var emptyMsg = document.getElementById('noFilteredProductsMessage');
+    if (visibleCount === 0) {
+        if (!emptyMsg) {
+            var grid = document.getElementById('productGrid');
+            var msgHtml = `<div id="noFilteredProductsMessage" class="col-12 text-center py-5 bg-light rounded-4 w-100">
+                <div class="text-muted mb-3"><i class="bi-search fs-1"></i></div>
+                <h5 class="fw-bold text-dark">Không tìm thấy sản phẩm phù hợp</h5>
+                <p class="text-muted small">Vui lòng thử chọn bộ lọc khác.</p>
+            </div>`;
+            grid.insertAdjacentHTML('beforeend', msgHtml);
+        } else {
+            emptyMsg.style.display = 'block';
+        }
+    } else {
+        if (emptyMsg) emptyMsg.style.display = 'none';
+    }
+}
+</script>
+
 
 <style>
     /* Styling variables specifically for customer storefront */

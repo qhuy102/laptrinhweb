@@ -1,0 +1,672 @@
+@model List<Web_Quản_Lí_Nhà_Thuốc.Models.Thuoc>
+@{
+    ViewData["Title"] = "Quầy Bán Thuốc POS";
+}
+
+<!-- Notification for interactions -->
+<div id="interactionAlert" class="alert alert-danger alert-dismissible fade show shadow-sm mb-4" style="display: none; border-radius: 12px; border-left: 5px solid #dc3545;">
+    <div class="d-flex align-items-center">
+        <i class="bi bi-exclamation-octagon-fill text-danger me-3 fs-3"></i>
+        <div>
+            <h6 class="alert-heading fw-bold mb-1">CẢNH BÁO TƯƠNG TÁC THUỐC NGUY HIỂM!</h6>
+            <div id="interactionWarningText" class="small">Hai thuốc trong giỏ hàng kỵ nhau...</div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Left Panel: Drug Selection (6/12) -->
+    <div class="col-12 col-lg-7">
+        <div class="dashboard-card p-3 h-100">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold mb-0 text-dark">Danh Sách Thuốc Kê</h5>
+                <div style="width: 250px;">
+                    <div class="input-group input-group-sm">
+                        <span class="input-group-text bg-light border-end-0"><i class="bi bi-search"></i></span>
+                        <input type="text" id="posSearch" class="form-control border-start-0 bg-light" placeholder="Tìm tên hoặc hoạt chất..." onkeyup="doPOSFuzzySearch()" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Drug Grid List -->
+            <div class="row row-cols-1 row-cols-md-2 g-3" id="posDrugContainer" style="max-height: 550px; overflow-y: auto; padding-right: 5px;">
+                @foreach (var d in Model)
+                {
+                    <div class="col">
+                        <div class="card h-100 border border-opacity-10 shadow-sm rounded-3 drug-card" style="border-radius: 10px; cursor: pointer;" onclick="addToCart(@d.MaThuoc)">
+                            <div class="card-body p-3">
+                                <div class="d-flex justify-content-between align-items-start mb-1">
+                                    <h6 class="card-title fw-bold text-dark mb-0 text-truncate" style="max-width: 170px;">@d.TenThuoc</h6>
+                                    <span class="badge bg-light text-primary border fw-bold">@string.Format("{0:N0}₫", d.DonGia)/@d.DonViCoBan</span>
+                                </div>
+                                <span class="small text-muted d-block mb-2"><i class="bi bi-capsule me-1"></i>Hoạt chất: @(d.HoatChat ?? "Chưa có")</span>
+                                <div class="d-flex justify-content-between align-items-center mt-2 border-top pt-2">
+                                    <span class="small @(d.SoLuong < 20 ? "text-danger fw-bold" : "text-muted")"><i class="bi bi-box-seam me-1"></i>Kho: @d.SoLuong @d.DonViCoBan</span>
+                                    <span class="small text-secondary font-monospace" style="font-size: 0.75rem;"><i class="bi bi-geo-alt-fill text-muted me-0.5"></i>@d.ViTriKe</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Panel: Cart & Customer (5/12) -->
+    <div class="col-12 col-lg-5">
+        <div class="dashboard-card p-3 h-100 d-flex flex-column justify-content-between">
+            <div>
+                <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+                    <h5 class="fw-bold mb-0 text-dark">Đơn Hàng / Giỏ Thanh Toán</h5>
+                    <span id="prescriptionBadge" class="badge bg-info text-white" style="display: none;">Liên kết đơn thuốc</span>
+                </div>
+
+                <!-- Customer Search Module -->
+                <div class="bg-light p-3 rounded-3 mb-3 border">
+                    <h6 class="fw-bold mb-2 text-secondary small"><i class="bi bi-person-bounding-box me-1"></i> Thông Tin Thành Viên VIP</h6>
+
+                    <!-- Auto-detected member banner (shown when buyer is a logged-in member) -->
+                    <div id="autoMemberBanner" style="display:none;" class="alert alert-success border-0 py-2 px-3 mb-2 rounded-3 d-flex align-items-center gap-2" style="font-size:0.85rem;">
+                        <i class="bi bi-person-check-fill text-success fs-5"></i>
+                        <div>
+                            <span class="fw-bold text-success small">Hội viên đã đăng nhập — đã tự động tích điểm!</span>
+                            <button class="btn btn-sm btn-link text-muted p-0 ms-2" onclick="clearAutoMember()"><i class="bi bi-x-circle"></i> Bỏ</button>
+                        </div>
+                    </div>
+
+                    <div class="input-group input-group-sm mb-2">
+                        <input type="text" id="custPhoneInput" class="form-control" placeholder="Nhập SĐT khách hàng (tích điểm)" />
+                        <button class="btn btn-outline-primary" type="button" onclick="searchCustomer()"><i class="bi bi-search"></i> Tìm</button>
+                    </div>
+
+                    <!-- Quick Register Panel (initially hidden) -->
+                    <div id="quickRegisterPanel" class="p-3 border rounded-3 bg-white mb-2 shadow-sm" style="display: none;">
+                        <span class="fw-bold text-teal small mb-2 d-block text-primary"><i class="bi bi-person-plus-fill me-1"></i>Đăng ký nhanh Hội viên mới</span>
+                        <div class="mb-2">
+                            <input type="text" id="quickRegisterName" class="form-control form-control-sm" placeholder="Nhập họ tên khách hàng" />
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-sm btn-success w-100 fw-bold" onclick="submitQuickRegister()"><i class="bi bi-check-circle-fill me-1"></i>Đăng ký</button>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="hideQuickRegister()"><i class="bi bi-x"></i></button>
+                        </div>
+                    </div>
+
+                    <div id="customerDetails" style="display: none;">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="fw-bold text-dark" id="custName">Nguyễn Văn A</span>
+                            <span class="badge bg-primary rounded-pill small" id="custTier">Hội viên Bạc</span>
+                        </div>
+                        <div class="d-flex justify-content-between text-muted small mb-2">
+                            <span>Tích lũy: <strong id="custPoints">1500</strong> điểm</span>
+                            <span class="text-success fw-bold">Chiết khấu: -<span id="custDiscount">10</span>%</span>
+                        </div>
+
+                        <!-- VIP Progress Gauge -->
+                        <div class="progress" style="height: 6px; border-radius: 10px;">
+                            <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" id="custProgressBar" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                        <div class="text-muted" style="font-size: 0.7rem; text-align: right; margin-top: 2px;" id="custProgressText">Cần thêm 500 điểm để thăng hạng VIP Vàng</div>
+                    </div>
+                </div>
+
+                <!-- Cart Items Container -->
+                <div id="cartItemsList" class="mb-3" style="max-height: 250px; overflow-y: auto;">
+                    <div class="text-center text-muted py-5" id="emptyCartMessage">
+                        <i class="bi bi-cart3 fs-2 d-block mb-2"></i>
+                        <span>Giỏ hàng trống. Click chọn thuốc để thêm.</span>
+                    </div>
+                    <!-- Items appended here dynamically -->
+                </div>
+            </div>
+
+            <!-- Total and Checkout -->
+            <div class="border-top pt-3 mt-3">
+                <div class="d-flex justify-content-between mb-1 text-muted small">
+                    <span>Tổng tiền thuốc:</span>
+                    <span id="subtotalText">0₫</span>
+                </div>
+                <div class="d-flex justify-content-between mb-1 text-success small">
+                    <span>Chiết khấu VIP:</span>
+                    <span id="discountText">-0₫</span>
+                </div>
+                <div class="d-flex justify-content-between mb-3 border-top pt-2">
+                    <strong class="text-dark fs-5">Thành tiền:</strong>
+                    <strong class="text-danger fs-5" id="grandTotalText">0₫</strong>
+                </div>
+
+                <button class="btn btn-primary w-100 py-2.5 fw-bold" id="checkoutBtn" style="border-radius: 8px; background-color: var(--primary-color); border: none;" onclick="submitCheckout()" disabled>
+                    <i class="bi bi-printer-fill me-2"></i> Thanh Toán & In Lịch Uống
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Receipt & Daily Pill Calendar Modal -->
+<div class="modal fade" id="receiptModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content" style="border-radius: 16px; border: none;">
+            <div class="modal-header bg-light">
+                <h5 class="modal-title fw-bold"><i class="bi bi-file-earmark-check-fill text-success me-2"></i>LỊCH HƯỚNG DẪN SỬ DỤNG THUỐC</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="window.location.reload()"></button>
+            </div>
+            <div class="modal-body" id="printArea">
+                <div class="text-center mb-4">
+                    <h3 class="fw-bold mb-0 text-teal"><i class="bi bi-capsule"></i> PHARMAHUB PHARMACY</h3>
+                    <p class="text-muted small mb-0">Địa chỉ: 123 Nguyễn Trãi, Q.1, TP. HCM | Hotline: 1900 6000</p>
+                    <hr class="my-3">
+                    <h5 class="fw-bold text-dark">PHIẾU HƯỚNG DẪN LIỀU DÙNG HẰNG NGÀY</h5>
+                    <p class="text-muted small">Mã hóa đơn: <strong id="recInvoiceId">#1024</strong> | Ngày in: <span id="recDate">10/06/2026</span></p>
+                </div>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-6">
+                        <span class="text-muted small d-block">Khách hàng:</span>
+                        <strong class="text-dark" id="recCustName">Khách vãng lai</strong>
+                    </div>
+                    <div class="col-6 text-end">
+                        <span class="text-muted small d-block">Dược sĩ phụ trách:</span>
+                        <strong class="text-dark">@User.Identity?.Name</strong>
+                    </div>
+                </div>
+
+                <!-- Dosage Calendar Schedule Table -->
+                <h6 class="fw-bold text-teal mb-3"><i class="bi bi-calendar-event me-2"></i>Bảng Phân Phối Lịch Uống Thuốc</h6>
+                <div class="table-responsive">
+                    <table class="table table-bordered align-middle text-center" style="font-size: 0.9rem;">
+                        <thead class="table-light text-dark fw-bold">
+                            <tr>
+                                <th style="width: 25%;">Tên Thuốc</th>
+                                <th style="width: 15%;"><i class="bi bi-brightness-alt-high text-warning"></i> Sáng</th>
+                                <th style="width: 15%;"><i class="bi bi-brightness-high text-danger"></i> Trưa</th>
+                                <th style="width: 15%;"><i class="bi bi-brightness-alt-low text-primary"></i> Chiều</th>
+                                <th style="width: 15%;"><i class="bi bi-moon-stars text-indigo"></i> Tối</th>
+                                <th style="width: 15%;">Ghi chú ăn uống</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recTableBody">
+                            <!-- Dynamic rows parsed from dosage rules -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="alert alert-info mt-4 small border-0 shadow-sm" style="border-radius: 8px;">
+                    <i class="bi bi-info-circle-fill me-2 fs-5 text-primary"></i>
+                    <strong>Lưu ý y khoa quan trọng:</strong> Uống đúng giờ, uống nhiều nước. Nếu phát hiện triệu chứng bất thường, vui lòng dừng thuốc và liên hệ bác sĩ điều trị hoặc hotline nhà thuốc ngay lập tức.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" onclick="window.print()"><i class="bi bi-printer me-1"></i> In Phiếu Lịch Trình</button>
+                <button type="button" class="btn btn-primary" style="background-color: var(--primary-color); border: none;" onclick="window.location.reload()">Đóng & Tiếp tục</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        var masterDrugs = @Html.Raw(Json.Serialize(Model));
+        var cart = [];
+        var customerData = null;
+        var linkedPrescriptionId = @(Context.Request.Query["prescriptionId"].ToString() != "" ? Context.Request.Query["prescriptionId"].ToString() : "null");
+
+        document.addEventListener("DOMContentLoaded", function() {
+            if (linkedPrescriptionId) {
+                document.getElementById("prescriptionBadge").style.display = "inline-block";
+                loadPrescriptionDemoData(linkedPrescriptionId);
+            }
+
+            // Auto-detect if the current user is a member (not Admin/Pharmacist)
+            fetch('/Pharmacist/GetCurrentUserMembership')
+                .then(res => {
+                    if (res.ok) return res.json();
+                    return null;
+                })
+                .then(data => {
+                    if (!data) return; // admin or pharmacist - skip
+                    customerData = data;
+
+                    // Show auto banner
+                    document.getElementById('autoMemberBanner').style.display = 'flex';
+
+                    // Fill phone & member info
+                    if (data.phone) document.getElementById('custPhoneInput').value = data.phone;
+
+                    document.getElementById('custName').innerText = data.name;
+                    document.getElementById('custTier').innerText = data.tier;
+                    document.getElementById('custPoints').innerText = data.points;
+                    document.getElementById('custDiscount').innerText = (data.discount * 100);
+
+                    var progressBar = document.getElementById('custProgressBar');
+                    progressBar.style.width = data.percentToNext + '%';
+
+                    if (data.tier === 'VIP Kim Cương') {
+                        document.getElementById('custProgressText').innerText = 'Bạn đã đạt cấp bậc cao nhất!';
+                    } else {
+                        document.getElementById('custProgressText').innerText = 'Cần thêm ' + data.pointsToNext + ' điểm để thăng cấp';
+                    }
+                    document.getElementById('customerDetails').style.display = 'block';
+                    updateTotals();
+                })
+                .catch(() => {}); // silently fail if not logged in
+        });
+
+        function clearAutoMember() {
+            customerData = null;
+            document.getElementById('autoMemberBanner').style.display = 'none';
+            document.getElementById('customerDetails').style.display = 'none';
+            document.getElementById('custPhoneInput').value = '';
+            updateTotals();
+        }
+
+        function loadPrescriptionDemoData(presId) {
+            // Mock: pre-add Amoxicillin and Paracetamol to cart
+            var amox = masterDrugs.find(d => d.tenThuoc.includes("Amoxicillin"));
+            var para = masterDrugs.find(d => d.tenThuoc.includes("Paracetamol"));
+            
+            if (amox) addToCart(amox.maThuoc, 15, "Viên", "Uống 1 viên mỗi lần, ngày 3 lần sau ăn.");
+            if (para) addToCart(para.maThuoc, 10, "Viên", "Uống 1 viên khi sốt > 38.5 độ C.");
+            
+            // Fill customer info
+            document.getElementById("custPhoneInput").value = "0987654321";
+            searchCustomer();
+        }
+
+        function doPOSFuzzySearch() {
+            var q = document.getElementById("posSearch").value;
+            fetch('/Pharmacist/SearchDrugs?query=' + encodeURIComponent(q))
+                .then(res => res.json())
+                .then(data => {
+                    var container = document.getElementById("posDrugContainer");
+                    container.innerHTML = "";
+
+                    if (data.length === 0) {
+                        container.innerHTML = "<div class='text-muted small text-center w-100 py-4'>Không tìm thấy thuốc nào khớp.</div>";
+                        return;
+                    }
+
+                    data.forEach(function(item) {
+                        var price = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.donGia);
+                        var stockClass = item.soLuong < 20 ? "text-danger fw-bold" : "text-muted";
+                        
+                        var html = `
+                            <div class="col">
+                                <div class="card h-100 border border-opacity-10 shadow-sm rounded-3 drug-card" style="border-radius: 10px; cursor: pointer;" onclick="addToCart(${item.maThuoc})">
+                                    <div class="card-body p-3">
+                                        <div class="d-flex justify-content-between align-items-start mb-1">
+                                            <h6 class="card-title fw-bold text-dark mb-0 text-truncate" style="max-width: 170px;">${item.tenThuoc}</h6>
+                                            <span class="badge bg-light text-primary border fw-bold">${price}/${item.donViCoBan}</span>
+                                        </div>
+                                        <span class="small text-muted d-block mb-2"><i class="bi bi-capsule me-1"></i>Hoạt chất: ${item.hoatChat || "Chưa có"}</span>
+                                        <div class="d-flex justify-content-between align-items-center mt-2 border-top pt-2">
+                                            <span class="small ${stockClass}"><i class="bi bi-box-seam me-1"></i>Kho: ${item.soLuong} ${item.donViCoBan}</span>
+                                            <span class="small text-secondary font-monospace" style="font-size: 0.75rem;"><i class="bi bi-geo-alt-fill text-muted me-0.5"></i>${item.viTriKe || "Chưa gán"}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>`;
+                        container.innerHTML += html;
+                    });
+                });
+        }
+
+        function addToCart(id, qty = 1, unit = null, instructions = null) {
+            var drug = masterDrugs.find(d => d.maThuoc === id);
+            if (!drug) return;
+
+            var existing = cart.find(c => c.maThuoc === id);
+            if (existing) {
+                existing.quantity += qty;
+            } else {
+                cart.push({
+                    maThuoc: drug.maThuoc,
+                    tenThuoc: drug.tenThuoc,
+                    donGia: drug.donGia,
+                    donViCoBan: drug.donViCoBan,
+                    selectedUnit: unit || drug.donViCoBan,
+                    quantity: qty,
+                    hoatChat: drug.hoatChat,
+                    lieuDung: instructions || drug.lieuLuong || "Sáng 1 viên, Tối 1 viên sau ăn.",
+                    conversions: drug.donViQuyDois || [],
+                    batches: drug.loThuocs || []
+                });
+            }
+
+            renderCart();
+            checkInteractions();
+        }
+
+        function removeFromCart(id) {
+            cart = cart.filter(c => c.maThuoc !== id);
+            renderCart();
+            checkInteractions();
+        }
+
+        function updateItemQty(id, qty) {
+            var item = cart.find(c => c.maThuoc === id);
+            if (item) {
+                item.quantity = parseInt(qty) || 1;
+                updateTotals();
+            }
+        }
+
+        function updateItemUnit(id, unit) {
+            var item = cart.find(c => c.maThuoc === id);
+            if (item) {
+                item.selectedUnit = unit;
+                renderCart();
+            }
+        }
+
+        function updateItemLieuDung(id, text) {
+            var item = cart.find(c => c.maThuoc === id);
+            if (item) {
+                item.lieuDung = text;
+            }
+        }
+
+        function renderCart() {
+            var list = document.getElementById("cartItemsList");
+            list.innerHTML = "";
+
+            if (cart.length === 0) {
+                document.getElementById("emptyCartMessage").style.display = "block";
+                document.getElementById("checkoutBtn").disabled = true;
+                updateTotals();
+                return;
+            }
+
+            document.getElementById("emptyCartMessage").style.display = "none";
+            document.getElementById("checkoutBtn").disabled = false;
+
+            cart.forEach(function(item) {
+                // Populate unit conversion dropdown
+                var unitOptions = `<option value="${item.donViCoBan}">${item.donViCoBan}</option>`;
+                item.conversions.forEach(function(c) {
+                    var selected = item.selectedUnit === c.tenDonVi ? "selected" : "";
+                    unitOptions += `<option value="${c.tenDonVi}" ${selected}>${c.tenDonVi}</option>`;
+                });
+
+                // Calculate display price
+                var displayPrice = item.donGia;
+                if (item.selectedUnit !== item.donViCoBan) {
+                    var c = item.conversions.find(conv => conv.tenDonVi === item.selectedUnit);
+                    if (c) {
+                        displayPrice = item.donGia * c.heSoGia;
+                    }
+                }
+
+                // Check batches to show FEFO drawing info
+                var sortedBatches = item.batches
+                    .filter(b => new Date(b.hanSuDung) > new Date() && b.soLuong > 0)
+                    .sort((a,b) => new Date(a.hanSuDung) - new Date(b.hanSuDung));
+
+                var fefoText = "";
+                if (sortedBatches.length > 0) {
+                    fefoText = `<span class="badge bg-light text-success border small font-monospace mt-1" style="font-size:0.7rem;"><i class="bi bi-clock-history me-1"></i>Xuất Lô: ${sortedBatches[0].soLo} (HSD: ${new Date(sortedBatches[0].hanSuDung).toLocaleDateString()})</span>`;
+                }
+
+                var priceFormatted = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(displayPrice);
+
+                var html = `
+                    <div class="p-3 bg-white rounded-3 mb-2 border shadow-sm">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div>
+                                <h6 class="fw-bold text-dark mb-0">${item.tenThuoc}</h6>
+                                <span class="small text-muted font-monospace" style="font-size:0.75rem;">Hoạt chất: ${item.hoatChat || "Không"}</span>
+                                <div>${fefoText}</div>
+                            </div>
+                            <button class="btn btn-sm text-danger" onclick="removeFromCart(${item.maThuoc})"><i class="bi bi-trash"></i></button>
+                        </div>
+                        
+                        <div class="row g-2 mb-2">
+                            <div class="col-4">
+                                <label class="small text-muted mb-1">Đơn vị</label>
+                                <select class="form-select form-select-sm" onchange="updateItemUnit(${item.maThuoc}, this.value)">
+                                    ${unitOptions}
+                                </select>
+                            </div>
+                            <div class="col-4">
+                                <label class="small text-muted mb-1">Số lượng</label>
+                                <input type="number" class="form-control form-control-sm" value="${item.quantity}" min="1" onchange="updateItemQty(${item.maThuoc}, this.value)" />
+                            </div>
+                            <div class="col-4 text-end align-self-end">
+                                <span class="fw-bold text-dark" style="font-size: 0.95rem;">${priceFormatted}</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <input type="text" class="form-control form-control-sm bg-light" placeholder="Liều lượng (ví dụ: Sáng 1, Tối 1)" value="${item.lieuDung}" onchange="updateItemLieuDung(${item.maThuoc}, this.value)" />
+                        </div>
+                    </div>
+                `;
+                list.innerHTML += html;
+            });
+
+            updateTotals();
+        }
+
+        function updateTotals() {
+            var subtotal = 0;
+            cart.forEach(function(item) {
+                var displayPrice = item.donGia;
+                if (item.selectedUnit !== item.donViCoBan) {
+                    var c = item.conversions.find(conv => conv.tenDonVi === item.selectedUnit);
+                    if (c) {
+                        displayPrice = item.donGia * c.heSoGia;
+                    }
+                }
+                subtotal += displayPrice * item.quantity;
+            });
+
+            var discount = 0;
+            if (customerData) {
+                discount = subtotal * customerData.discount;
+            }
+
+            var grandTotal = subtotal - discount;
+
+            document.getElementById("subtotalText").innerText = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(subtotal);
+            document.getElementById("discountText").innerText = "-" + new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(discount);
+            document.getElementById("grandTotalText").innerText = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(grandTotal);
+        }
+
+        function checkInteractions() {
+            var ids = cart.map(c => c.maThuoc);
+            if (ids.length < 2) {
+                document.getElementById("interactionAlert").style.display = "none";
+                return;
+            }
+
+            fetch('/Pharmacist/CheckDrugInteractions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(ids)
+            })
+            .then(res => res.json())
+            .then(data => {
+                var alertBox = document.getElementById("interactionAlert");
+
+                if (data.hasWarnings) {
+                    var textHtml = "";
+                    data.warnings.forEach(function(w) {
+                        textHtml += `<div>• ${w}</div>`;
+                    });
+                    document.getElementById("interactionWarningText").innerHTML = textHtml;
+                    alertBox.style.display = "block";
+                } else {
+                    alertBox.style.display = "none";
+                }
+            });
+        }
+
+        function showQuickRegister() {
+            document.getElementById("quickRegisterPanel").style.display = "block";
+            document.getElementById("quickRegisterName").focus();
+        }
+
+        function hideQuickRegister() {
+            document.getElementById("quickRegisterPanel").style.display = "none";
+            document.getElementById("quickRegisterName").value = "";
+        }
+
+        function submitQuickRegister() {
+            var phone = document.getElementById("custPhoneInput").value;
+            var name = document.getElementById("quickRegisterName").value;
+            if (!phone || !name) {
+                alert("Vui lòng nhập đầy đủ Tên và Số điện thoại.");
+                return;
+            }
+
+            fetch('/Pharmacist/RegisterCustomer', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ name: name, phone: phone })
+            })
+            .then(res => {
+                if (res.ok) return res.json();
+                return res.text().then(err => { throw new Error(err); });
+            })
+            .then(data => {
+                alert("Đăng ký hội viên thành công!");
+                hideQuickRegister();
+                customerData = data;
+                
+                document.getElementById("custName").innerText = data.name;
+                document.getElementById("custTier").innerText = data.tier;
+                document.getElementById("custPoints").innerText = data.points;
+                document.getElementById("custDiscount").innerText = (data.discount * 100);
+
+                var progressBar = document.getElementById("custProgressBar");
+                progressBar.style.width = data.percentToNext + "%";
+                progressBar.setAttribute("aria-valuenow", data.percentToNext);
+                document.getElementById("custProgressText").innerText = "Cần thêm " + data.pointsToNext + " điểm để thăng cấp tiếp theo";
+
+                document.getElementById("customerDetails").style.display = "block";
+                updateTotals();
+            })
+            .catch(err => {
+                alert("Lỗi: " + err.message);
+            });
+        }
+
+        function searchCustomer() {
+            var phone = document.getElementById("custPhoneInput").value;
+            if (!phone) return;
+
+            // Hide previous register panel if open
+            hideQuickRegister();
+
+            fetch('/Pharmacist/GetCustomerInfo?phone=' + encodeURIComponent(phone))
+                .then(res => {
+                    if (res.status === 404) {
+                        customerData = null;
+                        document.getElementById("customerDetails").style.display = "none";
+                        updateTotals();
+                        
+                        if (confirm("Số điện thoại này chưa được đăng ký hội viên. Bạn có muốn đăng ký nhanh hội viên mới không?")) {
+                            showQuickRegister();
+                        }
+                        return;
+                    }
+                    return res.json();
+                })
+                .then(data => {
+                    if (!data) return;
+                    customerData = data;
+                    
+                    document.getElementById("custName").innerText = data.name;
+                    document.getElementById("custTier").innerText = data.tier;
+                    document.getElementById("custPoints").innerText = data.points;
+                    document.getElementById("custDiscount").innerText = (data.discount * 100);
+
+                    var progressBar = document.getElementById("custProgressBar");
+                    progressBar.style.width = data.percentToNext + "%";
+                    progressBar.setAttribute("aria-valuenow", data.percentToNext);
+
+                    if (data.tier === "VIP Kim Cương") {
+                        document.getElementById("custProgressText").innerText = "Bạn đã đạt cấp bậc cao nhất!";
+                    } else {
+                        document.getElementById("custProgressText").innerText = "Cần thêm " + data.pointsToNext + " điểm để thăng cấp tiếp theo";
+                    }
+
+                    document.getElementById("customerDetails").style.display = "block";
+                    updateTotals();
+                });
+        }
+
+        function submitCheckout() {
+            if (cart.length === 0) return;
+
+            var checkoutData = {
+                customerId: customerData ? customerData.id : null,
+                prescriptionId: linkedPrescriptionId,
+                items: cart.map(c => ({
+                    maThuoc: c.maThuoc,
+                    quantity: c.quantity,
+                    unit: c.selectedUnit,
+                    lieuDung: c.lieuDung
+                }))
+            };
+
+            fetch('/Pharmacist/Checkout', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(checkoutData)
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    // Populate Receipt & Daily Pill Calendar Modal
+                    document.getElementById("recInvoiceId").innerText = "#HD-" + data.invoiceId;
+                    document.getElementById("recDate").innerText = new Date().toLocaleString('vi-VN');
+                    document.getElementById("recCustName").innerText = data.customerName;
+
+                    var tableBody = document.getElementById("recTableBody");
+                    tableBody.innerHTML = "";
+
+                    data.schedule.forEach(function(item) {
+                        var instruction = item.lieuDung.toLowerCase();
+                        
+                        // Parse morning, noon, afternoon, night checks based on keywords
+                        var morningVal = instruction.includes("sáng") ? "<i class='bi bi-check-circle-fill text-success fs-5'></i>" : "—";
+                        var noonVal = instruction.includes("trưa") ? "<i class='bi bi-check-circle-fill text-success fs-5'></i>" : "—";
+                        var afternoonVal = instruction.includes("chiều") ? "<i class='bi bi-check-circle-fill text-success fs-5'></i>" : "—";
+                        var nightVal = (instruction.includes("tối") || instruction.includes("đêm")) ? "<i class='bi bi-check-circle-fill text-success fs-5'></i>" : "—";
+
+                        var foodNote = "Sau khi ăn";
+                        if (instruction.includes("trước ăn")) foodNote = "Trước khi ăn";
+                        else if (instruction.includes("trong ăn")) foodNote = "Trong bữa ăn";
+
+                        var tr = `
+                            <tr>
+                                <td class="fw-bold text-dark text-start">${item.tenThuoc} <br><small class="text-muted">Mỗi lần dùng: ${item.soLuong} ${item.donVi}</small></td>
+                                <td>${morningVal}</td>
+                                <td>${noonVal}</td>
+                                <td>${afternoonVal}</td>
+                                <td>${nightVal}</td>
+                                <td><span class="badge bg-light text-dark border">${foodNote}</span></td>
+                            </tr>
+                        `;
+                        tableBody.innerHTML += tr;
+                    });
+
+                    var myModal = new bootstrap.Modal(document.getElementById('receiptModal'));
+                    myModal.show();
+                } else {
+                    alert("Lỗi thanh toán.");
+                }
+            })
+            .catch(err => {
+                alert("Đã xảy ra lỗi.");
+                console.error(err);
+            });
+        }
+    </script>
+}

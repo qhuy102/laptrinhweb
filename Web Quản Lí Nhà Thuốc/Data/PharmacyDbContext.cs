@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Web_Quản_Lí_Nhà_Thuốc.Models;
 namespace Web_Quản_Lí_Nhà_Thuốc.Data
@@ -21,5 +21,17 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Data
         public DbSet<ChiTietHoaDon> ChiTietHoaDons { get; set; }
 
         public DbSet<YeuThich> YeuThiches { get; set; }
+
+        public DbSet<LoThuoc> LoThuocs { get; set; }
+
+        public DbSet<DonViQuyDoi> DonViQuyDois { get; set; }
+
+        public DbSet<DonThuoc> DonThuocs { get; set; }
+
+        public DbSet<ChiTietDonThuoc> ChiTietDonThuocs { get; set; }
+
+        public DbSet<AuditLog> AuditLogs { get; set; }
+
+        public DbSet<LichUongThuoc> LichUongThuocs { get; set; }
     }
 }

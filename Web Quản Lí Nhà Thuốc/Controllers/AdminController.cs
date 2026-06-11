@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using Web_Quản_Lí_Nhà_Thuốc.Models;
+using Web_Quản_Lí_Nhà_Thuốc.Data;
 
 namespace Web_Quản_Lí_Nhà_Thuốc.Controllers
 {
@@ -16,13 +17,16 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Controllers
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly PharmacyDbContext _context;
 
         public AdminController(
             UserManager<ApplicationUser> userManager,
-            RoleManager<IdentityRole> roleManager)
+            RoleManager<IdentityRole> roleManager,
+            PharmacyDbContext context)
         {
             _userManager = userManager;
             _roleManager = roleManager;
+            _context = context;
         }
 
         // List all users
@@ -160,6 +164,98 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Controllers
             TempData["SuccessMessage"] = $"Đã cập nhật thành công tài khoản {user.Email}.";
             return RedirectToAction(nameof(Users));
         }
+
+        // Create Pharmacist (GET)
+        public IActionResult CreatePharmacist()
+        {
+            return View();
+        }
+
+        // Create Pharmacist (POST)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreatePharmacist(CreatePharmacistViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var existing = await _userManager.FindByEmailAsync(model.Email);
+            if (existing != null)
+            {
+                ModelState.AddModelError("Email", "Email này đã được đăng ký.");
+                return View(model);
+            }
+
+            var user = new ApplicationUser
+            {
+                UserName = model.Email,
+                Email = model.Email,
+                HoTen = model.HoTen,
+                NgaySinh = model.NgaySinh,
+                DiaChi = model.DiaChi,
+                EmailConfirmed = true
+            };
+
+            var result = await _userManager.CreateAsync(user, model.Password);
+            if (!result.Succeeded)
+            {
+                foreach (var err in result.Errors)
+                {
+                    ModelState.AddModelError("", err.Description);
+                }
+                return View(model);
+            }
+
+            await _userManager.AddToRoleAsync(user, "Pharmacist");
+
+            // Log the action
+            var audit = new AuditLog
+            {
+                UserId = _userManager.GetUserId(User),
+                UserEmail = User.Identity?.Name,
+                Action = "CREATE_USER",
+                MoTa = $"Admin đã tạo tài khoản dược sĩ mới: {model.Email} (Tên: {model.HoTen})",
+                ThoiGian = DateTime.Now,
+                IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString(),
+                IsSuspicious = false
+            };
+            _context.AuditLogs.Add(audit);
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = $"Đã tạo thành công tài khoản dược sĩ {model.Email}.";
+            return RedirectToAction(nameof(Users));
+        }
+
+        // Audit Logs (GET)
+        public async Task<IActionResult> AuditLogs()
+        {
+            var logs = await _context.AuditLogs.OrderByDescending(l => l.ThoiGian).Take(100).ToListAsync();
+            return View(logs);
+        }
+    }
+
+    public class CreatePharmacistViewModel
+    {
+        [Required(ErrorMessage = "Họ tên không được để trống")]
+        public string HoTen { get; set; }
+
+        [Required(ErrorMessage = "Email không được để trống")]
+        [EmailAddress(ErrorMessage = "Email không đúng định dạng")]
+        public string Email { get; set; }
+
+        [Required(ErrorMessage = "Mật khẩu không được để trống")]
+        [MinLength(6, ErrorMessage = "Mật khẩu phải từ 6 ký tự")]
+        [DataType(DataType.Password)]
+        public string Password { get; set; }
+
+        [Required(ErrorMessage = "Ngày sinh không được để trống")]
+        [DataType(DataType.Date)]
+        public DateTime NgaySinh { get; set; }
+
+        [Required(ErrorMessage = "Địa chỉ không được để trống")]
+        public string DiaChi { get; set; }
     }
 
     // ViewModels for User Management

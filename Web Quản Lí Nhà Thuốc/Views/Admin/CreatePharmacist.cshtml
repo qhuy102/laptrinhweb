@@ -1,0 +1,70 @@
+@model Web_Quản_Lí_Nhà_Thuốc.Controllers.CreatePharmacistViewModel
+@{
+    ViewData["Title"] = "Thêm Tài Khoản Dược Sĩ";
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="dashboard-card shadow border-0" style="border-radius: 16px;">
+                <div class="d-flex align-items-center mb-4">
+                    <a href="/Admin/Users" class="btn btn-light rounded-circle me-3"><i class="bi bi-arrow-left"></i></a>
+                    <h2 class="fw-bold mb-0 text-dark">Thêm Dược Sĩ Mới</h2>
+                </div>
+
+                <form asp-action="CreatePharmacist" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="HoTen" class="form-label fw-semibold">Họ và Tên</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0"><i class="bi bi-person text-secondary"></i></span>
+                            <input asp-for="HoTen" class="form-control border-start-0 bg-light" placeholder="Nhập họ tên đầy đủ" />
+                        </div>
+                        <span asp-validation-for="HoTen" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Email" class="form-label fw-semibold">Địa chỉ Email</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0"><i class="bi bi-envelope text-secondary"></i></span>
+                            <input asp-for="Email" type="email" class="form-control border-start-0 bg-light" placeholder="duocsi@gmail.com" />
+                        </div>
+                        <span asp-validation-for="Email" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Password" class="form-label fw-semibold">Mật khẩu</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0"><i class="bi bi-shield-lock text-secondary"></i></span>
+                            <input asp-for="Password" type="password" class="form-control border-start-0 bg-light" placeholder="Mật khẩu tối thiểu 6 ký tự" />
+                        </div>
+                        <span asp-validation-for="Password" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="NgaySinh" class="form-label fw-semibold">Ngày sinh</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0"><i class="bi bi-calendar-event text-secondary"></i></span>
+                            <input asp-for="NgaySinh" type="date" class="form-control border-start-0 bg-light" />
+                        </div>
+                        <span asp-validation-for="NgaySinh" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="DiaChi" class="form-label fw-semibold">Địa chỉ liên hệ</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0"><i class="bi bi-geo-alt text-secondary"></i></span>
+                            <input asp-for="DiaChi" class="form-control border-start-0 bg-light" placeholder="Địa chỉ hiện tại" />
+                        </div>
+                        <span asp-validation-for="DiaChi" class="text-danger small"></span>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 py-2.5 fw-bold" style="border-radius: 10px; background-color: var(--primary-color); border: none;">
+                        <i class="bi bi-person-plus-fill me-2"></i> Tạo Tài Khoản Dược Sĩ
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

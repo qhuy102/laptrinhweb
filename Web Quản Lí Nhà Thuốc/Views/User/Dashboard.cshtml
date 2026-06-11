@@ -1,149 +1,408 @@
-﻿@{
-    ViewData["Title"] = "Dashboard";
+@model IEnumerable<Web_Quản_Lí_Nhà_Thuốc.Models.LichUongThuoc>
+@{
+    ViewData["Title"] = "Dashboard - Nhắc uống thuốc";
 }
 
-<div class="container-fluid">
+<div class="container-fluid py-4">
+    <!-- Success/Error Messages -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show shadow-sm border-0 mb-4" style="border-radius: 12px; border-left: 5px solid #22c55e;">
+            <i class="bi bi-check-circle-fill me-2"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm border-0 mb-4" style="border-radius: 12px; border-left: 5px solid #ef4444;">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
 
-    <div class="card border-0 shadow-sm mb-4">
-        <div class="card-body">
-            <h2>
-                Xin chào @User.Identity.Name 👋
+    <!-- Welcome Card -->
+    <div class="card border-0 shadow-sm mb-4" style="border-radius: 16px; background: linear-gradient(135deg, #0f766e 0%, #115e59 100%);">
+        <div class="card-body p-4 text-white">
+            <h2 class="fw-bold mb-1">
+                Xin chào, @User.Identity.Name 👋
             </h2>
-
-            <p class="text-muted mb-0">
-                Chào mừng quay trở lại PharmaCare
+            <p class="text-white text-opacity-80 mb-0">
+                Chào mừng bạn quay trở lại PharmaCare. Theo dõi lịch uống thuốc hằng ngày để chăm sóc sức khỏe tốt nhất!
             </p>
         </div>
     </div>
 
-    <div class="row">
-
-        <div class="col-md-3 mb-3">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body text-center">
-                    <i class="bi bi-bag-check fs-1 text-success"></i>
-                    <h5 class="mt-2">Tổng đơn hàng</h5>
-                    <h3>12</h3>
+    <!-- Quick Stats Cards Row -->
+    <div class="row g-4 mb-4">
+        <div class="col-6 col-md-3">
+            <div class="card border-0 shadow-sm h-100" style="border-radius: 16px; border: 1px solid #f1f5f9 !important;">
+                <div class="card-body text-center p-3">
+                    <div class="text-success me-auto bg-success bg-opacity-10 p-2.5 rounded-circle mx-auto mb-2" style="width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;">
+                        <i class="bi bi-bag-check fs-4"></i>
+                    </div>
+                    <span class="text-muted small d-block">Tổng đơn hàng</span>
+                    <h4 class="fw-bold text-dark mt-1 mb-0">12</h4>
                 </div>
             </div>
         </div>
 
-        <div class="col-md-3 mb-3">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body text-center">
-                    <i class="bi bi-truck fs-1 text-primary"></i>
-                    <h5 class="mt-2">Đang giao</h5>
-                    <h3>2</h3>
+        <div class="col-6 col-md-3">
+            <div class="card border-0 shadow-sm h-100" style="border-radius: 16px; border: 1px solid #f1f5f9 !important;">
+                <div class="card-body text-center p-3">
+                    <div class="text-primary me-auto bg-primary bg-opacity-10 p-2.5 rounded-circle mx-auto mb-2" style="width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;">
+                        <i class="bi bi-truck fs-4"></i>
+                    </div>
+                    <span class="text-muted small d-block">Đang giao hàng</span>
+                    <h4 class="fw-bold text-dark mt-1 mb-0">2</h4>
                 </div>
             </div>
         </div>
 
-        <div class="col-md-3 mb-3">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body text-center">
-                    <i class="bi bi-heart-fill fs-1 text-danger"></i>
-                    <h5 class="mt-2">Yêu thích</h5>
-                    <h3>8</h3>
+        <div class="col-6 col-md-3">
+            <div class="card border-0 shadow-sm h-100" style="border-radius: 16px; border: 1px solid #f1f5f9 !important;">
+                <div class="card-body text-center p-3">
+                    <div class="text-danger me-auto bg-danger bg-opacity-10 p-2.5 rounded-circle mx-auto mb-2" style="width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;">
+                        <i class="bi bi-heart-fill fs-4"></i>
+                    </div>
+                    <span class="text-muted small d-block">Yêu thích</span>
+                    <h4 class="fw-bold text-dark mt-1 mb-0">8</h4>
                 </div>
             </div>
         </div>
 
-        <div class="col-md-3 mb-3">
-            <div class="card border-0 shadow-sm">
-                <div class="card-body text-center">
-                    <i class="bi bi-award fs-1 text-warning"></i>
-                    <h5 class="mt-2">Điểm thưởng</h5>
-                    <h3>150</h3>
+        <div class="col-6 col-md-3">
+            <div class="card border-0 shadow-sm h-100" style="border-radius: 16px; border: 1px solid #f1f5f9 !important;">
+                <div class="card-body text-center p-3">
+                    <div class="text-warning me-auto bg-warning bg-opacity-10 p-2.5 rounded-circle mx-auto mb-2" style="width: 48px; height: 48px; display: flex; align-items: center; justify-content: center;">
+                        <i class="bi bi-award fs-4"></i>
+                    </div>
+                    <span class="text-muted small d-block">Điểm tích lũy</span>
+                    <h4 class="fw-bold text-dark mt-1 mb-0">150</h4>
                 </div>
             </div>
         </div>
-
     </div>
 
-    <div class="row mt-4">
-
-        <div class="col-md-8">
-
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white">
-                    <h5 class="mb-0">
-                        Đơn hàng gần đây
-                    </h5>
+    <!-- Main Grid Content -->
+    <div class="row g-4">
+        <!-- Left Panel: Pill Reminder & Orders (8/12) -->
+        <div class="col-12 col-lg-8">
+            <!-- 1. Pill Reminder Calendar Card -->
+            <div class="card border-0 shadow-sm mb-4" style="border-radius: 16px; border: 1px solid #f1f5f9 !important;">
+                <div class="card-header bg-white border-0 pt-4 pb-0 d-flex justify-content-between align-items-center">
+                    <h5 class="fw-bold text-dark mb-0"><i class="bi bi-clock-history text-teal me-2"></i> Lịch Nhắc Uống Thuốc Hằng Ngày</h5>
+                    <button class="btn btn-teal px-3 rounded-pill fw-bold text-white btn-sm" style="background-color: var(--primary-color);" data-bs-toggle="modal" data-bs-target="#addReminderModal">
+                        <i class="bi bi-plus-circle me-1"></i> Thêm lịch nhắc
+                    </button>
                 </div>
-
                 <div class="card-body">
+                    <!-- Progress Tracker -->
+                    @{
+                        var totalReminders = Model.Count();
+                        var takenReminders = Model.Count(r => r.DaUongHomNay);
+                        var progressPercent = totalReminders > 0 ? (int)((double)takenReminders / totalReminders * 100) : 0;
+                    }
+                    <div class="p-3 rounded-3 mb-4" style="background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 100%);">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="small fw-semibold text-teal">Tiến trình uống thuốc hôm nay</span>
+                            <span class="badge bg-teal px-2.5 py-1 text-white fw-bold">@takenReminders/@totalReminders liều</span>
+                        </div>
+                        <div class="progress bg-white bg-opacity-50" style="height: 10px; border-radius: 10px;">
+                            <div class="progress-bar bg-teal" role="progressbar" style="width: @progressPercent%" aria-valuenow="@progressPercent" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                    </div>
 
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>Mã đơn</th>
-                                <th>Ngày đặt</th>
-                                <th>Trạng thái</th>
-                                <th>Tổng tiền</th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-                            <tr>
-                                <td>#DH001</td>
-                                <td>10/06/2026</td>
-                                <td>
-                                    <span class="badge bg-success">
-                                        Hoàn thành
-                                    </span>
-                                </td>
-                                <td>150.000đ</td>
-                            </tr>
-
-                            <tr>
-                                <td>#DH002</td>
-                                <td>12/06/2026</td>
-                                <td>
-                                    <span class="badge bg-warning">
-                                        Đang giao
-                                    </span>
-                                </td>
-                                <td>320.000đ</td>
-                            </tr>
-                        </tbody>
-                    </table>
-
+                    <!-- Reminder List -->
+                    @if (!Model.Any())
+                    {
+                        <div class="text-center py-4 text-muted">
+                            <i class="bi bi-calendar-check fs-2 mb-2 d-block text-secondary"></i>
+                            <p class="small mb-0 text-muted">Bạn chưa thiết lập lịch nhắc uống thuốc nào cho hôm nay.</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="row g-3">
+                            @foreach (var reminder in Model)
+                            {
+                                <div class="col-12">
+                                    <div class="p-3 border rounded-3 d-flex justify-content-between align-items-center reminder-card @(reminder.DaUongHomNay ? "bg-light opacity-75 border-light" : "bg-white shadow-2xs border-light-subtle")" 
+                                         id="reminder-row-@reminder.Id" style="transition: all 0.2s; border-left: 5px solid @(reminder.DaUongHomNay ? "#cbd5e1" : "var(--primary-color, #0d9488)") !important;">
+                                        <div class="d-flex align-items-center gap-3">
+                                            <div class="form-check form-switch ms-1">
+                                                <input class="form-check-input reminder-checkbox" type="checkbox" role="switch" 
+                                                       id="check-@reminder.Id" data-id="@reminder.Id" @(reminder.DaUongHomNay ? "checked" : "")
+                                                       onchange="toggleTakenStatus(@reminder.Id)">
+                                            </div>
+                                            <div>
+                                                <h6 class="fw-bold mb-0 text-dark @(reminder.DaUongHomNay ? "text-decoration-line-through text-muted" : "")" id="name-@reminder.Id">@reminder.TenThuoc</h6>
+                                                <div class="d-flex flex-wrap gap-2 mt-1 small">
+                                                    <span class="text-secondary"><i class="bi bi-capsule me-1"></i>@reminder.LieuDung</span>
+                                                    <span class="badge bg-teal bg-opacity-10 text-teal"><i class="bi bi-clock me-1"></i>@reminder.GioUong</span>
+                                                    @if (!string.IsNullOrEmpty(reminder.GhiChu))
+                                                    {
+                                                        <span class="text-muted"><i class="bi bi-chat-left-dots me-1"></i>@reminder.GhiChu</span>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <form asp-action="DeleteReminder" method="post" onsubmit="return confirm('Bạn chắc chắn muốn xóa lịch nhắc này?')">
+                                                <input type="hidden" name="id" value="@reminder.Id" />
+                                                @Html.AntiForgeryToken()
+                                                <button type="submit" class="btn btn-sm btn-link text-danger p-1"><i class="bi bi-trash fs-5"></i></button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
                 </div>
             </div>
 
-        </div>
-
-        <div class="col-md-4">
-
-            <div class="card border-0 shadow-sm">
-                <div class="card-header bg-white">
-                    <h5 class="mb-0">
-                        Thông tin tài khoản
-                    </h5>
+            <!-- 2. Recent Orders Card -->
+            <div class="card border-0 shadow-sm" style="border-radius: 16px; border: 1px solid #f1f5f9 !important;">
+                <div class="card-header bg-white border-0 pt-4 pb-0">
+                    <h5 class="fw-bold text-dark mb-0">Đơn hàng gần đây</h5>
                 </div>
-
-                <div class="card-body">
-
-                    <p>
-                        <strong>Email:</strong><br />
-                        @User.Identity.Name
-                    </p>
-
-                    <p>
-                        <strong>Hạng thành viên:</strong><br />
-                        Gold Member
-                    </p>
-
-                    <p>
-                        <strong>Điểm tích lũy:</strong><br />
-                        150 điểm
-                    </p>
-
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0" style="font-size: 0.9rem;">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="ps-4">Mã đơn</th>
+                                    <th>Ngày đặt</th>
+                                    <th>Trạng thái</th>
+                                    <th class="pe-4 text-end">Tổng tiền</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="ps-4 fw-bold">#DH001</td>
+                                    <td class="text-muted">10/06/2026</td>
+                                    <td><span class="badge bg-success bg-opacity-10 text-success rounded-pill px-2.5 py-1">Hoàn thành</span></td>
+                                    <td class="pe-4 text-end fw-bold">150.000₫</td>
+                                </tr>
+                                <tr>
+                                    <td class="ps-4 fw-bold">#DH002</td>
+                                    <td class="text-muted">12/06/2026</td>
+                                    <td><span class="badge bg-warning bg-opacity-10 text-warning rounded-pill px-2.5 py-1">Đang giao</span></td>
+                                    <td class="pe-4 text-end fw-bold">320.000₫</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
-
         </div>
 
+        <!-- Right Panel: Account Info (4/12) -->
+        <div class="col-12 col-lg-4">
+            <div class="card border-0 shadow-sm" style="border-radius: 16px; border: 1px solid #f1f5f9 !important;">
+                <div class="card-header bg-white border-0 pt-4 pb-0">
+                    <h5 class="fw-bold text-dark mb-0">Thông tin tài khoản</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="small text-muted d-block">Địa chỉ Email</label>
+                        <strong class="text-dark">@User.Identity.Name</strong>
+                    </div>
+                    <div class="mb-3">
+                        <label class="small text-muted d-block">Hạng thành viên</label>
+                        <strong class="text-teal"><i class="bi bi-award-fill me-1"></i>Hội viên Vàng</strong>
+                    </div>
+                    <div>
+                        <label class="small text-muted d-block">Điểm tích lũy hiện có</label>
+                        <strong class="text-dark">150 điểm</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-
 </div>
+
+<!-- Add Reminder Modal -->
+<div class="modal fade" id="addReminderModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 16px; border: none;">
+            <div class="modal-header bg-light">
+                <h5 class="modal-title fw-bold text-teal"><i class="bi bi-alarm-fill me-2"></i>Thiết Lập Nhắc Uống Thuốc</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form asp-action="AddReminder" method="post">
+                @Html.AntiForgeryToken()
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-secondary">Tên thuốc *</label>
+                        <input type="text" name="tenThuoc" class="form-control" placeholder="Ví dụ: Panadol Extra 500mg" required style="border-radius: 8px;" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-secondary">Liều lượng dùng *</label>
+                        <input type="text" name="lieuDung" class="form-control" placeholder="Ví dụ: 1 viên, 10ml, 1 gói" required style="border-radius: 8px;" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-secondary">Giờ uống trong ngày *</label>
+                        <input type="text" name="gioUong" class="form-control" placeholder="Ví dụ: 08:00, 20:00 (cách nhau bởi dấu phẩy)" required style="border-radius: 8px;" />
+                        <div class="form-text small text-muted">Định dạng 24 giờ (HH:MM). Có thể nhập nhiều mốc giờ cách nhau bởi dấu phẩy.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-secondary">Ghi chú hướng dẫn</label>
+                        <input type="text" name="ghiChu" class="form-control" placeholder="Ví dụ: Sau khi ăn 30 phút" style="border-radius: 8px;" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" style="border-radius: 8px;">Hủy bỏ</button>
+                    <button type="submit" class="btn btn-teal px-4 fw-bold text-white" style="background-color: var(--primary-color); border-radius: 8px;">Lưu nhắc nhở</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    :root {
+        --primary-color: #0d9488;
+        --primary-hover: #0f766e;
+    }
+
+    .text-teal {
+        color: var(--primary-color) !important;
+    }
+    
+    .bg-teal {
+        background-color: var(--primary-color) !important;
+    }
+
+    .shadow-2xs {
+        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+
+    .border-light-subtle {
+        border-color: #f1f5f9 !important;
+    }
+
+    .btn-teal {
+        background-color: var(--primary-color);
+        transition: background-color 0.2s;
+    }
+
+    .btn-teal:hover {
+        background-color: var(--primary-hover);
+        color: white;
+    }
+</style>
+
+<script>
+    // Web Audio Context for Alarm
+    var audioCtx = null;
+    function playBeep() {
+        try {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            var osc = audioCtx.createOscillator();
+            var gain = audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(587.33, audioCtx.currentTime); // D5
+            gain.gain.setValueAtTime(0.5, audioCtx.currentTime);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            setTimeout(() => { osc.stop(); }, 150);
+            
+            setTimeout(() => {
+                var osc2 = audioCtx.createOscillator();
+                var gain2 = audioCtx.createGain();
+                osc2.type = 'sine';
+                osc2.frequency.setValueAtTime(880, audioCtx.currentTime); // A5
+                gain2.gain.setValueAtTime(0.5, audioCtx.currentTime);
+                osc2.connect(gain2);
+                gain2.connect(audioCtx.destination);
+                osc2.start();
+                setTimeout(() => { osc2.stop(); }, 300);
+            }, 200);
+        } catch(e) { console.error("Web Audio error", e); }
+    }
+
+    function toggleTakenStatus(id) {
+        var checkbox = document.getElementById('check-' + id);
+        var label = document.getElementById('name-' + id);
+        var row = document.getElementById('reminder-row-' + id);
+
+        fetch('/User/ToggleTaken?id=' + id, {
+            method: 'POST'
+        })
+        .then(res => {
+            if (res.ok) return res.json();
+            throw new Error();
+        })
+        .then(data => {
+            if (data.success) {
+                // Dynamically refresh progress state
+                window.location.reload();
+            }
+        })
+        .catch(() => {
+            checkbox.checked = !checkbox.checked; // revert
+            alert("Không thể cập nhật trạng thái uống thuốc.");
+        });
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        // Request Web Notification permission
+        if ("Notification" in window && Notification.permission === "default") {
+            Notification.requestPermission();
+        }
+
+        var reminders = [];
+        @foreach (var r in Model)
+        {
+            if (!r.DaUongHomNay) {
+                <text>
+                reminders.push({
+                    id: @r.Id,
+                    name: "@Html.Raw(r.TenThuoc)",
+                    lieu: "@Html.Raw(r.LieuDung)",
+                    times: "@r.GioUong".split(",").map(t => t.trim())
+                });
+                </text>
+            }
+        }
+
+        var notifiedTimes = {};
+
+        function checkAlarm() {
+            var now = new Date();
+            var hh = String(now.getHours()).padStart(2, '0');
+            var mm = String(now.getMinutes()).padStart(2, '0');
+            var currentTimeString = hh + ":" + mm;
+
+            reminders.forEach(function(r) {
+                r.times.forEach(function(time) {
+                    var key = r.id + "-" + time;
+                    if (time === currentTimeString && !notifiedTimes[key]) {
+                        notifiedTimes[key] = true;
+                        triggerAlarm(r.name, r.lieu, time);
+                    }
+                });
+            });
+        }
+
+        function triggerAlarm(name, lieu, time) {
+            playBeep();
+            
+            // Web Notification API
+            if ("Notification" in window && Notification.permission === "granted") {
+                new Notification("Đến giờ uống thuốc PharmaCare!", {
+                    body: time + " - Hãy dùng: " + name + " (Liều: " + lieu + ")",
+                    icon: "/favicon.ico"
+                });
+            }
+
+            // Fallback UI Alarm alert
+            alert("⏰ [LỊCH HẸN " + time + "] Đã đến giờ uống thuốc: " + name + " (" + lieu + ")! Hãy dùng thuốc đúng giờ.");
+        }
+
+        setInterval(checkAlarm, 20000); // Check every 20 seconds
+        checkAlarm(); // Run immediately
+    });
+</script>
