@@ -1,7 +1,13 @@
 @model IEnumerable<Web_Quản_Lí_Nhà_Thuốc.Models.Thuoc>
+@using Microsoft.AspNetCore.Identity
+@using Web_Quản_Lí_Nhà_Thuốc.Models
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
 @{
     ViewData["Title"] = "Trang chủ - Nhà Thuốc Trực Tuyến";
 }
+
+<!-- Top toolbar and search are handled by the shared layout -->
 
 <!-- Hero Section -->
 <div class="hero-section text-white rounded-4 p-5 mb-5 shadow-sm overflow-hidden position-relative">
@@ -447,5 +453,32 @@ function filterProducts(type, value, btn) {
 
     .shadow-2xs {
         box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+
+    /* Toolbar styles */
+    .site-toolbar {
+        background: #1e66b3;
+        color: white;
+        padding: .6rem 0;
+    }
+    .site-toolbar .navbar-brand { color: white; }
+    .site-toolbar .brand-main { font-weight: 800; }
+    .site-toolbar .brand-accent { color: #b7f0e6; font-weight: 700; }
+    .toolbar-links .nav-link { color: rgba(255,255,255,0.95); padding: .45rem .75rem; }
+    .toolbar-links .nav-link:hover { background: rgba(255,255,255,0.04); border-radius: 8px; }
+
+    .btn-icon { background: transparent; border: none; color: white; position: relative; }
+    .badge-icon { position: absolute; top: -6px; right: -6px; background: #ff3b30; color: white; font-size: .65rem; padding: .12rem .35rem; border-radius: 999px; }
+
+    .btn-user-panel { background: rgba(255,255,255,0.92); color: #0f172a; border-radius: 12px; padding: .3rem .6rem; }
+    .btn-user-panel .user-avatar { width: 36px; height: 36px; border-radius: 50%; background: #e6fffb; color: #0d9488; display:flex; align-items:center; justify-content:center; }
+    .user-label { font-weight: 700; margin-left: .25rem; }
+
+    /* Inline search */
+    .search-inline { width: 100%; max-width: 820px; height: 54px; }
+    .search-inline .form-control { height: 54px; }
+
+    @@media (max-width: 991px) {
+        .toolbar-links { display: none; }
     }
 </style>

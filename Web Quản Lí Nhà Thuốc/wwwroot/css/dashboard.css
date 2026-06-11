@@ -108,6 +108,31 @@ body {
     z-index: 999;
 }
 
+/* Unified toolbar for storefront */
+.unified-toolbar {
+    background: linear-gradient(180deg, #1b6ec2 0%, #1861ac 100%);
+    color: white;
+    padding: .5rem 0;
+}
+.unified-toolbar .navbar-brand { color: white; font-weight: 800; }
+.unified-toolbar .brand-accent { color: #bff0e6; }
+.unified-toolbar .search-inline { width: 100%; }
+.unified-toolbar .search-inline .form-control { height: 44px; }
+.unified-toolbar .notification-btn { color: white; font-size: 1.15rem; position: relative; }
+.unified-toolbar .notification-badge { position: absolute; top: -6px; right: -6px; background: #ef4444; color: #fff; font-size: .65rem; padding: .1rem .35rem; border-radius: 12px; }
+.unified-toolbar .user-avatar { width: 36px; height: 36px; border-radius: 50%; background: #e6fffb; color: #0d9488; display:flex; align-items:center; justify-content:center; }
+
+.unified-toolbar .nav-link { color: rgba(255,255,255,0.95); margin-right: .4rem; }
+.unified-toolbar .nav-link:hover { background: rgba(255,255,255,0.04); border-radius: 6px; }
+
+@media (max-width: 991px) {
+    .unified-toolbar .toolbar-links { display: none; }
+    .unified-toolbar .search-inline { max-width: 320px; }
+}
+
+/* Mega menu styles */
+/* Mega menu removed - styles cleaned up */
+
 .topbar-search input {
     background-color: var(--bg-light);
     border: 1px solid transparent;
@@ -191,6 +216,69 @@ body {
     padding: 2rem;
     flex-grow: 1;
 }
+
+/* Hero / Promo Styles */
+.site-hero {
+    background: linear-gradient(180deg, #e6f7fb 0%, #f3fbff 100%);
+    padding: 3.5rem 0;
+}
+.site-hero .hero-left {
+    max-width: 700px;
+}
+.hero-title {
+    font-size: 2.25rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 0.5rem;
+}
+.hero-sub {
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+}
+.hero-search .input-group {
+    width: 520px;
+    height: 54px;
+}
+.hero-search .form-control {
+    font-size: 1rem;
+}
+.hero-search .btn-primary {
+    background: linear-gradient(90deg,#1573e6,#0d6efd);
+    border: none;
+    border-radius: 0 28px 28px 0;
+}
+
+.promo-card {
+    background: linear-gradient(135deg, #0f776d 0%, #0b6b61 100%);
+    border-radius: 8px;
+    min-height: 220px;
+    overflow: hidden;
+}
+.promo-pill {
+    width: 110px;
+    height: 22px;
+    background: rgba(255,255,255,0.9);
+    border-radius: 20px;
+}
+.promo-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+}
+.promo-desc {
+    color: rgba(255,255,255,0.9);
+    max-width: 520px;
+}
+.promo-card .btn-light {
+    background: #ffffff;
+    color: #0b6b61;
+    border-radius: 12px;
+}
+.promo-card .btn-outline-light {
+    border-color: rgba(255,255,255,0.6);
+    color: rgba(255,255,255,0.95);
+    border-radius: 12px;
+}
+
 
 .page-title {
     font-size: 1.5rem;

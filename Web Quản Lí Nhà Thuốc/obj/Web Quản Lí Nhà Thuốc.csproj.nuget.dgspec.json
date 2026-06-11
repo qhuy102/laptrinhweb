@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "I:\\laptrinhweb\\Web Quản Lí Nhà Thuốc\\Web Quản Lí Nhà Thuốc.csproj": {}
+    "C:\\Users\\Windows 11\\Desktop\\New folder (2)\\laptrinhweb\\Web Quản Lí Nhà Thuốc\\Web Quản Lí Nhà Thuốc.csproj": {}
   },
   "projects": {
-    "I:\\laptrinhweb\\Web Quản Lí Nhà Thuốc\\Web Quản Lí Nhà Thuốc.csproj": {
+    "C:\\Users\\Windows 11\\Desktop\\New folder (2)\\laptrinhweb\\Web Quản Lí Nhà Thuốc\\Web Quản Lí Nhà Thuốc.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "I:\\laptrinhweb\\Web Quản Lí Nhà Thuốc\\Web Quản Lí Nhà Thuốc.csproj",
+        "projectUniqueName": "C:\\Users\\Windows 11\\Desktop\\New folder (2)\\laptrinhweb\\Web Quản Lí Nhà Thuốc\\Web Quản Lí Nhà Thuốc.csproj",
         "projectName": "Web Quản Lí Nhà Thuốc",
-        "projectPath": "I:\\laptrinhweb\\Web Quản Lí Nhà Thuốc\\Web Quản Lí Nhà Thuốc.csproj",
-        "packagesPath": "C:\\Users\\Dell\\.nuget\\packages\\",
-        "outputPath": "I:\\laptrinhweb\\Web Quản Lí Nhà Thuốc\\obj\\",
+        "projectPath": "C:\\Users\\Windows 11\\Desktop\\New folder (2)\\laptrinhweb\\Web Quản Lí Nhà Thuốc\\Web Quản Lí Nhà Thuốc.csproj",
+        "packagesPath": "C:\\Users\\Windows 11\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Windows 11\\Desktop\\New folder (2)\\laptrinhweb\\Web Quản Lí Nhà Thuốc\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\Dell\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\Windows 11\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -90,6 +90,24 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[8.0.28, 8.0.28]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Host.win-x64",
+              "version": "[8.0.28, 8.0.28]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[8.0.28, 8.0.28]"
+            },
+            {
+              "name": "Microsoft.WindowsDesktop.App.Ref",
+              "version": "[8.0.28, 8.0.28]"
+            }
+          ],
           "frameworkReferences": {
             "Microsoft.AspNetCore.App": {
               "privateAssets": "none"
