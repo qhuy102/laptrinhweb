@@ -1,0 +1,52 @@
+@model IEnumerable<Web_Quản_Lí_Nhà_Thuốc.Models.HoaDon>
+
+@{
+    ViewData["Title"] = "Quản lý Đơn hàng";
+}
+
+<div class="container-fluid mt-4">
+    <h2>Danh sách Đơn hàng</h2>
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
+
+    <table class="table table-bordered table-striped mt-3">
+        <thead class="table-dark">
+            <tr>
+                <th>Mã ĐH</th>
+                <th>Khách hàng</th>
+                <th>Ngày đặt</th>
+                <th>Tổng tiền</th>
+                <th>Trạng thái</th>
+                <th>Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model) {
+                <tr>
+                    <td>#@item.MaHoaDon</td>
+                    <td>@(item.User?.HoTen ?? "Khách vãng lai")</td>
+                    <td>@item.NgayDat.ToString("dd/MM/yyyy HH:mm")</td>
+                    <td>@item.TongTien.ToString("N0") ₫</td>
+                    <td>
+                        @if (item.TrangThai == "Hoàn thành" || item.TrangThai == "Đã giao") {
+                            <span class="badge bg-success">@item.TrangThai</span>
+                        } else if (item.TrangThai == "Đang giao") {
+                            <span class="badge bg-warning text-dark">@item.TrangThai</span>
+                        } else {
+                            <span class="badge bg-secondary">@item.TrangThai</span>
+                        }
+                    </td>
+                    <td>
+                        <a asp-action="Details" asp-route-id="@item.MaHoaDon" class="btn btn-sm btn-info text-white">Chi tiết</a>
+                        @if (item.TrangThai == "Đang giao") {
+                            <a asp-action="MapTracking" asp-route-id="@item.MaHoaDon" class="btn btn-sm btn-primary">Xem Bản Đồ</a>
+                            <a asp-action="ShipperTracking" asp-route-id="@item.MaHoaDon" class="btn btn-sm btn-warning" target="_blank">Link Shipper</a>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

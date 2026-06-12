@@ -1,0 +1,315 @@
+@model Web_Quản_Lí_Nhà_Thuốc.Models.HoaDon
+
+@{
+    ViewData["Title"] = "Giao Diện Shipper";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>@ViewData["Title"]</title>
+    <!-- Use CDN for Bootstrap to ensure it loads even without Tag Helpers -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- SignalR from CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+
+    <style>
+        body, html { 
+            margin: 0; 
+            padding: 0; 
+            height: 100%; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            overflow: hidden; 
+            background-color: #f4f7f6;
+        }
+        
+        /* Bản đồ Toàn màn hình */
+        #shipperMap {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 1;
+        }
+
+        /* Huy hiệu góc trên bên trái */
+        .top-badge {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 15px 25px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            z-index: 1000;
+            border: 1px solid rgba(255,255,255,0.5);
+        }
+
+        /* Bảng điều khiển nổi ở dưới cùng */
+        .control-panel {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 92%;
+            max-width: 450px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(15px);
+            border-radius: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            padding: 30px;
+            z-index: 1000;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.6);
+        }
+
+        .app-title {
+            background: linear-gradient(135deg, #ff6b6b, #ff4757);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 900;
+            font-size: 24px;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+
+        .btn-action {
+            border-radius: 50px;
+            padding: 18px 20px;
+            font-weight: 800;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 100%;
+        }
+
+        .btn-start {
+            background: linear-gradient(135deg, #0984e3, #6c5ce7);
+            color: white;
+            border: none;
+            box-shadow: 0 10px 25px rgba(108, 92, 231, 0.4);
+        }
+
+        .btn-start:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 15px 30px rgba(108, 92, 231, 0.5);
+            color: white;
+        }
+
+        .btn-stop {
+            background: white;
+            color: #d63031;
+            border: 3px solid #d63031;
+            display: none;
+        }
+
+        .btn-stop:hover {
+            background: #d63031;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .status-text {
+            font-size: 15px;
+            color: #636e72;
+            margin-top: 20px;
+        }
+
+        /* Ẩn bảng hướng dẫn chữ của Routing Machine để giao diện sạch sẽ */
+        .leaflet-routing-container {
+            display: none !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- Bản đồ Fullscreen -->
+    <div id="shipperMap"></div>
+
+    <!-- Thông tin Đơn hàng góc trên -->
+    <div class="top-badge">
+        <h4 class="fw-bold text-dark mb-1"><i class="bi bi-box-seam text-primary me-2"></i>Đơn Hàng #@Model.MaHoaDon</h4>
+        <div class="d-flex align-items-center gap-2 mt-2">
+            <span class="badge bg-warning text-dark fs-6 rounded-pill px-3">@Model.TrangThai</span>
+            @if(Model.CustomerLat.HasValue && Model.CustomerLng.HasValue)
+            {
+                <span class="badge bg-success bg-opacity-10 text-success border border-success rounded-pill px-3"><i class="bi bi-geo-alt-fill"></i> Có định vị</span>
+            }
+            else
+            {
+                <span class="badge bg-danger bg-opacity-10 text-danger border border-danger rounded-pill px-3"><i class="bi bi-exclamation-circle"></i> Thiếu định vị</span>
+            }
+        </div>
+    </div>
+
+    <!-- Bảng điều khiển nổi ở dưới -->
+    <div class="control-panel">
+        <h3 class="app-title"><i class="bi bi-rocket-takeoff-fill me-2"></i>SHIPPER APP</h3>
+        <p class="text-muted small mb-4">Hệ thống giao hàng tự động</p>
+        
+        <button id="btnStart" class="btn btn-action btn-start mt-2">
+            <i class="bi bi-play-circle-fill fs-5 me-2"></i> BẮT ĐẦU GIAO HÀNG
+        </button>
+        <button id="btnStop" class="btn btn-action btn-stop mt-2">
+            <i class="bi bi-stop-circle-fill fs-5 me-2"></i> KẾT THÚC
+        </button>
+
+        <div id="status" class="status-text fw-bold">
+            <i class="bi bi-info-circle-fill text-primary"></i> Nhấn nút để bật GPS và hiện đường đi.
+        </div>
+    </div>
+
+    <!-- Leaflet & Routing -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
+
+    <script>
+        const orderId = @Model.MaHoaDon;
+        let watchId = null;
+        let broadcastInterval = null;
+        let lastLat = null;
+        let lastLng = null;
+
+        // Khởi tạo bản đồ Shipper
+        var map = L.map('shipperMap').setView([10.762622, 106.660172], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(map);
+
+        var shipperMarker = null;
+        var routingControl = null;
+
+        // Điểm đến (Nhà khách)
+        var customerLat = @(Model.CustomerLat.HasValue ? Model.CustomerLat.Value.ToString(System.Globalization.CultureInfo.InvariantCulture) : "null");
+        var customerLng = @(Model.CustomerLng.HasValue ? Model.CustomerLng.Value.ToString(System.Globalization.CultureInfo.InvariantCulture) : "null");
+
+        var motorIcon = L.icon({
+            iconUrl: 'https://cdn-icons-png.flaticon.com/512/3063/3063822.png',
+            iconSize: [40, 40],
+            iconAnchor: [20, 20]
+        });
+
+        var homeIcon = L.icon({
+            iconUrl: 'https://cdn-icons-png.flaticon.com/512/25/25694.png',
+            iconSize: [35, 35],
+            iconAnchor: [17, 35]
+        });
+
+        // Vẽ nhà khách hàng
+        if(customerLat !== null && customerLng !== null) {
+            L.marker([customerLat, customerLng], {icon: homeIcon}).addTo(map)
+             .bindPopup("<b>Điểm giao hàng</b>").openPopup();
+            map.setView([customerLat, customerLng], 14);
+        }
+
+        // Khởi tạo SignalR connection
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/inventoryHub")
+            .build();
+
+        connection.start().then(() => {
+            console.log("Đã kết nối SignalR.");
+        }).catch(err => console.error(err.toString()));
+
+        document.getElementById("btnStart").addEventListener("click", () => {
+            if (navigator.geolocation) {
+                document.getElementById("status").innerHTML = "Đang xin quyền truy cập vị trí GPS...";
+                
+                watchId = navigator.geolocation.watchPosition(
+                    (position) => {
+                        lastLat = position.coords.latitude;
+                        lastLng = position.coords.longitude;
+                        
+                        document.getElementById("status").innerHTML = `<span class="text-success"><i class="bi bi-broadcast"></i> Đang phát vị trí trực tiếp</span>`;
+                             
+                        document.getElementById("btnStart").style.display = "none";
+                        document.getElementById("btnStop").style.display = "block";
+
+                        // Cập nhật bản đồ
+                        if (shipperMarker === null) {
+                            shipperMarker = L.marker([lastLat, lastLng], {icon: motorIcon}).addTo(map);
+                            
+                            // Nếu có tọa độ khách, vẽ đường đi
+                            if (customerLat !== null && customerLng !== null) {
+                                routingControl = L.Routing.control({
+                                    waypoints: [
+                                        L.latLng(lastLat, lastLng),
+                                        L.latLng(customerLat, customerLng)
+                                    ],
+                                    createMarker: function() { return null; },
+                                    routeWhileDragging: false,
+                                    addWaypoints: false,
+                                    showAlternatives: false,
+                                    show: false, // Ẩn bảng hướng dẫn
+                                    lineOptions: {
+                                        styles: [{color: '#ff4757', opacity: 0.8, weight: 6}] // Màu đỏ cho Shipper app
+                                    }
+                                }).addTo(map);
+                                
+                                // Zoom out để thấy cả 2 điểm
+                                var group = new L.featureGroup([L.marker([lastLat, lastLng]), L.marker([customerLat, customerLng])]);
+                                map.fitBounds(group.getBounds(), {padding: [30, 30]});
+                            } else {
+                                map.setView([lastLat, lastLng], 16);
+                            }
+                        } else {
+                            shipperMarker.setLatLng([lastLat, lastLng]);
+                            if (routingControl !== null) {
+                                routingControl.setWaypoints([
+                                    L.latLng(lastLat, lastLng),
+                                    L.latLng(customerLat, customerLng)
+                                ]);
+                            }
+                        }
+
+                        // Gửi vị trí lên Server qua SignalR
+                        connection.invoke("UpdateLocation", orderId, lastLat, lastLng).catch(err => console.error(err));
+
+                        if (!broadcastInterval) {
+                            broadcastInterval = setInterval(() => {
+                                if (lastLat !== null && lastLng !== null && connection.state === signalR.HubConnectionState.Connected) {
+                                    connection.invoke("UpdateLocation", orderId, lastLat, lastLng).catch(err => console.error(err));
+                                }
+                            }, 3000);
+                        }
+                    },
+                    (error) => {
+                        let errMsg = "Lỗi lấy vị trí.";
+                        if(error.code == 1) errMsg = "Bạn đã từ chối quyền truy cập vị trí.";
+                        if(error.code == 2) errMsg = "Không thể xác định vị trí hiện tại.";
+                        if(error.code == 3) errMsg = "Quá thời gian lấy vị trí.";
+                        document.getElementById("status").innerHTML = `<span class="text-danger"><i class="bi bi-exclamation-triangle-fill"></i> ${errMsg} Hãy bật GPS!</span>`;
+                    },
+                    { enableHighAccuracy: true, maximumAge: 0 }
+                );
+            } else {
+                alert("Trình duyệt/Thiết bị của bạn không hỗ trợ định vị GPS.");
+            }
+        });
+
+        document.getElementById("btnStop").addEventListener("click", () => {
+            if (watchId !== null) {
+                navigator.geolocation.clearWatch(watchId);
+                watchId = null;
+            }
+            if (broadcastInterval !== null) {
+                clearInterval(broadcastInterval);
+                broadcastInterval = null;
+            }
+            document.getElementById("status").innerHTML = "Đã dừng phiên làm việc.";
+            document.getElementById("btnStart").style.display = "block";
+            document.getElementById("btnStop").style.display = "none";
+            
+            // Xóa bản đồ hiện tại
+            if (shipperMarker) { map.removeLayer(shipperMarker); shipperMarker = null; }
+            if (routingControl) { map.removeControl(routingControl); routingControl = null; }
+        });
+    </script>
+</body>
+</html>

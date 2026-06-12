@@ -1,0 +1,79 @@
+@model Web_Quản_Lí_Nhà_Thuốc.Models.HoaDon
+
+@{
+    ViewData["Title"] = "Chi tiết Đơn hàng";
+}
+
+<div class="container mt-4">
+    <h2>Chi tiết Đơn hàng #@Model.MaHoaDon</h2>
+    <hr />
+    <div class="row">
+        <div class="col-md-6">
+            <h4>Thông tin khách hàng</h4>
+            <p><strong>Tên:</strong> @(Model.User?.HoTen ?? "Khách vãng lai")</p>
+            <p><strong>SĐT:</strong> @(Model.User?.PhoneNumber ?? "N/A")</p>
+            <p><strong>Địa chỉ:</strong> @(Model.User?.DiaChi ?? "N/A")</p>
+            <p><strong>Ngày đặt:</strong> @Model.NgayDat.ToString("dd/MM/yyyy HH:mm")</p>
+            <p><strong>Tổng tiền:</strong> <span class="text-danger fw-bold">@Model.TongTien.ToString("N0") ₫</span></p>
+            <p>
+                <strong>Trạng thái hiện tại:</strong> 
+                <span class="badge bg-info">@Model.TrangThai</span>
+            </p>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-warning">
+                    <strong>Cập nhật Trạng thái Giao hàng</strong>
+                </div>
+                <div class="card-body">
+                    <form asp-action="UpdateStatus" method="post">
+                        <input type="hidden" name="id" value="@Model.MaHoaDon" />
+                        <select name="status" class="form-select mb-3">
+                            <option value="Đang chuẩn bị hàng">Đang chuẩn bị hàng</option>
+                            <option value="Đang giao">Đang giao hàng (Shipper)</option>
+                            <option value="Đã giao">Đã giao thành công</option>
+                            <option value="Đã hủy">Đã hủy</option>
+                        </select>
+                        <button type="submit" class="btn btn-primary w-100">Cập nhật</button>
+                    </form>
+                    
+                    @if (Model.TrangThai == "Đang giao")
+                    {
+                        <hr/>
+                        <p class="text-muted small">Nếu trạng thái là "Đang giao", bạn có thể gửi Link Shipper cho người giao hàng để họ phát vị trí GPS.</p>
+                        <a asp-action="ShipperTracking" asp-route-id="@Model.MaHoaDon" class="btn btn-outline-dark btn-sm w-100 mb-2" target="_blank">Mở màn hình Shipper</a>
+                        <a asp-action="MapTracking" asp-route-id="@Model.MaHoaDon" class="btn btn-success btn-sm w-100">Xem Bản Đồ (Dành cho Dược sĩ)</a>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h4 class="mt-4">Chi tiết mặt hàng</h4>
+    <table class="table table-bordered mt-2">
+        <thead class="table-light">
+            <tr>
+                <th>Tên Thuốc</th>
+                <th>Số lượng</th>
+                <th>Đơn giá</th>
+                <th>Thành tiền</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if(Model.ChiTietHoaDons != null)
+            {
+                foreach(var item in Model.ChiTietHoaDons)
+                {
+                    <tr>
+                        <td>@item.Thuoc?.TenThuoc</td>
+                        <td>@item.SoLuong</td>
+                        <td>@item.DonGia.ToString("N0") ₫</td>
+                        <td>@((item.SoLuong * item.DonGia).ToString("N0")) ₫</td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+    
+    <a asp-action="Index" class="btn btn-secondary mt-3">Quay lại danh sách</a>
+</div>

@@ -9,5 +9,11 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Hubs
         {
             await Clients.All.SendAsync("ReceiveStockUpdate", drugId, newQuantity);
         }
+
+        // Nhận tọa độ từ Shipper và phát sóng tới Khách hàng đang xem đơn hàng đó
+        public async Task UpdateLocation(int orderId, double lat, double lng)
+        {
+            await Clients.All.SendAsync("ReceiveLocationUpdate", orderId, lat, lng);
+        }
     }
 }

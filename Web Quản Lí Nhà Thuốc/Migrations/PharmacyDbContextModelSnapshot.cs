@@ -444,8 +444,23 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MaHoaDon"));
 
+                    b.Property<double?>("CustomerLat")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("CustomerLng")
+                        .HasColumnType("float");
+
+                    b.Property<string>("DiaChiGiaoHang")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("NgayDat")
                         .HasColumnType("datetime2");
+
+                    b.Property<double?>("ShipperLat")
+                        .HasColumnType("float");
+
+                    b.Property<double?>("ShipperLng")
+                        .HasColumnType("float");
 
                     b.Property<decimal>("TongTien")
                         .HasColumnType("decimal(18,2)");
@@ -463,6 +478,48 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("HoaDons");
+                });
+
+            modelBuilder.Entity("Web_Quản_Lí_Nhà_Thuốc.Models.LichUongThuoc", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("DaUongHomNay")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("GhiChu")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("GioUong")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("LieuDung")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("NgayCapNhat")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("TenThuoc")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("LichUongThuocs");
                 });
 
             modelBuilder.Entity("Web_Quản_Lí_Nhà_Thuốc.Models.LoThuoc", b =>
@@ -554,6 +611,10 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Migrations
 
                     b.Property<string>("MoTa")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NhomDieuTri")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<int>("SoLuong")
                         .HasColumnType("int");

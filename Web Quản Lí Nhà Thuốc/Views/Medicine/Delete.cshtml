@@ -1,0 +1,27 @@
+@model Web_Quản_Lí_Nhà_Thuốc.Models.Thuoc
+
+@{
+    ViewData["Title"] = "Xóa Thuốc";
+}
+
+<div class="container mt-4">
+    <h2>Xóa thuốc</h2>
+    <h4 class="text-danger">Bạn có chắc chắn muốn xóa thuốc này không?</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">Tên Thuốc</dt>
+        <dd class="col-sm-10">@Model.TenThuoc</dd>
+        
+        <dt class="col-sm-2">Phân Loại</dt>
+        <dd class="col-sm-10">@Model.LoaiThuoc?.TenLoai</dd>
+        
+        <dt class="col-sm-2">Số lượng tồn</dt>
+        <dd class="col-sm-10">@Model.SoLuong</dd>
+    </dl>
+    
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="MaThuoc" />
+        <input type="submit" value="Xác nhận Xóa" class="btn btn-danger" /> |
+        <a asp-action="Index" class="btn btn-secondary">Quay lại danh sách</a>
+    </form>
+</div>

@@ -1,0 +1,208 @@
+@model Web_Quản_Lí_Nhà_Thuốc.Models.HoaDon
+
+@{
+    ViewData["Title"] = "Theo dõi Đơn Hàng";
+}
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
+<style>
+    .tracking-header {
+        background: linear-gradient(135deg, #0d6efd, #0dcaf0);
+        color: white;
+        padding: 25px 35px;
+        border-radius: 20px 20px 0 0;
+        box-shadow: 0 4px 15px rgba(13, 110, 253, 0.2);
+    }
+    
+    .tracking-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        margin-bottom: 40px;
+        border: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .tracking-body {
+        padding: 25px;
+    }
+
+    #map { 
+        height: 75vh; 
+        width: 100%; 
+        border-radius: 15px; 
+        box-shadow: 0 8px 25px rgba(0,0,0,0.08); 
+        border: 3px solid #f8f9fa;
+        z-index: 1; /* Để tránh đè lên các tooltip/dropdown khác */
+    }
+
+    .pulse-dot {
+        height: 14px;
+        width: 14px;
+        background-color: #dc3545;
+        border-radius: 50%;
+        display: inline-block;
+        margin-right: 12px;
+        box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7);
+        animation: pulse-red 1.5s infinite;
+    }
+
+    .pulse-dot.active {
+        background-color: #198754;
+        box-shadow: 0 0 0 0 rgba(25, 135, 84, 0.7);
+        animation: pulse-green 1.5s infinite;
+    }
+
+    @@keyframes pulse-red {
+        0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7); }
+        70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(220, 53, 69, 0); }
+        100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(220, 53, 69, 0); }
+    }
+
+    @@keyframes pulse-green {
+        0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(25, 135, 84, 0.7); }
+        70% { transform: scale(1); box-shadow: 0 0 0 12px rgba(25, 135, 84, 0); }
+        100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(25, 135, 84, 0); }
+    }
+</style>
+
+<div class="container-fluid mt-4 px-4 px-lg-5">
+    <div class="tracking-card">
+        <div class="tracking-header d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <div>
+                <h2 class="mb-1 fw-bold text-white"><i class="bi bi-geo-alt-fill me-2"></i>Bản Đồ Giao Hàng Đơn #@Model.MaHoaDon</h2>
+                <p class="mb-0 text-white-50">Vị trí của shipper sẽ tự động cập nhật trực tiếp trên bản đồ.</p>
+            </div>
+            <div>
+                <span class="badge bg-white text-primary px-4 py-2 fs-5 rounded-pill shadow-sm">
+                    Trạng thái: @Model.TrangThai
+                </span>
+            </div>
+        </div>
+        
+        <div class="tracking-body">
+            <div class="d-flex align-items-center mb-4 p-3 rounded-4" style="background-color: #f8f9fa; border: 1px solid #e9ecef;">
+                <div id="dotIndicator" class="pulse-dot"></div>
+                <div id="statusIndicator" class="text-secondary fw-bold fs-5 mb-0">Đang chờ tín hiệu GPS từ shipper...</div>
+            </div>
+
+            <div id="map"></div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
+    <script src="~/lib/microsoft/signalr/dist/browser/signalr.js"></script>
+
+    <script>
+        const orderIdToTrack = @Model.MaHoaDon;
+        
+        // Khởi tạo bản đồ
+        var map = L.map('map').setView([10.762622, 106.660172], 13);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
+
+        // Icon xe máy (Shipper)
+        var motorIcon = L.icon({
+            iconUrl: 'https://cdn-icons-png.flaticon.com/512/3063/3063822.png',
+            iconSize: [45, 45],
+            iconAnchor: [22, 22]
+        });
+
+        // Xử lý hiển thị Nhà Khách Hàng (Điểm đến)
+        @if(Model.CustomerLat.HasValue && Model.CustomerLng.HasValue)
+        {
+            <text>
+            var customerLat = @Model.CustomerLat.Value.ToString(System.Globalization.CultureInfo.InvariantCulture);
+            var customerLng = @Model.CustomerLng.Value.ToString(System.Globalization.CultureInfo.InvariantCulture);
+            
+            // Icon Ngôi Nhà
+            var homeIcon = L.icon({
+                iconUrl: 'https://cdn-icons-png.flaticon.com/512/25/25694.png',
+                iconSize: [40, 40],
+                iconAnchor: [20, 40],
+                popupAnchor: [0, -40]
+            });
+
+            var customerMarker = L.marker([customerLat, customerLng], {icon: homeIcon})
+                .addTo(map)
+                .bindPopup("<div class='text-center'><b>🏡 Vị trí nhận hàng</b><br><span class='small'>@(string.IsNullOrEmpty(Model.DiaChiGiaoHang) ? "Khách đã ghim tọa độ" : Model.DiaChiGiaoHang)</span></div>")
+                .openPopup();
+
+            // Canh giữa bản đồ vào vị trí khách hàng ban đầu
+            map.setView([customerLat, customerLng], 14);
+            </text>
+        }
+
+        var shipperMarker = null;
+        var routingControl = null;
+
+        // Kết nối SignalR để nhận vị trí
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/inventoryHub")
+            .build();
+
+        connection.on("ReceiveLocationUpdate", function (orderId, lat, lng) {
+            if (orderId === orderIdToTrack) {
+                document.getElementById('dotIndicator').classList.add('active');
+                document.getElementById('statusIndicator').innerHTML = `<span class="text-success">Đang nhận tín hiệu GPS trực tiếp. (Cập nhật lúc: ${new Date().toLocaleTimeString()})</span>`;
+                
+                if (shipperMarker === null) {
+                    shipperMarker = L.marker([lat, lng], {icon: motorIcon}).addTo(map);
+                    
+                    @if(Model.CustomerLat.HasValue)
+                    {
+                        <text>
+                        // Vẽ đường đi từ Shipper đến Khách Hàng
+                        routingControl = L.Routing.control({
+                            waypoints: [
+                                L.latLng(lat, lng), // Điểm đi: Shipper
+                                L.latLng(customerLat, customerLng) // Điểm đến: Khách hàng
+                            ],
+                            createMarker: function() { return null; }, // Ẩn marker mặc định của routing
+                            routeWhileDragging: false,
+                            addWaypoints: false,
+                            showAlternatives: false,
+                            fitSelectedRoutes: true,
+                            show: false, // Ẩn bảng chỉ đường text
+                            lineOptions: {
+                                styles: [{color: '#0d6efd', opacity: 0.8, weight: 6}] // Vẽ đường màu xanh
+                            }
+                        }).addTo(map);
+                        </text>
+                    }
+                    else
+                    {
+                        <text>
+                        map.setView([lat, lng], 16);
+                        </text>
+                    }
+                } else {
+                    shipperMarker.setLatLng([lat, lng]);
+                    
+                    @if(Model.CustomerLat.HasValue)
+                    {
+                        <text>
+                        // Cập nhật lại đường đi khi shipper di chuyển
+                        if (routingControl !== null) {
+                            routingControl.setWaypoints([
+                                L.latLng(lat, lng),
+                                L.latLng(customerLat, customerLng)
+                            ]);
+                        }
+                        </text>
+                    }
+                }
+            }
+        });
+
+        connection.start().catch(function (err) {
+            return console.error(err.toString());
+        });
+    </script>
+}

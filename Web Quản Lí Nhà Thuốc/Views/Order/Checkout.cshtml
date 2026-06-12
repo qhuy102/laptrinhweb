@@ -1,0 +1,134 @@
+@model IEnumerable<Web_Quản_Lí_Nhà_Thuốc.Models.GioHang>
+
+@{
+    ViewData["Title"] = "Thanh toán & Chọn vị trí nhận hàng";
+}
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<style>
+    #map { height: 400px; width: 100%; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 2px solid #dee2e6; z-index: 1; }
+    .checkout-card { border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border: none; }
+    .order-summary { background-color: #f8f9fa; border-radius: 15px; padding: 20px; }
+</style>
+
+<div class="container mt-4 mb-5">
+    <h2 class="mb-4 fw-bold text-primary"><i class="bi bi-cart-check-fill me-2"></i>Thanh Toán Đơn Hàng</h2>
+
+    <div class="row">
+        <!-- Cột trái: Form thông tin & Bản đồ -->
+        <div class="col-lg-7">
+            <div class="card checkout-card mb-4">
+                <div class="card-body p-4">
+                    <h4 class="card-title fw-bold mb-4"><i class="bi bi-geo-alt-fill text-danger me-2"></i>Chọn Vị Trí Giao Hàng</h4>
+                    <p class="text-muted small">Hãy kéo thả điểm ghim màu đỏ trên bản đồ để chọn chính xác vị trí nhận hàng của bạn.</p>
+                    
+                    <div id="map"></div>
+
+                    <form asp-action="Checkout" method="post" id="checkoutForm">
+                        <input type="hidden" id="CustomerLat" name="customerLat" required />
+                        <input type="hidden" id="CustomerLng" name="customerLng" required />
+
+                        <div class="mb-3">
+                            <label for="diaChi" class="form-label fw-bold">Địa chỉ chi tiết (Số nhà, tên đường...)</label>
+                            <input type="text" class="form-control form-control-lg" id="diaChi" name="diaChi" placeholder="VD: 123 Đường Lê Lợi, Phường Bến Thành..." required>
+                        </div>
+                        
+                        <div class="alert alert-info mt-3">
+                            <i class="bi bi-info-circle-fill me-2"></i> Hệ thống sẽ dựa vào tọa độ trên bản đồ để Shipper giao hàng chính xác đến bạn.
+                        </div>
+
+                        <button type="button" class="btn btn-success btn-lg w-100 mt-3 rounded-pill fw-bold" onclick="submitOrder()">
+                            <i class="bi bi-check-circle-fill me-2"></i>XÁC NHẬN ĐẶT HÀNG
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cột phải: Tóm tắt đơn hàng -->
+        <div class="col-lg-5">
+            <div class="order-summary">
+                <h4 class="fw-bold mb-4">Tóm tắt đơn hàng</h4>
+                
+                <div class="list-group mb-4">
+                    @foreach (var item in Model)
+                    {
+                        <div class="list-group-item d-flex justify-content-between align-items-center bg-transparent px-0 border-start-0 border-end-0">
+                            <div>
+                                <h6 class="my-0">@item.Thuoc.TenThuoc</h6>
+                                <small class="text-muted">Số lượng: @item.SoLuong</small>
+                            </div>
+                            <span class="text-muted fw-bold">@((item.Thuoc.DonGia * item.SoLuong).ToString("N0")) đ</span>
+                        </div>
+                    }
+                </div>
+                
+                <div class="d-flex justify-content-between align-items-center border-top pt-3">
+                    <h5 class="mb-0 fw-bold">Tổng cộng:</h5>
+                    <h4 class="mb-0 text-danger fw-bold">@((ViewBag.TongTien ?? 0).ToString("N0")) đ</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // Khởi tạo bản đồ tại trung tâm TP.HCM
+        var map = L.map('map').setView([10.762622, 106.660172], 13);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
+
+        // Tạo marker có thể kéo thả được
+        var marker = L.marker([10.762622, 106.660172], {
+            draggable: true
+        }).addTo(map);
+
+        // Lấy vị trí hiện tại của người dùng (nếu có GPS)
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function(position) {
+                var lat = position.coords.latitude;
+                var lng = position.coords.longitude;
+                var newLatLng = new L.LatLng(lat, lng);
+                
+                marker.setLatLng(newLatLng);
+                map.setView(newLatLng, 16);
+                
+                updateHiddenInputs(lat, lng);
+            });
+        }
+
+        // Cập nhật tọa độ khi người dùng kéo thả ghim
+        marker.on('dragend', function(e) {
+            var position = marker.getLatLng();
+            updateHiddenInputs(position.lat, position.lng);
+        });
+        
+        // Cập nhật tọa độ khi click lên bản đồ
+        map.on('click', function(e) {
+            marker.setLatLng(e.latlng);
+            updateHiddenInputs(e.latlng.lat, e.latlng.lng);
+        });
+
+        function updateHiddenInputs(lat, lng) {
+            document.getElementById('CustomerLat').value = lat;
+            document.getElementById('CustomerLng').value = lng;
+        }
+
+        // Đảm bảo có tọa độ mặc định ban đầu
+        updateHiddenInputs(10.762622, 106.660172);
+
+        function submitOrder() {
+            var form = document.getElementById('checkoutForm');
+            if(form.checkValidity()) {
+                form.submit();
+            } else {
+                form.reportValidity();
+            }
+        }
+    </script>
+}

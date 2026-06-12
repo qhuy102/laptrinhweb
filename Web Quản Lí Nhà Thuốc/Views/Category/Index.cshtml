@@ -1,0 +1,32 @@
+@model IEnumerable<Web_Quản_Lí_Nhà_Thuốc.Models.LoaiThuoc>
+
+@{
+    ViewData["Title"] = "Quản lý Loại Thuốc";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Phân loại thuốc</h2>
+        <a asp-action="Create" class="btn btn-primary">Thêm loại thuốc mới</a>
+    </div>
+
+    <table class="table table-bordered table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th>Tên Loại</th>
+                <th>Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model) {
+                <tr>
+                    <td>@item.TenLoai</td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Sửa</a>
+                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Xóa</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

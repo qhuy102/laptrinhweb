@@ -1,0 +1,104 @@
+@model IEnumerable<Web_Quản_Lí_Nhà_Thuốc.Models.HoaDon>
+
+@{
+    ViewData["Title"] = "Đơn Hàng Của Tôi";
+}
+
+<div class="container py-5">
+    <h2 class="mb-4 text-primary"><i class="bi bi-box-seam me-2"></i>Đơn hàng của tôi</h2>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info shadow-sm rounded-3">
+            <i class="bi bi-info-circle me-2"></i>Bạn chưa có đơn hàng nào. 
+            <a asp-controller="Home" asp-action="Index" class="alert-link ms-2">Mua sắm ngay</a>
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            @foreach (var order in Model)
+            {
+                <div class="col-12 mb-4">
+                    <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
+                        <div class="card-header bg-light border-0 py-3 d-flex flex-wrap justify-content-between align-items-center">
+                            <div class="d-flex align-items-center mb-2 mb-md-0">
+                                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 45px; height: 45px;">
+                                    <i class="bi bi-receipt fs-5"></i>
+                                </div>
+                                <div>
+                                    <h5 class="mb-0 text-dark">Đơn Hàng #@order.MaHoaDon</h5>
+                                    <small class="text-muted">Ngày đặt: @order.NgayDat.ToString("dd/MM/yyyy HH:mm")</small>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                @{
+                                    string badgeClass = order.TrangThai switch
+                                    {
+                                        "Chờ Xử Lý" => "bg-warning text-dark",
+                                        "Đang Giao" => "bg-info text-white",
+                                        "Đã Giao" => "bg-success text-white",
+                                        "Đã Hủy" => "bg-danger text-white",
+                                        _ => "bg-secondary text-white"
+                                    };
+                                }
+                                <span class="badge rounded-pill @badgeClass fs-6 px-3 py-2">@order.TrangThai</span>
+                            </div>
+                        </div>
+                        
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th class="ps-4">Sản phẩm</th>
+                                            <th class="text-center">Số lượng</th>
+                                            <th class="text-end">Đơn giá</th>
+                                            <th class="text-end pe-4">Thành tiền</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var detail in order.ChiTietHoaDons)
+                                        {
+                                            <tr>
+                                                <td class="ps-4 text-dark fw-medium">@(detail.Thuoc?.TenThuoc ?? "Sản phẩm không tồn tại")</td>
+                                                <td class="text-center">@detail.SoLuong</td>
+                                                <td class="text-end text-muted">@detail.DonGia.ToString("N0") đ</td>
+                                                <td class="text-end pe-4 fw-bold text-dark">@((detail.SoLuong * detail.DonGia).ToString("N0")) đ</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <div class="card-footer bg-white border-top-0 py-3 d-flex flex-wrap justify-content-between align-items-center">
+                            <h5 class="mb-0 text-danger fw-bold ms-2">
+                                <span class="text-dark fs-6 fw-normal me-2">Tổng tiền:</span>
+                                @order.TongTien.ToString("N0") đ
+                            </h5>
+                            
+                            <div class="me-2 mt-2 mt-sm-0">
+                                @if (order.TrangThai != "Đã Giao" && order.TrangThai != "Đã Hủy")
+                                {
+                                    <a asp-controller="OrderManagement" asp-action="MapTracking" asp-route-id="@order.MaHoaDon" class="btn btn-outline-primary rounded-pill px-4">
+                                        <i class="bi bi-geo-alt-fill me-1"></i> Theo dõi vận chuyển
+                                    </a>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

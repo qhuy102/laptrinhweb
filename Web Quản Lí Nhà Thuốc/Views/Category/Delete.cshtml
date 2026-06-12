@@ -1,0 +1,25 @@
+@model Web_Quản_Lí_Nhà_Thuốc.Models.LoaiThuoc
+
+@{
+    ViewData["Title"] = "Xóa Loại Thuốc";
+}
+
+<div class="container mt-4">
+    <h2>Xóa loại thuốc</h2>
+    <h4 class="text-danger">Bạn có chắc chắn muốn xóa loại thuốc này không?</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            Tên Loại
+        </dt>
+        <dd class="col-sm-10">
+            @Model.TenLoai
+        </dd>
+    </dl>
+    
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="Id" />
+        <input type="submit" value="Xóa" class="btn btn-danger" /> |
+        <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+    </form>
+</div>

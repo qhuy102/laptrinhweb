@@ -1,0 +1,30 @@
+@model Web_Quản_Lí_Nhà_Thuốc.Models.LoaiThuoc
+
+@{
+    ViewData["Title"] = "Sửa Loại Thuốc";
+}
+
+<div class="container mt-4">
+    <h2>Chỉnh sửa Loại thuốc</h2>
+    <hr />
+    <div class="row">
+        <div class="col-md-4">
+            <form asp-action="Edit">
+                <input type="hidden" asp-for="Id" />
+                <div class="form-group mb-3">
+                    <label asp-for="TenLoai" class="control-label">Tên loại thuốc</label>
+                    <input asp-for="TenLoai" class="form-control" />
+                    <span asp-validation-for="TenLoai" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <input type="submit" value="Lưu" class="btn btn-primary" />
+                    <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

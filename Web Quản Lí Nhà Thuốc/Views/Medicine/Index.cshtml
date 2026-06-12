@@ -1,0 +1,50 @@
+@model IEnumerable<Web_Quản_Lí_Nhà_Thuốc.Models.Thuoc>
+
+@{
+    ViewData["Title"] = "Quản lý Thuốc";
+}
+
+<div class="container-fluid mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Quản lý danh mục thuốc</h2>
+        <a asp-action="Create" class="btn btn-primary">Thêm thuốc mới</a>
+    </div>
+
+    <table class="table table-bordered table-striped table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>Tên Thuốc</th>
+                <th>Phân loại</th>
+                <th>Giá</th>
+                <th>Số lượng</th>
+                <th>HSD</th>
+                <th>Hoạt chất</th>
+                <th>Vị trí kệ</th>
+                <th>Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model) {
+                <tr>
+                    <td>@item.TenThuoc</td>
+                    <td>@(item.LoaiThuoc?.TenLoai ?? "Chưa phân loại")</td>
+                    <td>@item.DonGia.ToString("N0") ₫</td>
+                    <td>
+                        @if (item.SoLuong < 20) {
+                            <span class="badge bg-danger">@item.SoLuong</span>
+                        } else {
+                            <span class="badge bg-success">@item.SoLuong</span>
+                        }
+                    </td>
+                    <td>@item.HanSuDung.ToString("dd/MM/yyyy")</td>
+                    <td>@item.HoatChat</td>
+                    <td>@item.ViTriKe</td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.MaThuoc" class="btn btn-sm btn-warning">Sửa</a>
+                        <a asp-action="Delete" asp-route-id="@item.MaThuoc" class="btn btn-sm btn-danger">Xóa</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

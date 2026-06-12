@@ -1,0 +1,67 @@
+@model Web_Quản_Lí_Nhà_Thuốc.Models.Thuoc
+
+@{
+    ViewData["Title"] = "Chỉnh sửa Thuốc";
+}
+
+<div class="container mt-4">
+    <h2>Chỉnh sửa thông tin Thuốc</h2>
+    <hr />
+    <form asp-action="Edit">
+        <input type="hidden" asp-for="MaThuoc" />
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group mb-3">
+                    <label asp-for="TenThuoc" class="control-label">Tên thuốc</label>
+                    <input asp-for="TenThuoc" class="form-control" />
+                    <span asp-validation-for="TenThuoc" class="text-danger"></span>
+                </div>
+                <div class="form-group mb-3">
+                    <label asp-for="DonGia" class="control-label">Đơn giá (VNĐ)</label>
+                    <input asp-for="DonGia" type="number" class="form-control" />
+                    <span asp-validation-for="DonGia" class="text-danger"></span>
+                </div>
+                <div class="form-group mb-3">
+                    <label asp-for="SoLuong" class="control-label">Số lượng</label>
+                    <input asp-for="SoLuong" type="number" class="form-control" />
+                    <span asp-validation-for="SoLuong" class="text-danger"></span>
+                </div>
+                <div class="form-group mb-3">
+                    <label asp-for="LoaiThuocId" class="control-label">Loại thuốc</label>
+                    <select asp-for="LoaiThuocId" class="form-control" asp-items="ViewBag.LoaiThuocId"></select>
+                </div>
+                <div class="form-group mb-3">
+                    <label asp-for="HanSuDung" class="control-label">Hạn sử dụng</label>
+                    <input asp-for="HanSuDung" type="date" class="form-control" />
+                    <span asp-validation-for="HanSuDung" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group mb-3">
+                    <label asp-for="DonViCoBan" class="control-label">Đơn vị cơ bản</label>
+                    <input asp-for="DonViCoBan" class="form-control" />
+                </div>
+                <div class="form-group mb-3">
+                    <label asp-for="HoatChat" class="control-label">Hoạt chất chính</label>
+                    <input asp-for="HoatChat" class="form-control" />
+                </div>
+                <div class="form-group mb-3">
+                    <label asp-for="ViTriKe" class="control-label">Vị trí kệ</label>
+                    <input asp-for="ViTriKe" class="form-control" />
+                </div>
+                <div class="form-group mb-3">
+                    <label asp-for="CongDung" class="control-label">Công dụng</label>
+                    <textarea asp-for="CongDung" class="form-control"></textarea>
+                </div>
+            </div>
+        </div>
+        <div class="form-group mt-3">
+            <input type="submit" value="Lưu thay đổi" class="btn btn-primary" />
+            <a asp-action="Index" class="btn btn-secondary">Quay lại danh sách</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

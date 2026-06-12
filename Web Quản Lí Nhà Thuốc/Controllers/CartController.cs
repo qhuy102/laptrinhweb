@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -44,11 +44,15 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Controllers
 
             if (cartItem == null)
             {
+                var thuoc = await _context.Thuocs.FindAsync(id);
+                if (thuoc == null) return NotFound();
+
                 cartItem = new GioHang
                 {
                     UserId = user.Id,
                     MaThuoc = id,
-                    SoLuong = 1
+                    SoLuong = 1,
+                    Thuoc = thuoc
                 };
 
                 _context.GioHangs.Add(cartItem);
