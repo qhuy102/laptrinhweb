@@ -73,8 +73,17 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Controllers
                 int? loaiId = null;
                 if (int.TryParse(Request.Query["loaiId"].FirstOrDefault() ?? "", out var tmp)) loaiId = tmp;
 
+                string searchTerm = Request.Query["query"].FirstOrDefault() ?? "";
+
                 var query = _context.Thuocs.Include(t => t.LoaiThuoc).Where(t => t.SoLuong > 0).AsQueryable();
                 if (loaiId.HasValue) query = query.Where(t => t.LoaiThuocId == loaiId.Value);
+
+                if (!string.IsNullOrWhiteSpace(searchTerm))
+                {
+                    var normalizedSearch = searchTerm.Trim().ToLower();
+                    query = query.Where(t => t.TenThuoc.ToLower().Contains(normalizedSearch) || 
+                                             (t.HoatChat != null && t.HoatChat.ToLower().Contains(normalizedSearch)));
+                }
 
                 var items = await query.OrderBy(t => t.TenThuoc).ToListAsync();
                 return View(items);

@@ -25,6 +25,54 @@
     <div class="hero-pattern"></div>
 </div>
 
+<!-- Quick Features Navigation -->
+<div class="row g-3 mb-5 justify-content-center">
+    <div class="col-6 col-md-3">
+        <a href="/Home/PrescriptionUpload" class="text-decoration-none text-dark">
+            <div class="card border-0 shadow-sm h-100 quick-feature-card text-center p-3 bg-white" style="border-radius: 16px; transition: all 0.3s ease;">
+                <div class="feature-icon bg-teal bg-opacity-10 text-teal rounded-3 mx-auto d-flex align-items-center justify-content-center mb-3" style="width: 56px; height: 56px;">
+                    <i class="bi bi-file-earmark-medical fs-3"></i>
+                </div>
+                <h6 class="fw-bold mb-1">Cần mua thuốc</h6>
+                <p class="text-muted mb-0" style="font-size: 0.75rem;">Chụp ảnh / Tải đơn thuốc</p>
+            </div>
+        </a>
+    </div>
+    <div class="col-6 col-md-3">
+        <a href="/Home/PrescriptionUpload?mode=consult" class="text-decoration-none text-dark">
+            <div class="card border-0 shadow-sm h-100 quick-feature-card text-center p-3 bg-white" style="border-radius: 16px; transition: all 0.3s ease;">
+                <div class="feature-icon bg-success bg-opacity-10 text-success rounded-3 mx-auto d-flex align-items-center justify-content-center mb-3" style="width: 56px; height: 56px;">
+                    <i class="bi bi-person-fill-check fs-3"></i>
+                </div>
+                <h6 class="fw-bold mb-1">Tư vấn với Dược Sĩ</h6>
+                <p class="text-muted mb-0" style="font-size: 0.75rem;">Hỏi đáp, tư vấn miễn phí</p>
+            </div>
+        </a>
+    </div>
+    <div class="col-6 col-md-3">
+        <a href="/Order/MyOrders" class="text-decoration-none text-dark">
+            <div class="card border-0 shadow-sm h-100 quick-feature-card text-center p-3 bg-white" style="border-radius: 16px; transition: all 0.3s ease;">
+                <div class="feature-icon bg-warning bg-opacity-10 text-warning rounded-3 mx-auto d-flex align-items-center justify-content-center mb-3" style="width: 56px; height: 56px;">
+                    <i class="bi bi-journal-medical fs-3"></i>
+                </div>
+                <h6 class="fw-bold mb-1">Đơn của tôi</h6>
+                <p class="text-muted mb-0" style="font-size: 0.75rem;">Xem lịch sử đơn hàng</p>
+            </div>
+        </a>
+    </div>
+    <div class="col-6 col-md-3">
+        <a href="#san-pham" class="text-decoration-none text-dark">
+            <div class="card border-0 shadow-sm h-100 quick-feature-card text-center p-3 bg-white" style="border-radius: 16px; transition: all 0.3s ease;">
+                <div class="feature-icon bg-info bg-opacity-10 text-info rounded-3 mx-auto d-flex align-items-center justify-content-center mb-3" style="width: 56px; height: 56px;">
+                    <i class="bi bi-geo-alt-fill fs-3"></i>
+                </div>
+                <h6 class="fw-bold mb-1">Tìm nhà thuốc</h6>
+                <p class="text-muted mb-0" style="font-size: 0.75rem;">Hệ thống nhà thuốc</p>
+            </div>
+        </a>
+    </div>
+</div>
+
 <!-- Membership Benefits Section -->
 <div class="card border-0 shadow-sm mb-5 p-4" style="border-radius: 20px; background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 100%);">
     <div class="row align-items-center">
@@ -421,5 +469,15 @@ function filterProducts(type, value, btn) {
 
     @@media (max-width: 991px) {
         .toolbar-links { display: none; }
+    }
+
+    .quick-feature-card {
+        border: 1px solid #f1f5f9 !important;
+        transition: all 0.25s ease !important;
+    }
+    .quick-feature-card:hover {
+        transform: translateY(-5px) !important;
+        box-shadow: 0 12px 25px rgba(13, 148, 136, 0.08) !important;
+        border-color: rgba(13, 148, 136, 0.3) !important;
     }
 </style>

@@ -585,7 +585,6 @@ D:\laptrinhweb\Web Quản Lí Nhà Thuốc\obj\Debug\net8.0\refint\Web Quản L�
 D:\laptrinhweb\Web Quản Lí Nhà Thuốc\obj\Debug\net8.0\Web Quản Lí Nhà Thuốc.pdb
 D:\laptrinhweb\Web Quản Lí Nhà Thuốc\obj\Debug\net8.0\Web Quản Lí Nhà Thuốc.genruntimeconfig.cache
 D:\laptrinhweb\Web Quản Lí Nhà Thuốc\obj\Debug\net8.0\ref\Web Quản Lí Nhà Thuốc.dll
-D:\laptrinhweb\Web Quản Lí Nhà Thuốc\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
 I:\laptrinhweb\Web Quản Lí Nhà Thuốc\bin\Debug\net8.0\appsettings.Development.json
 I:\laptrinhweb\Web Quản Lí Nhà Thuốc\bin\Debug\net8.0\appsettings.json
 I:\laptrinhweb\Web Quản Lí Nhà Thuốc\bin\Debug\net8.0\Web Quản Lí Nhà Thuốc.staticwebassets.runtime.json
@@ -1151,3 +1150,5 @@ C:\Users\Windows 11\Desktop\New folder (2)\laptrinhweb\Web Quản Lí Nhà Thu�
 C:\Users\Windows 11\Desktop\New folder (2)\laptrinhweb\Web Quản Lí Nhà Thuốc\obj\Debug\net8.0\Web Quản Lí Nhà Thuốc.pdb
 C:\Users\Windows 11\Desktop\New folder (2)\laptrinhweb\Web Quản Lí Nhà Thuốc\obj\Debug\net8.0\Web Quản Lí Nhà Thuốc.genruntimeconfig.cache
 C:\Users\Windows 11\Desktop\New folder (2)\laptrinhweb\Web Quản Lí Nhà Thuốc\obj\Debug\net8.0\ref\Web Quản Lí Nhà Thuốc.dll
+D:\laptrinhweb\Web Quản Lí Nhà Thuốc\obj\Debug\net8.0\swae.build.ex.cache
+D:\laptrinhweb\Web Quản Lí Nhà Thuốc\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt

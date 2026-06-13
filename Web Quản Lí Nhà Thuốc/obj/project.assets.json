@@ -1,5 +1,5 @@
 {
-  "version": 4,
+  "version": 3,
   "targets": {
     "net8.0": {
       "Azure.Core/1.38.0": {
@@ -8074,23 +8074,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Windows 11\\.nuget\\packages\\": {},
+    "C:\\Users\\HOA\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Windows 11\\Desktop\\New folder (2)\\laptrinhweb\\Web Quản Lí Nhà Thuốc\\Web Quản Lí Nhà Thuốc.csproj",
+      "projectUniqueName": "D:\\laptrinhweb\\Web Quản Lí Nhà Thuốc\\Web Quản Lí Nhà Thuốc.csproj",
       "projectName": "Web Quản Lí Nhà Thuốc",
-      "projectPath": "C:\\Users\\Windows 11\\Desktop\\New folder (2)\\laptrinhweb\\Web Quản Lí Nhà Thuốc\\Web Quản Lí Nhà Thuốc.csproj",
-      "packagesPath": "C:\\Users\\Windows 11\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Windows 11\\Desktop\\New folder (2)\\laptrinhweb\\Web Quản Lí Nhà Thuốc\\obj\\",
+      "projectPath": "D:\\laptrinhweb\\Web Quản Lí Nhà Thuốc\\Web Quản Lí Nhà Thuốc.csproj",
+      "packagesPath": "C:\\Users\\HOA\\.nuget\\packages\\",
+      "outputPath": "D:\\laptrinhweb\\Web Quản Lí Nhà Thuốc\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\Windows 11\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\HOA\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
@@ -8118,7 +8118,7 @@
         "auditLevel": "low",
         "auditMode": "direct"
       },
-      "SdkAnalysisLevel": "10.0.300"
+      "SdkAnalysisLevel": "10.0.200"
     },
     "frameworks": {
       "net8.0": {
@@ -8163,24 +8163,6 @@
         ],
         "assetTargetFallback": true,
         "warn": true,
-        "downloadDependencies": [
-          {
-            "name": "Microsoft.AspNetCore.App.Ref",
-            "version": "[8.0.28, 8.0.28]"
-          },
-          {
-            "name": "Microsoft.NETCore.App.Host.win-x64",
-            "version": "[8.0.28, 8.0.28]"
-          },
-          {
-            "name": "Microsoft.NETCore.App.Ref",
-            "version": "[8.0.28, 8.0.28]"
-          },
-          {
-            "name": "Microsoft.WindowsDesktop.App.Ref",
-            "version": "[8.0.28, 8.0.28]"
-          }
-        ],
         "frameworkReferences": {
           "Microsoft.AspNetCore.App": {
             "privateAssets": "none"
@@ -8189,7 +8171,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.301/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.203/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

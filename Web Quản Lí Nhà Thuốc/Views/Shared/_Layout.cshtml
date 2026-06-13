@@ -13,6 +13,14 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" />
     <link rel="stylesheet" href="~/css/dashboard.css" asp-append-version="true" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .suggestion-item:hover {
+            background-color: #f1f5f9 !important;
+        }
+        .text-teal {
+            color: #0d9488 !important;
+        }
+    </style>
 </head>
 <body>
     @if (SignInManager.IsSignedIn(User) && (User.IsInRole("Admin") || User.IsInRole("Pharmacist")))
@@ -170,12 +178,15 @@
                 </div>
 
                 <div class="right-group d-flex align-items-center ms-auto gap-2">
-                    <div class="notification-btn position-relative me-2">
-                        <i class="bi bi-bell"></i>
-                        <span class="notification-badge">3</span>
+                    <div class="notification-btn position-relative me-2" style="cursor: pointer;" onclick="window.location.href='/Order/MyOrders'">
+                        <i class="bi bi-bell text-white fs-5"></i>
+                        <span id="notificationBadge" class="notification-badge" style="display: none;">0</span>
                     </div>
 
-                    <a href="/Cart" class="btn btn-link text-white position-relative me-2"><i class="bi bi-cart3"></i><span class="notification-badge">2</span></a>
+                    <a href="/Cart" class="btn btn-link text-white position-relative me-2">
+                        <i class="bi bi-cart3 fs-5"></i>
+                        <span id="cartBadge" class="notification-badge" style="display: none;">0</span>
+                    </a>
 
                     @if (SignInManager.IsSignedIn(User))
                     {
@@ -251,10 +262,13 @@
 
         <!-- Search bar below unified toolbar -->
         <div class="container py-3">
-            <div class="input-group shadow-sm rounded-pill mx-auto" style="max-width:920px;">
+            <div class="input-group shadow-sm rounded-pill mx-auto position-relative" style="max-width:920px; z-index: 1000;">
                 <span class="input-group-text bg-white border-0"><i class="bi bi-search"></i></span>
-                <input type="text" class="form-control border-0" placeholder="Tìm kiếm thuốc, bệnh, thành phần...">
-                <button class="btn btn-primary rounded-end px-4">Tìm kiếm</button>
+                <div class="flex-grow-1 position-relative">
+                    <input type="text" id="topbarSearchInput" class="form-control border-0 autocomplete-input" placeholder="Tìm kiếm thuốc, bệnh, thành phần..." autocomplete="off">
+                    <div id="searchSuggestionsDropdown" class="suggestions-dropdown shadow rounded-3 bg-white position-absolute w-100 mt-2 p-2" style="display: none; z-index: 1050; border: 1px solid #cbd5e1; max-height: 350px; overflow-y: auto;"></div>
+                </div>
+                <button class="btn btn-primary rounded-end px-4" onclick="triggerSearch()">Tìm kiếm</button>
             </div>
         </div>
 
@@ -268,6 +282,134 @@
     <script src="~/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <script>
+        // Update notification & cart counts dynamically
+        function updateTopbarCounts() {
+            fetch('/Home/GetCartAndNotificationCounts')
+                .then(res => res.json())
+                .then(data => {
+                    var cartBadge = document.getElementById("cartBadge");
+                    var notifBadge = document.getElementById("notificationBadge");
+
+                    if (cartBadge) {
+                        if (data.cartCount > 0) {
+                            cartBadge.innerText = data.cartCount;
+                            cartBadge.style.display = "inline-block";
+                        } else {
+                            cartBadge.style.display = "none";
+                        }
+                    }
+
+                    if (notifBadge) {
+                        if (data.notificationCount > 0) {
+                            notifBadge.innerText = data.notificationCount;
+                            notifBadge.style.display = "inline-block";
+                        } else {
+                            notifBadge.style.display = "none";
+                        }
+                    }
+                })
+                .catch(err => console.error("Error updating badges:", err));
+        }
+
+        // Initialize autocomplete search suggestions
+        document.addEventListener("DOMContentLoaded", function() {
+            updateTopbarCounts();
+
+            var searchInput = document.getElementById("topbarSearchInput");
+            var dropdown = document.getElementById("searchSuggestionsDropdown");
+
+            if (searchInput && dropdown) {
+                searchInput.addEventListener("input", function() {
+                    var query = searchInput.value.trim();
+                    if (query.length < 2) {
+                        dropdown.innerHTML = "";
+                        dropdown.style.display = "none";
+                        return;
+                    }
+
+                    fetch('/Home/GetSearchSuggestions?query=' + encodeURIComponent(query))
+                        .then(res => res.json())
+                        .then(data => {
+                            dropdown.innerHTML = "";
+                            if (data.length === 0) {
+                                dropdown.innerHTML = `<div class="p-2 text-muted small"><i class="bi bi-info-circle me-1"></i>Không tìm thấy thuốc khớp với từ khóa</div>`;
+                                dropdown.style.display = "block";
+                                return;
+                            }
+
+                            data.forEach(function(item) {
+                                var imgUrl = item.hinhAnh || "";
+                                if (!imgUrl) {
+                                    var lowerName = item.tenThuoc.toLowerCase();
+                                    if (lowerName.includes("panadol") || lowerName.includes("paracetamol")) {
+                                        imgUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Tylenol_Extra_Strength.jpg/500px-Tylenol_Extra_Strength.jpg";
+                                    } else if (lowerName.includes("cetaphil")) {
+                                        imgUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Cetaphil_Daily_Facial_Cleanser.png/500px-Cetaphil_Daily_Facial_Cleanser.png";
+                                    } else if (lowerName.includes("amoxicillin")) {
+                                        imgUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Amoxicillin_500_mg_capsule.JPG/500px-Amoxicillin_500_mg_capsule.JPG";
+                                    } else if (lowerName.includes("vitamin c")) {
+                                        imgUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Ascorbic_acid_crystals.jpg/500px-Ascorbic_acid_crystals.jpg";
+                                    } else {
+                                        imgUrl = "https://via.placeholder.com/60x60?text=Thuoc";
+                                    }
+                                }
+
+                                var priceFormatted = item.donGia.toLocaleString('vi-VN') + " đ";
+                                var itemHtml = `
+                                    <div class="suggestion-item d-flex align-items-center p-2 rounded" style="cursor: pointer; transition: background-color 0.2s;" onclick="selectSuggestion('${item.tenThuoc}')">
+                                        <img src="${imgUrl}" alt="${item.tenThuoc}" class="rounded border" style="width: 40px; height: 40px; object-fit: contain; background: white;">
+                                        <div class="ms-3 flex-grow-1 text-truncate">
+                                            <div class="fw-bold text-dark small mb-0">${item.tenThuoc}</div>
+                                            <span class="text-muted" style="font-size: 0.72rem;">${item.loaiThuoc} ${item.hoatChat ? ' • ' + item.hoatChat : ''}</span>
+                                        </div>
+                                        <div class="text-teal fw-bold small text-nowrap ms-2">${priceFormatted}</div>
+                                    </div>
+                                `;
+                                dropdown.innerHTML += itemHtml;
+                            });
+                            dropdown.style.display = "block";
+                        })
+                        .catch(err => console.error("Error fetching suggestions:", err));
+                });
+
+                // Hide dropdown on clicking outside
+                document.addEventListener("click", function(e) {
+                    if (!searchInput.contains(e.target) && !dropdown.contains(e.target)) {
+                        dropdown.style.display = "none";
+                    }
+                });
+
+                // Trigger search on Enter key
+                searchInput.addEventListener("keypress", function(e) {
+                    if (e.key === "Enter") {
+                        e.preventDefault();
+                        triggerSearch();
+                    }
+                });
+            }
+        });
+
+        function selectSuggestion(name) {
+            var searchInput = document.getElementById("topbarSearchInput");
+            if (searchInput) {
+                searchInput.value = name;
+                document.getElementById("searchSuggestionsDropdown").style.display = "none";
+                triggerSearch();
+            }
+        }
+
+        function triggerSearch() {
+            var searchInput = document.getElementById("topbarSearchInput");
+            if (searchInput && searchInput.value.trim()) {
+                window.location.href = '/Catalog/Index?cat=thuoc&loaiId=&query=' + encodeURIComponent(searchInput.value.trim());
+            }
+        }
+
+        // Hook updateTopbarCounts to window so other views can refresh counts
+        window.updateTopbarCounts = updateTopbarCounts;
+    </script>
 
     @await RenderSectionAsync("Scripts", required: false)
 </body>

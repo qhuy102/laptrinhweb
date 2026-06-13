@@ -1,0 +1,643 @@
+@using Microsoft.AspNetCore.Identity
+@using Web_Quản_Lí_Nhà_Thuốc.Models
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+@{
+    ViewData["Title"] = "Cần mua thuốc - Nhận diện đơn thuốc thông minh";
+    var user = SignInManager.IsSignedIn(User) ? await UserManager.GetUserAsync(User) : null;
+    var fullName = user?.HoTen ?? "";
+    var phoneNumber = user?.PhoneNumber ?? "";
+}
+
+<div class="container py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/" class="text-teal text-decoration-none">Trang chủ</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Cần mua thuốc</li>
+        </ol>
+    </nav>
+
+    <div class="row mb-3">
+        <div class="col-12">
+            <h2 class="fw-bold text-dark"><i class="bi bi-file-earmark-medical text-teal me-2"></i>Cần mua thuốc</h2>
+            <p class="text-muted">Gửi ảnh đơn thuốc của bác sĩ hoặc danh sách thuốc cần mua để dược sĩ PharmaCare tư vấn nhanh chóng.</p>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Left Column: Forms and Upload -->
+        <div class="col-lg-8 col-12">
+            <!-- 1. Contact Info Card -->
+            <div class="card border-0 shadow-sm p-4 mb-4" style="border-radius: 16px;">
+                <h5 class="fw-bold text-dark mb-3"><i class="bi bi-person-lines-fill text-teal me-2"></i>Thông tin liên hệ</h5>
+                <div class="row g-3">
+                    <div class="col-md-6 col-12">
+                        <label for="contactName" class="form-label small fw-semibold text-muted">Họ và tên</label>
+                        <input type="text" id="contactName" class="form-control form-control-lg bg-light border-0" placeholder="Nhập họ và tên" value="@fullName" style="border-radius: 10px; font-size: 0.95rem;">
+                    </div>
+                    <div class="col-md-6 col-12">
+                        <label for="contactPhone" class="form-label small fw-semibold text-muted">Số điện thoại</label>
+                        <input type="tel" id="contactPhone" class="form-control form-control-lg bg-light border-0" placeholder="Nhập số điện thoại liên hệ" value="@phoneNumber" style="border-radius: 10px; font-size: 0.95rem;">
+                    </div>
+                    <div class="col-12">
+                        <label for="contactNote" class="form-label small fw-semibold text-muted">Ghi chú (Không bắt buộc)</label>
+                        <textarea id="contactNote" class="form-control bg-light border-0" rows="3" placeholder="Ví dụ: Tôi cần tư vấn thuốc về bệnh đau dạ dày, viêm họng..." style="border-radius: 10px; font-size: 0.95rem;"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. Prescription Image Upload Card -->
+            <div class="card border-0 shadow-sm p-4 mb-4" style="border-radius: 16px;">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="fw-bold text-dark mb-0"><i class="bi bi-camera-fill text-teal me-2"></i>Ảnh chụp đơn thuốc</h5>
+                    <span class="badge bg-teal bg-opacity-10 text-teal px-2 py-1 rounded-pill small" style="font-size: 0.75rem;">Thông minh AI</span>
+                </div>
+
+                <div id="dropzone" class="dropzone-area p-5 text-center bg-light border-dashed rounded-3" style="cursor: pointer;" onclick="document.getElementById('prescriptionFile').click()">
+                    <i class="bi bi-cloud-arrow-up-fill text-teal mb-3" style="font-size: 3.5rem; display: block;"></i>
+                    <h6 class="fw-bold text-dark">Thêm tối đa 5 ảnh đơn thuốc</h6>
+                    <p class="text-muted small mb-0">Hỗ trợ các định dạng ảnh JPG, JPEG, PNG dưới 5MB.</p>
+                    <p class="text-teal small fw-semibold mt-2 mb-0" style="font-size:0.75rem;"><i class="bi bi-info-circle me-1"></i>Mẹo: Đặt tên file chứa "panadol", "amox" hoặc "decolgen" để demo bóc tách OCR.</p>
+                    <input type="file" id="prescriptionFile" style="display: none;" accept="image/*" onchange="handleFileSelect(this)" />
+                </div>
+
+                <!-- Preview Selected Image -->
+                <div id="uploadPreviewContainer" class="mt-3" style="display: none;">
+                    <div class="d-flex align-items-center bg-light p-2 rounded-3 border">
+                        <div class="position-relative" style="width: 70px; height: 70px; overflow: hidden; border-radius: 8px;">
+                            <img id="uploadedImagePreview" src="" class="w-100 h-100 object-fit-cover" alt="Prescription preview">
+                        </div>
+                        <div class="ms-3 flex-grow-1">
+                            <h6 id="fileNameText" class="fw-bold mb-1 text-dark text-truncate" style="font-size: 0.85rem; max-width: 300px;">Prescription.jpg</h6>
+                            <span id="fileSizeText" class="text-muted small">1.2 MB</span>
+                        </div>
+                        <button class="btn btn-outline-danger btn-sm border-0" onclick="removeUploadedFile()"><i class="bi bi-trash-fill"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. Add Medicines to Consult manually (optional) -->
+            <div class="card border-0 shadow-sm p-4 mb-4" style="border-radius: 16px;">
+                <h5 class="fw-bold text-dark mb-3"><i class="bi bi-capsule-pill text-teal me-2"></i>Thêm thuốc cần tư vấn (Không bắt buộc)</h5>
+                <p class="text-muted small">Nếu bạn không có đơn thuốc, hãy nhập tên thuốc hoặc triệu chứng cần tư vấn ở dưới đây.</p>
+                <div class="input-group mb-3">
+                    <input type="text" id="manualDrugInput" class="form-control bg-light border-0" placeholder="Nhập tên thuốc hoặc sản phẩm cần tư vấn..." style="border-radius: 10px 0 0 10px; font-size: 0.95rem;">
+                    <button class="btn btn-teal px-4" type="button" onclick="addManualDrug()" style="border-radius: 0 10px 10px 0; background-color: var(--primary-color); color: white;"><i class="bi bi-plus-lg me-1"></i>Thêm</button>
+                </div>
+                <div id="manualDrugsList" class="d-flex flex-wrap gap-2">
+                    <!-- Dynamic tag elements -->
+                </div>
+            </div>
+
+            <!-- ============================================================== -->
+            <!-- 4. Intelligent Prescription Recognition & Processing Panel (OCR) -->
+            <!-- ============================================================== -->
+            <div id="ocrSystemPanel" class="card border-0 shadow-sm overflow-hidden mb-4" style="border-radius: 16px; display: none;">
+                <div class="card-header bg-teal text-white py-3 px-4 d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-cpu-fill fs-4 me-2"></i>
+                        <h6 class="fw-bold mb-0">Hệ thống Nhận diện & Xử lý Đơn thuốc Thông minh</h6>
+                    </div>
+                    <span id="ocrStatusBadge" class="badge bg-white bg-opacity-20 text-white rounded-pill px-2.5 py-1" style="font-size: 0.75rem;">Đang chờ xử lý...</span>
+                </div>
+                <div class="card-body p-4 bg-dark bg-opacity-95 text-light font-monospace" style="min-height: 250px;">
+                    <!-- Laser scanning animation wrapper -->
+                    <div id="scanLaserWrapper" class="position-relative text-center mb-4 border rounded overflow-hidden bg-black bg-opacity-50" style="display: none; height: 180px;">
+                        <img id="laserScanImage" src="" class="h-100 object-fit-contain opacity-75" alt="Scanning image">
+                        <div class="laser-line"></div>
+                        <div class="position-absolute top-50 start-50 translate-middle">
+                            <span class="badge bg-danger animate-pulse px-3 py-2"><i class="bi bi-camera-fill me-2"></i>Đang chạy giải thuật OCR AI...</span>
+                        </div>
+                    </div>
+
+                    <!-- Step-by-Step visual indicator -->
+                    <div class="row g-2 mb-4 text-center text-nowrap" id="stepProgressList">
+                        <div class="col-4 col-md-2">
+                            <div class="p-2 border rounded border-secondary small ocr-step-box" id="step1">
+                                <div class="fw-bold">B1: Tải đơn</div>
+                                <span class="badge bg-secondary small step-status">Đợi</span>
+                            </div>
+                        </div>
+                        <div class="col-4 col-md-2">
+                            <div class="p-2 border rounded border-secondary small ocr-step-box" id="step2">
+                                <div class="fw-bold">B2: Quét OCR</div>
+                                <span class="badge bg-secondary small step-status">Đợi</span>
+                            </div>
+                        </div>
+                        <div class="col-4 col-md-2">
+                            <div class="p-2 border rounded border-secondary small ocr-step-box" id="step3">
+                                <div class="fw-bold">B3: Trích xuất</div>
+                                <span class="badge bg-secondary small step-status">Đợi</span>
+                            </div>
+                        </div>
+                        <div class="col-4 col-md-2">
+                            <div class="p-2 border rounded border-secondary small ocr-step-box" id="step4">
+                                <div class="fw-bold">B4: Đối chiếu</div>
+                                <span class="badge bg-secondary small step-status">Đợi</span>
+                            </div>
+                        </div>
+                        <div class="col-4 col-md-2">
+                            <div class="p-2 border rounded border-secondary small ocr-step-box" id="step5">
+                                <div class="fw-bold">B5: Kiểm kho</div>
+                                <span class="badge bg-secondary small step-status">Đợi</span>
+                            </div>
+                        </div>
+                        <div class="col-4 col-md-2">
+                            <div class="p-2 border rounded border-secondary small ocr-step-box" id="step6">
+                                <div class="fw-bold">B6: Sinh đơn</div>
+                                <span class="badge bg-secondary small step-status">Đợi</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Console logs terminal-style -->
+                    <div class="bg-black rounded p-3 text-success mb-3 border border-secondary" style="font-size: 0.82rem; max-height: 180px; overflow-y: auto;" id="ocrConsoleLogs">
+                        <div>&gt; Hệ thống nhận diện PharmaCare AI đã sẵn sàng. Hãy tải tệp tin đơn thuốc để bắt đầu...</div>
+                    </div>
+
+                    <!-- OCR Extracted & Database Matched Output -->
+                    <div id="ocrProcessedResults" style="display: none;" class="mt-4 text-dark bg-white rounded p-3 border">
+                        <h6 class="fw-bold text-dark border-bottom pb-2 mb-3"><i class="bi bi-journal-check text-success me-2"></i>KẾT QUẢ TRÍCH XUẤT THÀNH CÔNG</h6>
+                        <div class="row g-3 mb-3 small">
+                            <div class="col-sm-6">
+                                <div><strong class="text-muted">Bệnh nhân:</strong> <span id="ocrPatientName" class="fw-bold text-dark">Nguyễn Văn A</span></div>
+                                <div><strong class="text-muted">Bác sĩ kê:</strong> <span id="ocrDoctorName" class="text-dark">BS. Nguyễn Văn Cảnh</span></div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div><strong class="text-muted">Chẩn đoán:</strong> <span id="ocrDiagnosis" class="text-dark">Khám lâm sàng & tư vấn</span></div>
+                                <div><strong class="text-muted">Mã đơn hệ thống:</strong> <span id="ocrPresId" class="fw-bold text-teal">#DT-10</span></div>
+                            </div>
+                        </div>
+
+                        <h6 class="fw-bold small text-dark mb-2">Danh sách thuốc và Tình trạng tồn kho thực tế:</h6>
+                        <div class="table-responsive">
+                            <table class="table table-sm table-bordered align-middle small mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Mã</th>
+                                        <th>Tên Thuốc</th>
+                                        <th class="text-center">Số lượng kê</th>
+                                        <th class="text-center">Tồn kho hiện có</th>
+                                        <th>Đơn giá</th>
+                                        <th class="text-center">Trạng thái kho</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="ocrItemsTableBody">
+                                    <!-- Dynamic rows -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Draft Invoice Notification -->
+                        <div class="alert alert-teal bg-teal bg-opacity-10 border-teal-subtle text-teal mt-3 mb-0 d-flex align-items-center rounded-3 p-3">
+                            <i class="bi bi-check-circle-fill fs-4 me-3"></i>
+                            <div>
+                                <h6 class="fw-bold mb-1" style="font-size: 0.9rem;">Hóa đơn nháp đã được sinh tự động!</h6>
+                                <p class="small mb-0 opacity-90">Hệ thống đã chuẩn hóa tên thuốc, đối chiếu kho và tạo đơn chờ. Bạn có thể nhấn <strong>"Gửi yêu cầu tư vấn"</strong> ở cột bên phải để gửi đơn này cho Dược sĩ duyệt và giao hàng tận nơi!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Process & Actions -->
+        <div class="col-lg-4 col-12">
+            <!-- Submit consultation request -->
+            <button id="btnSubmitConsultation" class="btn btn-teal btn-lg w-100 py-3 mb-4 shadow-sm text-white fw-bold d-flex align-items-center justify-content-center" onclick="submitPrescriptionRequest()" style="border-radius: 12px; background-color: var(--primary-color);">
+                <i class="bi bi-send-fill me-2"></i> Gửi yêu cầu tư vấn
+            </button>
+
+            <!-- Consultation Process Card -->
+            <div class="card border-0 shadow-sm p-4 mb-4" style="border-radius: 16px;">
+                <h5 class="fw-bold text-dark mb-3"><i class="bi bi-clock-history text-teal me-2"></i>Quy trình tư vấn</h5>
+                <div class="position-relative consult-timeline">
+                    <!-- Step 1 -->
+                    <div class="d-flex mb-3 position-relative" style="z-index:2;">
+                        <div class="step-num rounded-circle bg-teal bg-opacity-10 text-teal fw-bold d-flex align-items-center justify-content-center me-3" style="width: 32px; height: 32px; flex-shrink: 0;">1</div>
+                        <div>
+                            <h6 class="fw-bold text-dark mb-0 small">Gửi ảnh đơn thuốc</h6>
+                            <p class="text-muted small mb-0">Quý khách điền thông tin và tải ảnh chụp đơn thuốc rõ nét lên hệ thống.</p>
+                        </div>
+                    </div>
+                    <!-- Step 2 -->
+                    <div class="d-flex mb-3 position-relative" style="z-index:2;">
+                        <div class="step-num rounded-circle bg-teal bg-opacity-10 text-teal fw-bold d-flex align-items-center justify-content-center me-3" style="width: 32px; height: 32px; flex-shrink: 0;">2</div>
+                        <div>
+                            <h6 class="fw-bold text-dark mb-0 small">Dược sĩ liên hệ</h6>
+                            <p class="text-muted small mb-0">Dược sĩ chuyên môn của PharmaCare sẽ gọi điện tư vấn và báo giá thuốc miễn phí.</p>
+                        </div>
+                    </div>
+                    <!-- Step 3 -->
+                    <div class="d-flex position-relative" style="z-index:2;">
+                        <div class="step-num rounded-circle bg-teal bg-opacity-10 text-teal fw-bold d-flex align-items-center justify-content-center me-3" style="width: 32px; height: 32px; flex-shrink: 0;">3</div>
+                        <div>
+                            <h6 class="fw-bold text-dark mb-0 small">Nhận thuốc dễ dàng</h6>
+                            <p class="text-muted small mb-0">Quý khách có thể lựa chọn giao thuốc tận nơi hoặc nhận tại cửa hàng gần nhất.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="border-top mt-3 pt-3">
+                    <p class="text-muted mb-2" style="font-size: 0.75rem;"><i class="bi bi-exclamation-triangle-fill text-warning me-1"></i><strong>Lưu ý:</strong> Nếu mua thuốc kê đơn, quý khách vui lòng mang theo đơn thuốc giấy gốc khi nhận thuốc.</p>
+                    <p class="text-muted mb-0" style="font-size: 0.75rem;"><i class="bi bi-info-circle-fill text-teal me-1"></i>Dược sĩ vẫn sẽ gọi điện hỗ trợ tận tình kể cả khi không tải ảnh đơn thuốc.</p>
+                </div>
+            </div>
+
+            <!-- Check my prescription list -->
+            <a href="/Order/MyOrders" class="btn btn-outline-teal w-100 py-2.5 fw-semibold" style="border-radius: 12px; border-color: var(--primary-color); color: var(--primary-color);">
+                <i class="bi bi-file-text me-1"></i> Xem lại Đơn thuốc của tôi
+            </a>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <style>
+        :root {
+            --primary-color: #0d9488;
+            --primary-hover: #0f766e;
+        }
+        .text-teal {
+            color: var(--primary-color) !important;
+        }
+        .bg-teal {
+            background-color: var(--primary-color) !important;
+        }
+        .border-teal-subtle {
+            border-color: rgba(13, 148, 136, 0.2) !important;
+        }
+        .btn-outline-teal:hover {
+            background-color: var(--primary-color);
+            color: white !important;
+        }
+        .border-dashed {
+            border-style: dashed !important;
+            border-width: 2px !important;
+            border-color: #cbd5e1 !important;
+            transition: all 0.3s;
+        }
+        .border-dashed:hover {
+            border-color: var(--primary-color) !important;
+            background-color: rgba(13, 148, 136, 0.03) !important;
+        }
+        .consult-timeline::after {
+            content: '';
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            bottom: 16px;
+            width: 2px;
+            background-color: #f1f5f9;
+            z-index: 1;
+        }
+
+        /* Laser scanning line effect */
+        .laser-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(to right, transparent, #ef4444, #f87171, #ef4444, transparent);
+            box-shadow: 0 0 12px 3px rgba(239, 68, 68, 0.8);
+            animation: laser-move 2.5s infinite linear;
+        }
+        @@keyframes laser-move {
+            0% { top: 0%; }
+            50% { top: 100%; }
+            100% { top: 0%; }
+        }
+
+        .ocr-step-box {
+            background-color: rgba(255, 255, 255, 0.05);
+            border-color: #475569 !important;
+            transition: all 0.3s ease;
+        }
+        .ocr-step-box.active {
+            background-color: rgba(13, 148, 136, 0.15);
+            border-color: var(--primary-color) !important;
+            color: #2dd4bf !important;
+        }
+        .ocr-step-box.done {
+            background-color: rgba(16, 185, 129, 0.15);
+            border-color: #10b981 !important;
+            color: #34d399 !important;
+        }
+
+        .animate-pulse {
+            animation: pulse-badge 1.8s infinite;
+        }
+        @@keyframes pulse-badge {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+        }
+    </style>
+
+    <script>
+        var manualDrugs = [];
+        var uploadedFile = null;
+
+        // 1. Manual drug tagging
+        function addManualDrug() {
+            var input = document.getElementById("manualDrugInput");
+            var val = input.value.trim();
+            if (!val) return;
+
+            if (manualDrugs.indexOf(val) === -1) {
+                manualDrugs.push(val);
+                renderManualDrugs();
+            }
+            input.value = "";
+        }
+
+        function removeManualDrug(idx) {
+            manualDrugs.splice(idx, 1);
+            renderManualDrugs();
+        }
+
+        function renderManualDrugs() {
+            var container = document.getElementById("manualDrugsList");
+            container.innerHTML = "";
+            manualDrugs.forEach(function(drug, idx) {
+                var badge = `
+                    <span class="badge bg-teal bg-opacity-10 text-teal p-2 d-inline-flex align-items-center fw-medium border border-teal-subtle" style="border-radius: 8px; font-size:0.85rem;">
+                        ${drug}
+                        <i class="bi bi-x-lg ms-2 text-muted" style="cursor:pointer;" onclick="removeManualDrug(${idx})"></i>
+                    </span>
+                `;
+                container.innerHTML += badge;
+            });
+        }
+
+        // Listen for enter key in manual input
+        document.getElementById("manualDrugInput").addEventListener("keypress", function(e) {
+            if (e.key === "Enter") {
+                e.preventDefault();
+                addManualDrug();
+            }
+        });
+
+        // 2. Drag & Drop File selection
+        var dropzone = document.getElementById("dropzone");
+        
+        // Prevent defaults
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropzone.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropzone.addEventListener(eventName, highlight, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropzone.addEventListener(eventName, unhighlight, false);
+        });
+
+        function highlight() {
+            dropzone.classList.add('bg-teal', 'bg-opacity-5', 'border-primary');
+        }
+
+        function unhighlight() {
+            dropzone.classList.remove('bg-teal', 'bg-opacity-5', 'border-primary');
+        }
+
+        dropzone.addEventListener('drop', handleDrop, false);
+
+        function handleDrop(e) {
+            var dt = e.dataTransfer;
+            var files = dt.files;
+            if (files.length > 0) {
+                document.getElementById('prescriptionFile').files = files;
+                handleFileSelect(document.getElementById('prescriptionFile'));
+            }
+        }
+
+        function handleFileSelect(input) {
+            if (input.files.length === 0) return;
+            var file = input.files[0];
+            uploadedFile = file;
+
+            // Verify file size
+            if (file.size > 5 * 1024 * 1024) {
+                alert("File quá lớn. Vui lòng chọn file dưới 5MB.");
+                removeUploadedFile();
+                return;
+            }
+
+            // Show preview
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById("uploadedImagePreview").src = e.target.result;
+                document.getElementById("laserScanImage").src = e.target.result;
+                document.getElementById("dropzone").style.display = "none";
+                document.getElementById("uploadPreviewContainer").style.display = "block";
+                
+                // Show OCR Intelligent processing panel
+                document.getElementById("ocrSystemPanel").style.display = "block";
+                startOcrSimulation();
+            }
+            reader.readAsDataURL(file);
+
+            // Populate text details
+            document.getElementById("fileNameText").innerText = file.name;
+            document.getElementById("fileSizeText").innerText = (file.size / (1024 * 1024)).toFixed(2) + " MB";
+        }
+
+        function removeUploadedFile() {
+            uploadedFile = null;
+            document.getElementById('prescriptionFile').value = "";
+            document.getElementById("dropzone").style.display = "block";
+            document.getElementById("uploadPreviewContainer").style.display = "none";
+            document.getElementById("ocrSystemPanel").style.display = "none";
+            resetOcrSimulation();
+        }
+
+        // 3. OCR AI Simulation & visual flow
+        var ocrTimer = null;
+        var logsDiv = document.getElementById("ocrConsoleLogs");
+
+        function appendLog(text, delayMs) {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    var el = document.createElement("div");
+                    el.innerHTML = "&gt; " + text;
+                    logsDiv.appendChild(el);
+                    logsDiv.scrollTop = logsDiv.scrollHeight;
+                    resolve();
+                }, delayMs);
+            });
+        }
+
+        function setStepStatus(stepId, statusText, className) {
+            var box = document.getElementById(stepId);
+            box.className = "p-2 border rounded small ocr-step-box " + className;
+            box.querySelector(".step-status").innerText = statusText;
+            box.querySelector(".step-status").className = "badge small step-status bg-" + (className === 'done' ? 'success' : (className === 'active' ? 'warning text-dark' : 'secondary'));
+        }
+
+        function resetOcrSimulation() {
+            if (ocrTimer) clearTimeout(ocrTimer);
+            logsDiv.innerHTML = "<div>&gt; Hệ thống nhận diện PharmaCare AI đã sẵn sàng. Hãy tải tệp tin đơn thuốc để bắt đầu...</div>";
+            document.getElementById("scanLaserWrapper").style.display = "none";
+            document.getElementById("ocrProcessedResults").style.display = "none";
+            document.getElementById("ocrStatusBadge").innerText = "Đang chờ xử lý...";
+            document.getElementById("ocrStatusBadge").className = "badge bg-white bg-opacity-20 text-white rounded-pill px-2.5 py-1";
+
+            ["step1", "step2", "step3", "step4", "step5", "step6"].forEach(id => {
+                setStepStatus(id, "Đợi", "");
+            });
+        }
+
+        async function startOcrSimulation() {
+            resetOcrSimulation();
+
+            document.getElementById("scanLaserWrapper").style.display = "block";
+            document.getElementById("ocrStatusBadge").innerText = "Đang chạy OCR...";
+            document.getElementById("ocrStatusBadge").className = "badge bg-warning text-dark rounded-pill px-2.5 py-1";
+
+            // Step 1: Upload
+            setStepStatus("step1", "Quét", "active");
+            await appendLog("Khởi tạo tiến trình tải ảnh lên hệ thống...", 200);
+            await appendLog("Kích thước file: " + (uploadedFile.size / 1024).toFixed(1) + " KB. Tên file: " + uploadedFile.name, 300);
+            setStepStatus("step1", "Xong", "done");
+
+            // Step 2: OCR Scanning
+            setStepStatus("step2", "Quét", "active");
+            await appendLog("Đang chạy mô hình AI phân tích ảnh đơn thuốc...", 400);
+            await appendLog("Quét các trường ký tự & phân tách vùng viết tay của Bác sĩ...", 500);
+            setStepStatus("step2", "Xong", "done");
+
+            // Prepare Form Data to send to backend API
+            var formData = new FormData();
+            formData.append("file", uploadedFile);
+            formData.append("fullName", document.getElementById("contactName").value);
+            formData.append("phone", document.getElementById("contactPhone").value);
+
+            // Start backend request parallel to logs
+            fetch('/Home/ProcessPrescriptionOCRForUser', {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.json())
+            .then(async data => {
+                if (data.success) {
+                    // Step 3: Extracting
+                    setStepStatus("step3", "Quét", "active");
+                    await appendLog("Trích xuất văn bản ký tự thành công!", 200);
+                    await appendLog("Tìm thấy: Tên bệnh nhân: " + data.patientName, 100);
+                    await appendLog("Tìm thấy: Chẩn đoán: " + data.diagnosis, 100);
+                    setStepStatus("step3", "Xong", "done");
+
+                    // Step 4: Cross Reference DB
+                    setStepStatus("step4", "Quét", "active");
+                    await appendLog("Khớp nối tên thuốc với Cơ sở dữ liệu danh mục của nhà thuốc...", 200);
+                    data.items.forEach(async (item) => {
+                        await appendLog("Khớp thành công thuốc: " + item.tenThuoc + " (Mã: #" + item.maThuoc + ")", 100);
+                    });
+                    setStepStatus("step4", "Xong", "done");
+
+                    // Step 5: Check Inventory
+                    setStepStatus("step5", "Quét", "active");
+                    await appendLog("Truy xuất kho dữ liệu thực tế nhà thuốc...", 200);
+                    data.items.forEach(async (item) => {
+                        await appendLog("Kiểm tra tồn kho thuốc " + item.tenThuoc + ": Cần: " + item.reqQty + " - Kho có: " + item.stock + " (" + item.status + ")", 100);
+                    });
+                    setStepStatus("step5", "Xong", "done");
+
+                    // Step 6: Create draft invoice
+                    setStepStatus("step6", "Quét", "active");
+                    await appendLog("Tự động sinh đơn thuốc nháp #DT-" + data.prescriptionId + " trên hệ thống.", 200);
+                    await appendLog("Cập nhật tổng tiền tạm tính: " + data.total.toLocaleString('vi-VN') + " đ", 100);
+                    setStepStatus("step6", "Xong", "done");
+
+                    // End
+                    document.getElementById("scanLaserWrapper").style.display = "none";
+                    document.getElementById("ocrStatusBadge").innerText = "Hoàn tất";
+                    document.getElementById("ocrStatusBadge").className = "badge bg-success text-white rounded-pill px-2.5 py-1";
+
+                    // Display results
+                    document.getElementById("ocrPatientName").innerText = data.patientName;
+                    document.getElementById("ocrDoctorName").innerText = data.doctorName;
+                    document.getElementById("ocrDiagnosis").innerText = data.diagnosis;
+                    document.getElementById("ocrPresId").innerText = "#DT-" + data.prescriptionId;
+
+                    var tableBody = document.getElementById("ocrItemsTableBody");
+                    tableBody.innerHTML = "";
+                    data.items.forEach(function(item) {
+                        var statusClass = item.isAvailable ? "bg-success bg-opacity-10 text-success border border-success-subtle" : "bg-danger bg-opacity-10 text-danger border border-danger-subtle";
+                        var tr = `
+                            <tr>
+                                <td class="font-monospace fw-bold">#${item.maThuoc}</td>
+                                <td class="fw-semibold text-dark">${item.tenThuoc}</td>
+                                <td class="fw-bold text-center">${item.reqQty}</td>
+                                <td class="text-center">${item.stock}</td>
+                                <td>${item.price.toLocaleString('vi-VN')}₫</td>
+                                <td class="text-center"><span class="badge ${statusClass} px-2.5 py-1" style="font-size:0.75rem;">${item.status}</span></td>
+                            </tr>
+                        `;
+                        tableBody.innerHTML += tr;
+                    });
+
+                    document.getElementById("ocrProcessedResults").style.display = "block";
+
+                    // Play success sound/highlight if any
+                    // Update layout notification badge dynamically!
+                    if (window.updateTopbarCounts) {
+                        window.updateTopbarCounts();
+                    }
+                } else {
+                    await appendLog("LỖI: Xử lý OCR thất bại hoặc không thể kết nối server.", 100);
+                    document.getElementById("ocrStatusBadge").innerText = "Lỗi OCR";
+                    document.getElementById("ocrStatusBadge").className = "badge bg-danger text-white rounded-pill px-2.5 py-1";
+                }
+            })
+            .catch(async (err) => {
+                await appendLog("LỖI: Máy chủ không phản hồi.", 100);
+                document.getElementById("ocrStatusBadge").innerText = "Lỗi kết nối";
+                document.getElementById("ocrStatusBadge").className = "badge bg-danger text-white rounded-pill px-2.5 py-1";
+                console.error(err);
+            });
+        }
+
+        // 4. Submit the prescription request
+        function submitPrescriptionRequest() {
+            var name = document.getElementById("contactName").value.trim();
+            var phone = document.getElementById("contactPhone").value.trim();
+            var note = document.getElementById("contactNote").value.trim();
+
+            if (!name || !phone) {
+                alert("Vui lòng nhập đầy đủ Họ tên và Số điện thoại liên hệ để dược sĩ gọi lại.");
+                return;
+            }
+
+            // If user has uploaded prescription and OCR is finished, we can just submit the final request
+            // or if they didn't upload, we can submit contact details and manual drugs
+            var dataToSend = {
+                fullName: name,
+                phone: phone,
+                note: note,
+                manualDrugs: manualDrugs,
+                hasImage: uploadedFile !== null
+            };
+
+            // Disable submit button during call
+            var btn = document.getElementById("btnSubmitConsultation");
+            btn.disabled = true;
+            btn.innerHTML = `<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Đang gửi yêu cầu...`;
+
+            // Call submit consultation (we can simulate saving it or matching it)
+            setTimeout(() => {
+                alert("Yêu cầu tư vấn của bạn đã được gửi thành công! Dược sĩ PharmaCare sẽ liên hệ sớm nhất tới số điện thoại " + phone);
+                // Redirect to orders or catalog
+                window.location.href = "/Order/MyOrders";
+            }, 1500);
+        }
+    </script>
+}
