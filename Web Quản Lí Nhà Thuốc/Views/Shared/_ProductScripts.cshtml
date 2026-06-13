@@ -1,0 +1,189 @@
+@* Shared product image loader, filters and styles used by Home and Catalog *@
+<script>
+(function() {
+	// Cache to avoid duplicate API calls for same drug name
+	var imgCache = {};
+
+	function loadImgForArea(area) {
+		if (area.dataset.loaded) return;
+		area.dataset.loaded = '1';
+
+		var drugName = area.dataset.drugName || '';
+		var hoatChat = area.dataset.hoatChat || '';
+		var spinner  = area.querySelector('.drug-spinner');
+		var imgEl    = area.querySelector('.drug-loaded-img');
+		var holder   = area.querySelector('.drug-placeholder');
+
+		if (!imgEl) return; // has manual image already — skip
+
+		function showImg(url) {
+			var testImg = new Image();
+			testImg.referrerPolicy = "no-referrer";
+			testImg.onload = function() {
+				if (spinner) spinner.style.display = 'none';
+				imgEl.referrerPolicy = "no-referrer";
+				imgEl.src = url;
+				imgEl.style.display = 'block';
+				if (holder) holder.style.display = 'none';
+			};
+			testImg.onerror = function() { showPlaceholder(); };
+			testImg.src = url;
+		}
+
+		function showPlaceholder() {
+			if (spinner) spinner.style.display = 'none';
+			if (holder) { holder.style.display = 'flex'; holder.style.removeProperty('display'); holder.style.display = 'flex'; }
+		}
+
+		function tryFetch(name, fallbackName) {
+			if (imgCache[name] !== undefined) {
+				if (imgCache[name]) showImg(imgCache[name]);
+				else showPlaceholder();
+				return;
+			}
+
+			var lowerName = name.toLowerCase();
+			var searchStr = name;
+			if (lowerName.includes('panadol') || lowerName.includes('paracetamol') || lowerName.includes('hapacol') || lowerName.includes('decolgen')) {
+				searchStr = 'tylenol';
+			} else if (lowerName.includes('vitamin c') || lowerName.includes('enervon')) {
+				searchStr = 'ascorbic acid';
+			} else if (lowerName.includes('cetaphil')) {
+				searchStr = 'cetaphil';
+			} else if (lowerName.includes('amoxicillin')) {
+				searchStr = 'amoxil';
+			} else {
+				searchStr = name.replace(/\s+\d+\s*(mg|ml|g|mcg|iu|%|UI)\b.*/gi, '').trim();
+			}
+
+			var wikiUrl = 'https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&prop=pageimages&generator=search&gsrsearch=' + encodeURIComponent(searchStr) + '&pithumbsize=500';
+
+			fetch(wikiUrl)
+				.then(function(r) { return r.json(); })
+				.then(function(data) {
+					if (data && data.query && data.query.pages) {
+						var pages = data.query.pages;
+						var firstPageId = Object.keys(pages)[0];
+						if (pages[firstPageId] && pages[firstPageId].thumbnail && pages[firstPageId].thumbnail.source) {
+							var imgUrl = pages[firstPageId].thumbnail.source;
+							imgCache[name] = imgUrl;
+							showImg(imgUrl);
+							return;
+						}
+					}
+					fetch('/Pharmacist/GetDrugImage?name=' + encodeURIComponent(name))
+						.then(function(r2) { return r2.json(); })
+						.then(function(d2) {
+							if (d2 && d2.imageUrl) {
+								imgCache[name] = d2.imageUrl;
+								showImg(d2.imageUrl);
+							} else {
+								imgCache[name] = null;
+								showPlaceholder();
+							}
+						}).catch(function() { showPlaceholder(); });
+				})
+				.catch(function() { 
+					showPlaceholder(); 
+				});
+		}
+
+		tryFetch(drugName, hoatChat);
+	}
+
+	if ('IntersectionObserver' in window) {
+		var observer = new IntersectionObserver(function(entries) {
+			entries.forEach(function(entry) {
+				if (entry.isIntersecting) {
+					loadImgForArea(entry.target);
+					observer.unobserve(entry.target);
+				}
+			});
+		}, { rootMargin: '100px' });
+
+		document.querySelectorAll('.drug-img-area[data-drug-name]').forEach(function(el) {
+			observer.observe(el);
+		});
+	} else {
+		document.querySelectorAll('.drug-img-area[data-drug-name]').forEach(function(el) {
+			loadImgForArea(el);
+		});
+	}
+})();
+
+var activeCategory = 'All';
+var activeTreatment = 'All';
+
+function filterProducts(type, value, btn) {
+	if (type === 'category') {
+		activeCategory = value;
+		document.querySelectorAll('.category-filter-btn').forEach(b => {
+			b.classList.remove('btn-teal-active');
+			b.classList.add('btn-outline-secondary');
+		});
+	} else if (type === 'treatment') {
+		activeTreatment = value;
+		document.querySelectorAll('.treatment-filter-btn').forEach(b => {
+			b.classList.remove('btn-teal-active');
+			b.classList.add('btn-outline-secondary');
+		});
+	}
+	btn.classList.remove('btn-outline-secondary');
+	btn.classList.add('btn-teal-active');
+
+	var items = document.querySelectorAll('.product-item-card');
+	var visibleCount = 0;
+
+	items.forEach(function(item) {
+		var cat = item.dataset.category || '';
+		var treat = item.dataset.treatment || '';
+		var matchCat = (activeCategory === 'All' || cat === activeCategory);
+		var matchTreat = (activeTreatment === 'All' || treat === activeTreatment);
+
+		if (matchCat && matchTreat) {
+			item.style.display = 'block';
+			visibleCount++;
+		} else {
+			item.style.display = 'none';
+		}
+	});
+
+	var emptyMsg = document.getElementById('noFilteredProductsMessage');
+	if (visibleCount === 0) {
+		if (!emptyMsg) {
+			var grid = document.getElementById('productGrid');
+			var msgHtml = `<div id="noFilteredProductsMessage" class="col-12 text-center py-5 bg-light rounded-4 w-100">
+				<div class="text-muted mb-3"><i class="bi-search fs-1"></i></div>
+				<h5 class="fw-bold text-dark">Không tìm thấy sản phẩm phù hợp</h5>
+				<p class="text-muted small">Vui lòng thử chọn bộ lọc khác.</p>
+			</div>`;
+			grid.insertAdjacentHTML('beforeend', msgHtml);
+		} else {
+			emptyMsg.style.display = 'block';
+		}
+	} else {
+		if (emptyMsg) emptyMsg.style.display = 'none';
+	}
+}
+</script>
+
+<style>
+	:root { --primary-color: #0d9488; --primary-hover: #0f766e; }
+	.text-teal { color: var(--primary-color) !important; }
+	.bg-teal { background-color: var(--primary-color) !important; }
+	.border-teal-subtle { border-color: rgba(13, 148, 136, 0.2) !important; }
+	.hero-section { background: linear-gradient(135deg, #0f766e 0%, #115e59 100%); box-shadow: 0 10px 30px rgba(15, 118, 110, 0.15) !important; }
+	.hero-pattern { position: absolute; top:0; right:0; bottom:0; left:0; background-image: radial-gradient(circle at 80% 20%, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 50%); pointer-events: none; }
+	.product-card { transition: transform 0.2s, box-shadow 0.2s; border: 1px solid #f1f5f9 !important; }
+	.product-card:hover { transform: translateY(-4px); box-shadow: 0 12px 20px -5px rgba(0,0,0,0.08), 0 8px 8px -5px rgba(0,0,0,0.04) !important; }
+	.product-img { max-height: 120px; object-fit: contain; }
+	.product-img-wrapper { border-bottom: 1px solid #f8fafc; }
+	.text-truncate-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; }
+	.btn-teal-active { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
+	.btn-teal-active:hover { background-color: var(--primary-hover); color: white; }
+	.btn-teal-btn { background-color: var(--primary-color); color: white; border: none; transition: background-color 0.2s; }
+	.btn-teal-btn:hover { background-color: var(--primary-hover); }
+	.scrollbar-hidden::-webkit-scrollbar { display: none; }
+	.scrollbar-hidden { -ms-overflow-style: none; scrollbar-width: none; }
+	.shadow-2xs { box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+</style>

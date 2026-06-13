@@ -1,0 +1,45 @@
+@*
+	Partial: Category Mega Menu
+	Render inside Danh mục dropdown. Uses placeholder data; replace with Model when integrating with backend.
+*@
+@{
+	var cats = new[] {
+		new { Key = "thuoc", Title = "Thuốc", Img = "https://via.placeholder.com/120x70?text=Thuoc" },
+		new { Key = "tracuu", Title = "Tra cứu bệnh", Img = "https://via.placeholder.com/120x70?text=Tra+Cuu" },
+		new { Key = "tpcn", Title = "Thực phẩm bảo vệ sức khỏe", Img = "https://via.placeholder.com/120x70?text=TPCN" },
+		new { Key = "chamsoc", Title = "Chăm sóc cá nhân", Img = "https://via.placeholder.com/120x70?text=Chamsoc" },
+		new { Key = "me-be", Title = "Mẹ & Bé", Img = "https://via.placeholder.com/120x70?text=Me+Be" },
+		// removed Chăm sóc sắc đẹp and Thiết bị y tế per request
+		new { Key = "vitamin", Title = "Vitamin & Khoáng", Img = "https://via.placeholder.com/120x70?text=Vitamin" },
+		new { Key = "thietbiyte", Title = "Thiết bị y tế", Img = "https://via.placeholder.com/120x70?text=TBYT" },
+		new { Key = "sanpham-tien-loi", Title = "Sản phẩm tiện lợi", Img = "https://via.placeholder.com/120x70?text=Tien+Loi" }
+	};
+}
+
+<div class="mega-menu p-3">
+	<div class="row g-3">
+		@foreach(var c in cats) {
+			<div class="col-6 col-sm-4 col-md-3">
+				<a href="/Catalog/Index?cat=@c.Key" class="d-flex flex-column align-items-center text-center text-dark category-tile p-2">
+					<div class="tile-thumb bg-light rounded mb-2 d-flex align-items-center justify-content-center">
+						<img src="@c.Img" alt="@c.Title" class="img-fluid" />
+					</div>
+					<div class="tile-title small">@c.Title</div>
+				</a>
+			</div>
+		}
+	</div>
+</div>
+
+<script>
+	// quick enhancement: keyboard focus visible and simple analytics placeholder
+	(function(){
+		var tiles = document.querySelectorAll('.category-tile');
+		tiles.forEach(function(t){
+			t.addEventListener('click', function(){
+				// placeholder: send analytics or perform quick action
+				// console.log('Category clicked', t.getAttribute('href'));
+			});
+		});
+	})();
+</script>

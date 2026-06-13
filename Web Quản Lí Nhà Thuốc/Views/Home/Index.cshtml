@@ -44,3 +44,90 @@
 <div class="container">
     <p class="text-muted">Nội dung khác của trang sẽ hiển thị ở đây...</p>
 </div>
+
+<!-- Category explorer section -->
+<section class="container my-5">
+    <div class="row">
+        <div class="col-lg-3 d-none d-lg-block">
+            <div class="category-sidebar p-3 rounded shadow-sm">
+                <h6 class="fw-bold mb-3">Danh mục</h6>
+                <ul class="list-unstyled mb-0">
+                    <li><a href="#" class="d-block py-2 px-2 category-filter active" data-filter="all">Thuốc</a></li>
+                    <li><a href="#" class="d-block py-2 px-2 category-filter" data-filter="tra-cuu">Tra cứu bệnh</a></li>
+                    <li><a href="#" class="d-block py-2 px-2 category-filter" data-filter="tpcn">Thực phẩm bảo vệ sức khỏe</a></li>
+                    <li><a href="#" class="d-block py-2 px-2 category-filter" data-filter="chamsoc">Chăm sóc cá nhân</a></li>
+                    <li><a href="#" class="d-block py-2 px-2 category-filter" data-filter="me-be">Mẹ và Bé</a></li>
+                    <li><a href="#" class="d-block py-2 px-2 category-filter" data-filter="thietbiyte">Thiết bị y tế</a></li>
+                    <li><a href="#" class="d-block py-2 px-2 category-filter" data-filter="vitamin">Vitamin & Khoáng</a></li>
+                    <li><a href="#" class="d-block py-2 px-2 category-filter" data-filter="thuonghieu">Nhãn hàng</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="col-lg-9">
+            <div class="category-grid p-3 rounded shadow-sm bg-white">
+                <div class="row g-3" id="categoryItems">
+                    @{ 
+                        // Example categories - replace or load from DB as needed
+                        var cats = new[] {
+                            new { Key = "thuoc", Title = "Thuốc cảm lạnh, ho", Img = "https://via.placeholder.com/150x90?text=Thuoc" },
+                            new { Key = "thuoc", Title = "Thuốc thần kinh", Img = "https://via.placeholder.com/150x90?text=Th%E1%BB%A7c+ph%E1%BA%A9m" },
+                            new { Key = "thuoc", Title = "Thuốc kháng viêm", Img = "https://via.placeholder.com/150x90?text=Khang+viem" },
+                            new { Key = "tpcn", Title = "Thực phẩm bảo vệ", Img = "https://via.placeholder.com/150x90?text=TPCN" },
+                            new { Key = "chamsoc", Title = "Chăm sóc cá nhân", Img = "https://via.placeholder.com/150x90?text=Care" },
+                            new { Key = "me-be", Title = "Sản phẩm Mẹ & Bé", Img = "https://via.placeholder.com/150x90?text=Me+Be" },
+                            new { Key = "thietbiyte", Title = "Thiết bị y tế", Img = "https://via.placeholder.com/150x90?text=TBYT" },
+                            new { Key = "vitamin", Title = "Vitamin & Khoáng", Img = "https://via.placeholder.com/150x90?text=Vitamin" },
+                            new { Key = "thuonghieu", Title = "Nhãn hàng Pharmacity", Img = "https://via.placeholder.com/150x90?text=Brand" }
+                        };
+                    }
+
+                    @foreach(var c in cats) {
+                        <div class="col-6 col-sm-4 col-md-3">
+                            <a href="/Category/Index" class="text-decoration-none text-dark">
+                                <div class="card category-card h-100 border-0 shadow-sm">
+                                    <div class="card-body text-center py-3">
+                                        <div class="category-thumb mb-2">
+                                            <img src="@c.Img" alt="@c.Title" class="img-fluid rounded" />
+                                        </div>
+                                        <div class="small">@c.Title</div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    (function(){
+        var filters = document.querySelectorAll('.category-filter');
+        var items = document.querySelectorAll('#categoryItems > div');
+
+        filters.forEach(function(f){
+            f.addEventListener('click', function(e){
+                e.preventDefault();
+                filters.forEach(function(x){ x.classList.remove('active'); });
+                this.classList.add('active');
+                var key = this.getAttribute('data-filter');
+
+                // Simple client-side filter by title or key (demo)
+                items.forEach(function(it){
+                    var text = it.textContent || it.innerText;
+                    if(key === 'all') {
+                        it.style.display = '';
+                    } else {
+                        if(text.toLowerCase().indexOf(key.replace('-', ' ')) !== -1) {
+                            it.style.display = '';
+                        } else {
+                            it.style.display = 'none';
+                        }
+                    }
+                });
+            });
+        });
+    })();
+</script>

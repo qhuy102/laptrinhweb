@@ -1,0 +1,87 @@
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Web_Quản_Lí_Nhà_Thuốc.Data;
+using Web_Quản_Lí_Nhà_Thuốc.Models;
+
+namespace Web_Quản_Lí_Nhà_Thuốc.Controllers
+{
+    public class CatalogController : Controller
+    {
+        private readonly PharmacyDbContext _context;
+
+        public CatalogController(PharmacyDbContext context)
+        {
+            _context = context;
+        }
+
+        // Public category listing - displays Thuoc from DB when appropriate
+        [HttpGet]
+        public async Task<IActionResult> Index(string cat)
+        {
+            var key = (cat ?? "thuoc").ToLower();
+
+            string title;
+            string desc;
+
+            switch (key)
+            {
+                case "thuoc":
+                    title = "Thuốc";
+                    desc = "Danh mục các loại thuốc";
+                    break;
+                case "tracuu":
+                    title = "Tra cứu bệnh";
+                    desc = "Tài nguyên tra cứu bệnh";
+                    break;
+                case "tpcn":
+                    title = "Thực phẩm bảo vệ sức khỏe";
+                    desc = "Sản phẩm hỗ trợ sức khỏe";
+                    break;
+                case "me-be":
+                    title = "Mẹ & Bé";
+                    desc = "Sản phẩm cho mẹ và bé";
+                    break;
+                case "thietbiyte":
+                    title = "Thiết bị y tế";
+                    desc = "Thiết bị, dụng cụ y tế";
+                    break;
+                case "sanpham-tien-loi":
+                    title = "Sản phẩm tiện lợi";
+                    desc = "Đồ dùng tiện lợi cho gia đình";
+                    break;
+                default:
+                    title = "Danh mục";
+                    desc = "Các sản phẩm trong danh mục.";
+                    break;
+            }
+
+            ViewData["CategoryKey"] = key;
+            ViewData["CategoryTitle"] = title;
+            ViewData["CategoryDescription"] = desc;
+
+            // Load categories for sidebar
+            var categories = await _context.LoaiThuocs.OrderBy(l => l.TenLoai).ToListAsync();
+            ViewData["AllCategories"] = categories;
+
+            // If category is 'thuoc' show medicines from DB; otherwise show empty list (could filter by LoaiThuoc)
+            if (key == "thuoc")
+            {
+                // check for LoaiThuoc filter id
+                int? loaiId = null;
+                if (int.TryParse(Request.Query["loaiId"].FirstOrDefault() ?? "", out var tmp)) loaiId = tmp;
+
+                var query = _context.Thuocs.Include(t => t.LoaiThuoc).Where(t => t.SoLuong > 0).AsQueryable();
+                if (loaiId.HasValue) query = query.Where(t => t.LoaiThuocId == loaiId.Value);
+
+                var items = await query.OrderBy(t => t.TenThuoc).ToListAsync();
+                return View(items);
+            }
+
+            var empty = new List<Thuoc>();
+            return View(empty);
+        }
+    }
+}

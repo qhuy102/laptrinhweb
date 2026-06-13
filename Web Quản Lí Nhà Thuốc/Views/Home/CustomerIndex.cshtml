@@ -110,66 +110,7 @@
             @foreach (var item in Model)
             {
                 <div class="col-12 col-sm-6 col-md-4 col-lg-3 product-item-card" data-category="@(item.LoaiThuoc?.TenLoai ?? "")" data-treatment="@(item.NhomDieuTri ?? "")">
-                    <div class="card product-card border-0 shadow-2xs h-100 overflow-hidden" style="border-radius: 16px;">
-                        <!-- Product Image — auto-loaded via API cascade -->
-                        <div class="product-img-wrapper bg-light text-center p-4 position-relative">
-                            <div class="drug-img-area mx-auto"
-                                 data-drug-name="@item.TenThuoc"
-                                 data-hoat-chat="@item.HoatChat"
-                                 style="width:120px; height:120px; display:flex; align-items:center; justify-content:center;">
-
-                                @if (!string.IsNullOrEmpty(item.HinhAnh))
-                                {
-                                    <!-- If manually uploaded image exists, use it directly -->
-                                    <img src="@item.HinhAnh" alt="@item.TenThuoc" class="img-fluid product-img drug-loaded-img" />
-                                }
-                                else
-                                {
-                                    <!-- Spinner while loading -->
-                                    <div class="drug-spinner text-muted">
-                                        <div class="spinner-border spinner-border-sm text-secondary" role="status"></div>
-                                    </div>
-                                    <!-- Will be replaced by JS -->
-                                    <img class="img-fluid product-img drug-loaded-img" src="" alt="@item.TenThuoc"
-                                         style="display:none; max-height:120px; object-fit:contain;" />
-                                    <!-- Fallback placeholder if no API image -->
-                                    <div class="drug-placeholder position-relative overflow-hidden rounded-3 d-flex align-items-center justify-content-center"
-                                         style="width:120px; height:120px; background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); display:none; border: 1px solid #cbd5e1;">
-                                        <div class="position-absolute top-50 start-50 translate-middle" style="opacity: 0.5;">
-                                            <i class="bi bi-capsule" style="font-size: 3rem; color: #94a3b8; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.05));"></i>
-                                        </div>
-                                        <span class="position-absolute bottom-0 w-100 text-center pb-2 small fw-medium" style="color: #64748b; font-size: 0.65rem; letter-spacing: 0.5px;">PHARMACARE</span>
-                                    </div>
-                                }
-                            </div>
-                            <span class="badge bg-teal bg-opacity-10 text-teal rounded-pill px-2.5 py-1 position-absolute top-0 start-0 m-3 small border border-teal-subtle">
-                                @(item.LoaiThuoc?.TenLoai ?? "Thuốc")
-                            </span>
-                        </div>
-
-                        <!-- Product Content -->
-                        <div class="card-body p-3.5 d-flex flex-column">
-                            <h6 class="fw-bold text-dark mb-1 text-truncate-2">@item.TenThuoc</h6>
-                            <p class="text-muted small mb-3 text-truncate-2 flex-grow-1">@(item.MoTa ?? "Không có mô tả sản phẩm.")</p>
-                            
-                            <div class="d-flex justify-content-between align-items-center mt-auto">
-                                <div>
-                                    <div class="text-muted small" style="font-size: 0.7rem;">Giá bán</div>
-                                    <div class="fw-bold text-dark fs-5">@item.DonGia.ToString("#,##0")₫</div>
-                                </div>
-                                @if (item.SoLuong > 0)
-                                {
-                                    <a asp-controller="Cart" asp-action="AddToCart" asp-route-id="@item.MaThuoc" class="btn btn-teal-btn rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                                        <i class="bi bi-cart-plus fs-5"></i>
-                                    </a>
-                                }
-                                else
-                                {
-                                    <span class="badge bg-danger bg-opacity-10 text-danger rounded-pill px-2.5 py-1 small border border-danger-subtle">Hết hàng</span>
-                                }
-                            </div>
-                        </div>
-                    </div>
+                    @await Html.PartialAsync("~/Views/Shared/_ProductCard.cshtml", item)
                 </div>
             }
         </div>

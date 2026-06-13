@@ -46,3 +46,103 @@ button.accept-policy[b-3lmfxuveux] {
   white-space: nowrap;
   line-height: 60px;
 }
+
+/* Category explorer styles */
+.category-sidebar a[b-3lmfxuveux] { color: #222; }
+.category-sidebar a.active[b-3lmfxuveux] { background: #eef6ff; border-radius: 6px; }
+.category-sidebar a:hover[b-3lmfxuveux] { text-decoration: none; background: #f8f9fb; }
+.category-grid[b-3lmfxuveux] { min-height: 220px; }
+.category-card[b-3lmfxuveux] { border-radius: 12px; overflow: hidden; }
+.category-thumb img[b-3lmfxuveux] { max-height: 80px; object-fit: contain; }
+
+@media (max-width: 991px) {
+  .category-sidebar[b-3lmfxuveux] { display: none; }
+}
+
+/* Topbar category button */
+.btn-category[b-3lmfxuveux] { background: rgba(255,255,255,0.08); color: #fff; border: 1px solid rgba(255,255,255,0.06); }
+.btn-category i[b-3lmfxuveux] { font-size: 0.95rem; }
+.dropdown-menu .dropdown-item[b-3lmfxuveux] { color: #222; }
+
+/* Make toolbar elements use consistent sizing and vertical alignment */
+.unified-toolbar .container.d-flex[b-3lmfxuveux] {
+  height: 64px; /* overall toolbar height for comfortable spacing */
+  display: flex;
+  flex-wrap: nowrap; /* keep toolbar one row */
+  gap: 16px;
+  width: 100%;
+  overflow: hidden;
+}
+
+.unified-toolbar .navbar-brand[b-3lmfxuveux],
+.unified-toolbar .toolbar-links .nav-link[b-3lmfxuveux],
+.unified-toolbar .btn[b-3lmfxuveux],
+.unified-toolbar .user-menu .user-avatar-btn[b-3lmfxuveux],
+.unified-toolbar .notification-btn[b-3lmfxuveux],
+.unified-toolbar .btn-category[b-3lmfxuveux] {
+  display: inline-flex;
+  align-items: center;
+  height: 100%;
+  line-height: 1;
+  font-size: 0.98rem;
+}
+
+.unified-toolbar .navbar-brand[b-3lmfxuveux] { padding: 0 12px; }
+.unified-toolbar .toolbar-links[b-3lmfxuveux] { display: flex; gap: 20px; align-items: center; }
+.unified-toolbar .toolbar-links .nav-link[b-3lmfxuveux] { padding: 0 8px; color: #fff; }
+.unified-toolbar .btn[b-3lmfxuveux] { padding-left: 12px; padding-right: 12px; }
+.unified-toolbar .user-menu .user-avatar-btn[b-3lmfxuveux] { padding: 6px 10px; border-radius: 999px; }
+
+/* Notification button sizing and badge placement */
+.unified-toolbar .notification-btn[b-3lmfxuveux] { width: 44px; justify-content: center; position: relative; }
+.notification-badge[b-3lmfxuveux] { position: absolute; top: 8px; right: -6px; transform: none; font-size: 0.75rem; }
+
+/* Slightly increase icon sizes for visual balance */
+.unified-toolbar .bi[b-3lmfxuveux] { font-size: 1.05rem; }
+
+/* Reduce visual noise on toolbar buttons */
+.unified-toolbar .btn-outline-light[b-3lmfxuveux] { background: transparent; border-color: rgba(255,255,255,0.12); color: #fff; }
+.unified-toolbar .btn-primary[b-3lmfxuveux] { background-color: #1070d6; border-color: #0e63bf; }
+
+/* Make brand and left group fixed width to keep center links visible */
+.unified-toolbar .navbar-brand[b-3lmfxuveux] { flex: 0 0 auto; }
+.unified-toolbar > .container > .d-flex.align-items-center[b-3lmfxuveux] { flex: 1 1 auto; min-width: 0; }
+.unified-toolbar .d-flex.align-items-center > .nav[b-3lmfxuveux] { flex: 1 1 auto; min-width: 0; }
+
+/* Ensure right actions stay on one line */
+.unified-toolbar .d-flex.align-items-center.gap-2[b-3lmfxuveux] { flex: 0 0 auto; }
+
+/* Category button pill style */
+.btn-category[b-3lmfxuveux] { border-radius: 10px; padding: 8px 14px; background: rgba(255,255,255,0.06); }
+.btn-category .bi-caret-down-fill[b-3lmfxuveux] { font-size: 0.8rem; }
+
+/* Layout groups */
+.left-group[b-3lmfxuveux] { display: flex; align-items: center; gap: 12px; flex: 0 0 auto; }
+.center-nav[b-3lmfxuveux] { display: flex; align-items: center; flex: 1 1 auto; min-width: 0; justify-content: center; }
+.right-group[b-3lmfxuveux] { display: flex; align-items: center; flex: 0 0 auto; }
+
+/* Make center nav items evenly spaced and centered */
+.center-nav .toolbar-links[b-3lmfxuveux] { gap: 28px; display: flex; align-items: center; white-space: nowrap; overflow: auto; -webkit-overflow-scrolling: touch; }
+.center-nav .toolbar-links[b-3lmfxuveux]::-webkit-scrollbar { display: none; }
+.center-nav .nav-link[b-3lmfxuveux] { padding: 0 6px; font-weight: 600; white-space: nowrap; }
+
+/* Visual for Danh mục pill to match screenshot */
+.btn-category[b-3lmfxuveux] { background: rgba(255,255,255,0.12); color: #fff; border: 1px solid rgba(255,255,255,0.12); }
+.btn-category .bi-grid-fill[b-3lmfxuveux] { font-size: 1.05rem; }
+
+/* Ensure nav doesn't overflow - truncate if necessary */
+.center-nav[b-3lmfxuveux] { min-width: 0; }
+.center-nav .toolbar-links[b-3lmfxuveux] { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* Mega-menu styles */
+.mega-menu[b-3lmfxuveux] { width: 720px; max-width: 90vw; }
+.mega-menu .category-tile[b-3lmfxuveux] { color: #222; text-decoration: none; }
+.mega-menu .tile-thumb[b-3lmfxuveux] { width: 120px; height: 70px; }
+.mega-menu .tile-thumb img[b-3lmfxuveux] { max-width: 100%; max-height: 100%; object-fit: contain; }
+.mega-menu .category-tile:hover[b-3lmfxuveux] { transform: translateY(-4px); transition: transform .15s ease; }
+.dropdown-menu.mega[b-3lmfxuveux] { padding: 0.5rem; border-radius: 10px; }
+
+@media (max-width: 991px) {
+  .mega-menu[b-3lmfxuveux] { width: 100%; }
+  .dropdown.d-none.d-lg-block[b-3lmfxuveux] { display: none !important; }
+}
