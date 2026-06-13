@@ -142,6 +142,59 @@ button.accept-policy[b-3lmfxuveux] {
 .mega-menu .category-tile:hover[b-3lmfxuveux] { transform: translateY(-4px); transition: transform .15s ease; }
 .dropdown-menu.mega[b-3lmfxuveux] { padding: 0.5rem; border-radius: 10px; }
 
+/* Premium Category Mega Dropdown */
+.category-mega-dropdown[b-3lmfxuveux] {
+    border: none;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.02) !important;
+}
+
+.category-mega-dropdown .dropdown-item[b-3lmfxuveux] {
+    transition: all 0.2s ease;
+    white-space: normal;
+    background: transparent;
+    border-radius: 8px;
+}
+
+.category-mega-dropdown .dropdown-item:hover[b-3lmfxuveux] {
+    background-color: #f1f5f9;
+    transform: translateY(-2px);
+}
+
+.category-mega-dropdown .dropdown-item:active[b-3lmfxuveux] {
+    background-color: #e2e8f0;
+}
+
+.category-mega-dropdown .small-desc[b-3lmfxuveux] {
+    font-size: 0.72rem;
+    color: #64748b;
+    margin-top: 2px;
+}
+
+.category-icon-wrapper[b-3lmfxuveux] {
+    transition: all 0.2s ease;
+}
+
+.category-mega-dropdown .dropdown-item:hover .category-icon-wrapper[b-3lmfxuveux] {
+    transform: scale(1.1);
+}
+
+.bg-teal[b-3lmfxuveux] {
+    background-color: #0d9488 !important;
+}
+
+.text-teal[b-3lmfxuveux] {
+    color: #0d9488 !important;
+}
+
+/* Custom Category Icon Wrappers (since Bootstrap 5.0.1 does not support bg-opacity) */
+.icon-primary[b-3lmfxuveux] { background-color: rgba(13, 110, 253, 0.1) !important; color: #0d6efd !important; }
+.icon-teal[b-3lmfxuveux]    { background-color: rgba(13, 148, 136, 0.1) !important; color: #0d9488 !important; }
+.icon-danger[b-3lmfxuveux]  { background-color: rgba(220, 53, 69, 0.1) !important; color: #dc3545 !important; }
+.icon-success[b-3lmfxuveux] { background-color: rgba(25, 135, 84, 0.1) !important; color: #198754 !important; }
+.icon-info[b-3lmfxuveux]    { background-color: rgba(13, 202, 240, 0.1) !important; color: #0dcaf0 !important; }
+.icon-warning[b-3lmfxuveux] { background-color: rgba(253, 126, 20, 0.1) !important; color: #fd7e14 !important; }
+.icon-secondary[b-3lmfxuveux] { background-color: rgba(108, 117, 125, 0.1) !important; color: #6c757d !important; }
+
 @media (max-width: 991px) {
   .mega-menu[b-3lmfxuveux] { width: 100%; }
   .dropdown.d-none.d-lg-block[b-3lmfxuveux] { display: none !important; }

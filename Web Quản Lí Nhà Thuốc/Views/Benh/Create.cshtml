@@ -1,0 +1,225 @@
+@model Web_Quản_Lí_Nhà_Thuốc.Models.Benh
+
+@{
+    ViewData["Title"] = "Thêm bệnh mới";
+}
+
+<div class="container mt-4 mb-5" style="max-width: 900px;">
+    <div class="card border-0 shadow-sm p-4 bg-white" style="border-radius: 16px;">
+        <div class="mb-4">
+            <h3 class="fw-bold text-dark mb-1"><i class="bi bi-plus-circle-fill text-teal me-2"></i>Thêm thông tin bệnh mới</h3>
+            <p class="text-muted small mb-0">Điền đầy đủ thông tin mô tả chi tiết, triệu chứng và cách chăm sóc để đồng bộ lên hệ thống tra cứu y khoa.</p>
+        </div>
+        <hr class="text-muted opacity-25" />
+
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        <label asp-for="TenBenh" class="form-label fw-semibold text-dark">Tên bệnh <span class="text-danger">*</span></label>
+                        <input asp-for="TenBenh" class="form-control" placeholder="Ví dụ: Viêm xoang cấp, Hen phế quản..." id="inputTenBenh" />
+                        <span asp-validation-for="TenBenh" class="text-danger small"></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        <label asp-for="MaBenh" class="form-label fw-semibold text-dark">Mã bệnh (Slug) <span class="text-danger">*</span></label>
+                        <input asp-for="MaBenh" class="form-control" placeholder="Ví dụ: viem-xoang, hen-suyen" id="inputMaBenh" />
+                        <span asp-validation-for="MaBenh" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        <label asp-for="NhomBenh" class="form-label fw-semibold text-dark">Nhóm bệnh <span class="text-danger">*</span></label>
+                        <select asp-for="NhomBenh" class="form-select">
+                            <option value="">-- Chọn nhóm bệnh --</option>
+                            <option value="Hô hấp">Bệnh hô hấp</option>
+                            <option value="Tiêu hóa">Bệnh tiêu hóa</option>
+                            <option value="Tim mạch">Bệnh tim mạch</option>
+                            <option value="Xương khớp">Bệnh xương khớp</option>
+                            <option value="Da liễu">Bệnh ngoài da</option>
+                            <option value="Truyền nhiễm">Bệnh truyền nhiễm</option>
+                        </select>
+                        <span asp-validation-for="NhomBenh" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        <label asp-for="TrieuChungCodes" class="form-label fw-semibold text-dark">Triệu chứng lâm sàng (Mã triệu chứng)</label>
+                        <input asp-for="TrieuChungCodes" class="form-control" placeholder="Ví dụ: sot,ho,dau-dau" id="symptomCodesInput" />
+                        <span class="text-muted" style="font-size: 0.72rem;">Có thể chọn trực tiếp danh sách bên dưới để điền tự động.</span>
+                    </div>
+                </div>
+
+                <!-- Symptom checklist helper -->
+                <div class="col-12 mb-3">
+                    <div class="p-3 bg-light rounded-3">
+                        <div class="fw-semibold small text-dark mb-2"><i class="bi bi-tag-fill me-1"></i>Chọn nhanh triệu chứng đi kèm:</div>
+                        <div class="d-flex flex-wrap gap-2">
+                            <div class="form-check form-check-inline m-0">
+                                <input class="form-check-input symp-check-helper" type="checkbox" value="sot" id="check_sot">
+                                <label class="form-check-label small" for="check_sot">Sốt</label>
+                            </div>
+                            <div class="form-check form-check-inline m-0">
+                                <input class="form-check-input symp-check-helper" type="checkbox" value="ho" id="check_ho">
+                                <label class="form-check-label small" for="check_ho">Ho</label>
+                            </div>
+                            <div class="form-check form-check-inline m-0">
+                                <input class="form-check-input symp-check-helper" type="checkbox" value="dau-dau" id="check_daudau">
+                                <label class="form-check-label small" for="check_daudau">Đau đầu</label>
+                            </div>
+                            <div class="form-check form-check-inline m-0">
+                                <input class="form-check-input symp-check-helper" type="checkbox" value="dau-hong" id="check_dauhong">
+                                <label class="form-check-label small" for="check_dauhong">Đau họng</label>
+                            </div>
+                            <div class="form-check form-check-inline m-0">
+                                <input class="form-check-input symp-check-helper" type="checkbox" value="so-mui" id="check_somui">
+                                <label class="form-check-label small" for="check_somui">Sổ mũi</label>
+                            </div>
+                            <div class="form-check form-check-inline m-0">
+                                <input class="form-check-input symp-check-helper" type="checkbox" value="dau-bung" id="check_daubung">
+                                <label class="form-check-label small" for="check_daubung">Đau bụng</label>
+                            </div>
+                            <div class="form-check form-check-inline m-0">
+                                <input class="form-check-input symp-check-helper" type="checkbox" value="ngua" id="check_ngua">
+                                <label class="form-check-label small" for="check_ngua">Mẩn ngứa</label>
+                            </div>
+                            <div class="form-check form-check-inline m-0">
+                                <input class="form-check-input symp-check-helper" type="checkbox" value="dau-khop" id="check_daukhop">
+                                <label class="form-check-label small" for="check_daukhop">Đau khớp</label>
+                            </div>
+                            <div class="form-check form-check-inline m-0">
+                                <input class="form-check-input symp-check-helper" type="checkbox" value="kho-tho" id="check_khotho">
+                                <label class="form-check-label small" for="check_khotho">Khó thở</label>
+                            </div>
+                            <div class="form-check form-check-inline m-0">
+                                <input class="form-check-input symp-check-helper" type="checkbox" value="met-moi" id="check_metmoi">
+                                <label class="form-check-label small" for="check_metmoi">Mệt mỏi</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="form-group mb-3">
+                        <label asp-for="MoTaTrieuChung" class="form-label fw-semibold text-dark">Mô tả triệu chứng lâm sàng chi tiết</label>
+                        <textarea asp-for="MoTaTrieuChung" class="form-control" rows="3" placeholder="Chi tiết các biểu hiện đặc trưng lâm sàng của người bệnh..."></textarea>
+                        <span asp-validation-for="MoTaTrieuChung" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="form-group mb-3">
+                        <label asp-for="TongQuan" class="form-label fw-semibold text-dark">Tổng quan bệnh lý</label>
+                        <textarea asp-for="TongQuan" class="form-control" rows="3" placeholder="Định nghĩa bệnh, dịch tễ học và mức độ nguy hiểm..."></textarea>
+                        <span asp-validation-for="TongQuan" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="form-group mb-3">
+                        <label asp-for="NguyenNhan" class="form-label fw-semibold text-dark">Nguyên nhân mắc bệnh</label>
+                        <textarea asp-for="NguyenNhan" class="form-control" rows="3" placeholder="Virus, vi khuẩn, lối sống hoặc các yếu tố xúc tác khác..."></textarea>
+                        <span asp-validation-for="NguyenNhan" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="form-group mb-3">
+                        <label asp-for="PhongNgua" class="form-label fw-semibold text-dark">Phương pháp phòng ngừa</label>
+                        <textarea asp-for="PhongNgua" class="form-control" rows="3" placeholder="Lối sống, vắc xin, vệ sinh, dinh dưỡng..."></textarea>
+                        <span asp-validation-for="PhongNgua" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="form-group mb-4">
+                        <label asp-for="ThuocKhuyenDung" class="form-label fw-semibold text-dark">Thuốc điều trị khuyên dùng (ngăn cách bởi dấu phẩy)</label>
+                        <input asp-for="ThuocKhuyenDung" class="form-control" placeholder="Ví dụ: Paracetamol 500mg, Panadol Extra, Decolgen Forte" />
+                        <span class="text-muted" style="font-size: 0.72rem;">Nhập chính xác tên biệt dược hoặc hoạt chất đang có trong kho hàng để kết nối trực tiếp liên kết đặt mua.</span>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="form-group d-flex gap-2">
+                        <input type="submit" value="Tạo bệnh lý mới" class="btn btn-teal-btn px-4 py-2 rounded-pill" />
+                        <a asp-action="Index" class="btn btn-secondary px-4 py-2 rounded-pill">Quay lại danh sách</a>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        // Auto Slug generation from TenBenh
+        const nameInput = document.getElementById("inputTenBenh");
+        const slugInput = document.getElementById("inputMaBenh");
+        
+        if (nameInput && slugInput) {
+            nameInput.addEventListener("input", function() {
+                if (slugInput.dataset.userEdited) return;
+                
+                let val = nameInput.value;
+                val = val.toLowerCase();
+                val = val.normalize('NFD').replace(/[\u0300-\u036f]/g, ''); // Remove accents
+                val = val.replace(/[đĐ]/g, 'd');
+                val = val.replace(/([^a-z0-9\s-]|_)+/g, ''); // Remove special chars
+                val = val.replace(/\s+/g, '-'); // Replace spaces with -
+                val = val.replace(/-+/g, '-'); // Replace multiple - with single -
+                val = val.trim().replace(/^-+|-+$/g, ''); // Trim - from ends
+                
+                slugInput.value = val;
+            });
+            
+            slugInput.addEventListener("input", function() {
+                slugInput.dataset.userEdited = "true";
+            });
+        }
+
+        // Checklist builder for symptom codes
+        const codeInput = document.getElementById("symptomCodesInput");
+        const helpers = document.querySelectorAll(".symp-check-helper");
+        
+        if (codeInput && helpers.length) {
+            function updateCodesFromCheckboxes() {
+                const checked = Array.from(helpers)
+                                     .filter(cb => cb.checked)
+                                     .map(cb => cb.value);
+                codeInput.value = checked.join(",");
+            }
+            
+            helpers.forEach(cb => {
+                cb.addEventListener("change", updateCodesFromCheckboxes);
+            });
+
+            // Initialize checkboxes from input value if any
+            function syncCheckboxesFromInput() {
+                const currentCodes = codeInput.value.split(",").map(s => s.trim());
+                helpers.forEach(cb => {
+                    cb.checked = currentCodes.includes(cb.value);
+                });
+            }
+
+            codeInput.addEventListener("input", syncCheckboxesFromInput);
+        }
+    </script>
+}
+
+<style>
+    .btn-teal-btn {
+        background-color: #0d9488 !important;
+        color: white !important;
+        border: none !important;
+        transition: background-color 0.2s;
+    }
+    .btn-teal-btn:hover {
+        background-color: #0f766e !important;
+    }
+</style>

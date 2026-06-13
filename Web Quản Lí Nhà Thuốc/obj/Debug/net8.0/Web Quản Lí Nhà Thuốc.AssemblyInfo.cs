@@ -15,7 +15,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Web Quản Lí Nhà Thuốc")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8c09efe9eeb1389185ad5e2e1be130c23ab7ab8e")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+05568b38a092a054eeb5396a25f50bd9d9695f20")]
 [assembly: System.Reflection.AssemblyProductAttribute("Web Quản Lí Nhà Thuốc")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Web Quản Lí Nhà Thuốc")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

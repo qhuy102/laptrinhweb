@@ -1,0 +1,105 @@
+@model IEnumerable<Web_Quản_Lí_Nhà_Thuốc.Models.Benh>
+
+@{
+    ViewData["Title"] = "Quản lý Bệnh lý";
+}
+
+<div class="container mt-4 mb-5">
+    <div class="card border-0 shadow-sm p-4 bg-white" style="border-radius: 16px;">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h3 class="fw-bold text-dark mb-1"><i class="bi bi-heart-pulse-fill text-danger me-2"></i>Quản lý thông tin bệnh lý</h3>
+                <p class="text-muted small mb-0">Thêm mới, chỉnh sửa thông tin mô tả, triệu chứng và các thuốc điều trị của bệnh lý phục vụ tra cứu.</p>
+            </div>
+            <a asp-action="Create" class="btn btn-teal-btn px-4 py-2 rounded-pill"><i class="bi bi-plus-circle me-1"></i>Thêm bệnh mới</a>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle border-0">
+                <thead class="bg-light text-dark fw-bold">
+                    <tr style="font-size: 0.9rem;">
+                        <th class="border-0 py-3" style="width: 25%;">Tên bệnh</th>
+                        <th class="border-0 py-3" style="width: 15%;">Nhóm bệnh</th>
+                        <th class="border-0 py-3" style="width: 40%;">Triệu chứng &amp; Tag</th>
+                        <th class="border-0 py-3 text-center" style="width: 20%;">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var item in Model)
+                        {
+                            var badgeClass = "bg-primary";
+                            if (item.NhomBenh == "Hô hấp") badgeClass = "bg-info text-dark";
+                            else if (item.NhomBenh == "Tiêu hóa") badgeClass = "bg-success";
+                            else if (item.NhomBenh == "Tim mạch") badgeClass = "bg-danger";
+                            else if (item.NhomBenh == "Xương khớp") badgeClass = "bg-warning text-dark";
+                            else if (item.NhomBenh == "Da liễu") badgeClass = "bg-secondary";
+                            else if (item.NhomBenh == "Truyền nhiễm") badgeClass = "bg-dark";
+
+                            <tr>
+                                <td class="py-3">
+                                    <div class="fw-bold text-dark mb-0">@item.TenBenh</div>
+                                    <small class="text-muted" style="font-size: 0.72rem;">Slug: @item.MaBenh</small>
+                                </td>
+                                <td class="py-3">
+                                    <span class="badge @badgeClass rounded-pill px-2.5 py-1 text-uppercase fw-semibold" style="font-size: 0.65rem;">@item.NhomBenh</span>
+                                </td>
+                                <td class="py-3">
+                                    <div class="text-truncate text-muted small mb-1" style="max-width: 350px;">@item.MoTaTrieuChung</div>
+                                    <div class="d-flex flex-wrap">
+                                        @if (!string.IsNullOrEmpty(item.TrieuChungCodes))
+                                        {
+                                            foreach (var code in item.TrieuChungCodes.Split(','))
+                                            {
+                                                var label = code.Trim();
+                                                if (code == "sot") label = "Sốt";
+                                                else if (code == "ho") label = "Ho";
+                                                else if (code == "dau-dau") label = "Đau đầu";
+                                                else if (code == "dau-hong") label = "Đau họng";
+                                                else if (code == "so-mui") label = "Sổ mũi";
+                                                else if (code == "dau-bung") label = "Đau bụng";
+                                                else if (code == "ngua") label = "Mẩn ngứa";
+                                                else if (code == "dau-khop") label = "Đau khớp";
+                                                else if (code == "kho-tho") label = "Khó thở";
+                                                else if (code == "met-moi") label = "Mệt mỏi";
+                                                <span class="badge bg-light text-muted border me-1 mb-1" style="font-size: 0.65rem; font-weight: normal;"># @label</span>
+                                            }
+                                        }
+                                    </div>
+                                </td>
+                                <td class="py-3 text-center">
+                                    <div class="btn-group gap-1">
+                                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-warning btn-sm rounded-pill px-3"><i class="bi bi-pencil-square me-1"></i>Sửa</a>
+                                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-outline-danger btn-sm rounded-pill px-3"><i class="bi bi-trash-fill me-1"></i>Xóa</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="4" class="text-center py-5 text-muted">
+                                <i class="bi bi-search fs-1 mb-2 d-block"></i>
+                                Chưa có thông tin bệnh lý nào được tạo.
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+    .btn-teal-btn {
+        background-color: #0d9488 !important;
+        color: white !important;
+        border: none !important;
+        transition: background-color 0.2s;
+    }
+    .btn-teal-btn:hover {
+        background-color: #0f766e !important;
+    }
+</style>

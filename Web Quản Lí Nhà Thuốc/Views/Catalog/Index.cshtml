@@ -2,48 +2,550 @@
 
 @{
 	ViewData["Title"] = ViewData["CategoryTitle"] ?? "Danh mục";
+	var isTraCuu = ViewData["CategoryKey"]?.ToString() == "tracuu";
 }
 
-<div class="container mt-4">
-	<div class="row">
-		<div class="col-lg-3 mb-4">
-			<div class="category-sidebar p-3 rounded shadow-sm">
-				<h6 class="fw-bold mb-2">Danh mục thuốc</h6>
-				<ul class="list-unstyled mb-0">
-					<li><a class="d-block py-2" href="/Catalog/Index?cat=thuoc">Tất cả</a></li>
-					@if (ViewData["AllCategories"] is IEnumerable<Web_Quản_Lí_Nhà_Thuốc.Models.LoaiThuoc> cats)
-					{
-						foreach(var c in cats) {
-							<li><a class="d-block py-2" href="/Catalog/Index?cat=thuoc&loaiId=@c.Id">@c.TenLoai</a></li>
-						}
-					}
-				</ul>
+@if (isTraCuu)
+{
+	<div class="container mt-4">
+		<!-- Hero section for Tra cứu bệnh -->
+		<div class="hero-section text-white rounded-4 p-5 mb-5 shadow-sm overflow-hidden position-relative" style="background: linear-gradient(135deg, #0f776d 0%, #0891b2 100%);">
+			<div class="hero-content position-relative" style="z-index: 2; max-width: 700px;">
+				<span class="badge text-white rounded-pill px-3 py-2 mb-3 fw-semibold text-uppercase tracking-wider" style="font-size: 0.8rem; backdrop-filter: blur(5px); background-color: rgba(255, 255, 255, 0.25);">
+					Cổng tra cứu y khoa PharmaCare
+				</span>
+				<h1 class="display-5 fw-bold mb-3">Tra Cứu Bệnh Lý & Triệu Chứng</h1>
+				<p class="lead text-white text-opacity-90 mb-0">Tìm kiếm thông tin khoa học về các loại bệnh phổ biến, hướng dẫn nhận biết triệu chứng, nguyên nhân, cách phòng ngừa và sản phẩm hỗ trợ điều trị phù hợp.</p>
 			</div>
+			<div style="position: absolute; top: 0; right: 0; bottom: 0; left: 0; background-image: radial-gradient(circle at 85% 30%, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0) 50%); pointer-events: none;"></div>
 		</div>
 
-		<div class="col-lg-9">
-			<div class="d-flex justify-content-between align-items-end mb-3">
-				<div>
-					<h2 class="fw-bold text-dark mb-1">@ViewData["CategoryTitle"]</h2>
-					<p class="text-muted small mb-0">@ViewData["CategoryDescription"]</p>
+		<div class="row">
+			<!-- Sidebar: Triệu chứng lâm sàng -->
+			<div class="col-lg-3 mb-4">
+				<div class="card border-0 shadow-sm p-3 bg-white mb-4" style="border-radius: 16px;">
+					<h6 class="fw-bold mb-3 text-dark d-flex align-items-center">
+						<i class="bi bi-heart-pulse-fill text-danger me-2"></i>
+						Bộ lọc triệu chứng
+					</h6>
+					<p class="text-muted small mb-3">Tích chọn các triệu chứng đang gặp để sàng lọc bệnh lý tương ứng:</p>
+					
+					<div class="symptom-checkbox-list">
+						<div class="form-check mb-2">
+							<input class="form-check-input symptom-filter-checkbox" type="checkbox" value="sot" id="symp_sot">
+							<label class="form-check-label text-dark small" for="symp_sot">Sốt (Thân nhiệt cao)</label>
+						</div>
+						<div class="form-check mb-2">
+							<input class="form-check-input symptom-filter-checkbox" type="checkbox" value="ho" id="symp_ho">
+							<label class="form-check-label text-dark small" for="symp_ho">Ho / Ho khan / Ho đờm</label>
+						</div>
+						<div class="form-check mb-2">
+							<input class="form-check-input symptom-filter-checkbox" type="checkbox" value="dau-dau" id="symp_daudau">
+							<label class="form-check-label text-dark small" for="symp_daudau">Đau đầu / Nhức đầu</label>
+						</div>
+						<div class="form-check mb-2">
+							<input class="form-check-input symptom-filter-checkbox" type="checkbox" value="dau-hong" id="symp_dauhong">
+							<label class="form-check-label text-dark small" for="symp_dauhong">Đau họng / Rát họng</label>
+						</div>
+						<div class="form-check mb-2">
+							<input class="form-check-input symptom-filter-checkbox" type="checkbox" value="so-mui" id="symp_somui">
+							<label class="form-check-label text-dark small" for="symp_somui">Sổ mũi / Nghẹt mũi</label>
+						</div>
+						<div class="form-check mb-2">
+							<input class="form-check-input symptom-filter-checkbox" type="checkbox" value="dau-bung" id="symp_daubung">
+							<label class="form-check-label text-dark small" for="symp_daubung">Đau bụng / Đầy hơi / Ợ chua</label>
+						</div>
+						<div class="form-check mb-2">
+							<input class="form-check-input symptom-filter-checkbox" type="checkbox" value="ngua" id="symp_ngua">
+							<label class="form-check-label text-dark small" for="symp_ngua">Ngứa / Phát ban / Mẩn đỏ</label>
+						</div>
+						<div class="form-check mb-2">
+							<input class="form-check-input symptom-filter-checkbox" type="checkbox" value="dau-khop" id="symp_daukhop">
+							<label class="form-check-label text-dark small" for="symp_daukhop">Đau khớp / Sưng khớp</label>
+						</div>
+						<div class="form-check mb-2">
+							<input class="form-check-input symptom-filter-checkbox" type="checkbox" value="kho-tho" id="symp_khotho">
+							<label class="form-check-label text-dark small" for="symp_khotho">Khó thở / Thở khò khè</label>
+						</div>
+						<div class="form-check mb-2">
+							<input class="form-check-input symptom-filter-checkbox" type="checkbox" value="met-moi" id="symp_metmoi">
+							<label class="form-check-label text-dark small" for="symp_metmoi">Mệt mỏi / Mất nước</label>
+						</div>
+					</div>
+
+					<button class="btn btn-outline-secondary btn-sm w-100 mt-3 rounded-pill" onclick="clearSymptomFilters()">Bỏ lọc triệu chứng</button>
 				</div>
-				<a href="#" class="text-teal fw-semibold text-decoration-none">Xem tất cả <i class="bi bi-arrow-right"></i></a>
+
+				<div class="card border-0 shadow-sm p-3 bg-white text-center" style="border-radius: 16px; background: linear-gradient(180deg, #ecfeff 0%, #ffffff 100%) !important;">
+					<div class="text-teal fs-3 mb-2"><i class="bi bi-chat-dots"></i></div>
+					<h6 class="fw-bold mb-1">Cần tư vấn chuyên sâu?</h6>
+					<p class="text-muted small mb-3">Kết nối trực tiếp với Dược sĩ để nhận chẩn đoán chính xác nhất.</p>
+					<a href="/Home/PrescriptionUpload?mode=consult" class="btn btn-primary btn-sm rounded-pill w-100">Liên hệ Dược sĩ</a>
+				</div>
 			</div>
 
-			@if (Model != null && Model.Any()) {
-				<div class="row g-3">
-					@foreach(var p in Model) {
-						<div class="col-6 col-md-4 col-lg-3">
-							@await Html.PartialAsync("~/Views/Shared/_ProductCard.cshtml", p)
-						</div>
-					}
+			<!-- Main disease search and list -->
+			<div class="col-lg-9">
+				<div class="card border-0 shadow-sm p-3 bg-white mb-4" style="border-radius: 16px;">
+					<!-- Disease search input -->
+					<div class="input-group shadow-sm rounded-pill overflow-hidden border">
+						<span class="input-group-text bg-white border-0"><i class="bi bi-search"></i></span>
+						<input type="text" id="diseaseKeywordInput" class="form-control border-0" placeholder="Nhập tên bệnh muốn tra cứu..." style="box-shadow: none;">
+					</div>
 				</div>
-			}
-			else {
-				<div class="alert alert-secondary">Không có sản phẩm cho danh mục này.</div>
-			}
+
+				<!-- Category filter tabs -->
+				<div class="d-flex gap-2 overflow-x-auto pb-3 mb-4 scrollbar-hidden">
+					<button class="btn btn-teal-active disease-group-btn px-4 py-2 text-nowrap rounded-pill" onclick="filterDiseases('group', 'All', this)">Tất cả nhóm</button>
+					<button class="btn btn-outline-secondary disease-group-btn px-4 py-2 text-nowrap rounded-pill" onclick="filterDiseases('group', 'Hô hấp', this)">Bệnh hô hấp</button>
+					<button class="btn btn-outline-secondary disease-group-btn px-4 py-2 text-nowrap rounded-pill" onclick="filterDiseases('group', 'Tiêu hóa', this)">Bệnh tiêu hóa</button>
+					<button class="btn btn-outline-secondary disease-group-btn px-4 py-2 text-nowrap rounded-pill" onclick="filterDiseases('group', 'Tim mạch', this)">Bệnh tim mạch</button>
+					<button class="btn btn-outline-secondary disease-group-btn px-4 py-2 text-nowrap rounded-pill" onclick="filterDiseases('group', 'Xương khớp', this)">Bệnh xương khớp</button>
+					<button class="btn btn-outline-secondary disease-group-btn px-4 py-2 text-nowrap rounded-pill" onclick="filterDiseases('group', 'Da liễu', this)">Bệnh ngoài da</button>
+					<button class="btn btn-outline-secondary disease-group-btn px-4 py-2 text-nowrap rounded-pill" onclick="filterDiseases('group', 'Truyền nhiễm', this)">Bệnh truyền nhiễm</button>
+				</div>
+
+				<!-- Diseases grid -->
+				<div class="row g-3" id="diseasesGrid">
+					<!-- Cards will be rendered dynamically by JavaScript for interactive filtering -->
+				</div>
+			</div>
 		</div>
 	</div>
 
-	@await Html.PartialAsync("~/Views/Shared/_ProductScripts.cshtml")
-</div>
+	<!-- Disease Detail Modal -->
+	<div class="modal fade" id="diseaseDetailModal" tabindex="-1" aria-labelledby="diseaseDetailModalLabel" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered modal-lg">
+			<div class="modal-content border-0" style="border-radius: 20px; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.15);">
+				<div class="modal-header text-white border-0 p-4" id="modalHeader" style="background: linear-gradient(135deg, #0f776d 0%, #0891b2 100%);">
+					<div>
+						<span class="badge text-white rounded-pill px-3 py-1 mb-2 fw-medium small" id="diseaseDetailBadge" style="background-color: rgba(255, 255, 255, 0.25);">Category</span>
+						<h4 class="modal-title fw-bold" id="diseaseDetailModalLabel">Disease Name</h4>
+					</div>
+					<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body p-4 bg-light">
+					<div class="row g-3">
+						<div class="col-md-7">
+							<div class="bg-white p-3 rounded-4 shadow-sm mb-3">
+								<h6 class="fw-bold text-dark d-flex align-items-center mb-2">
+									<i class="bi bi-info-circle-fill text-teal me-2"></i>Tổng quan bệnh lý
+								</h6>
+								<p class="text-muted small mb-0" id="diseaseOverview">Overview content</p>
+							</div>
+							
+							<div class="bg-white p-3 rounded-4 shadow-sm mb-3">
+								<h6 class="fw-bold text-dark d-flex align-items-center mb-2">
+									<i class="bi bi-exclamation-triangle-fill text-warning me-2"></i>Triệu chứng lâm sàng
+								</h6>
+								<p class="text-muted small mb-0" id="diseaseSymptoms">Symptoms content</p>
+							</div>
+
+							<div class="bg-white p-3 rounded-4 shadow-sm mb-3">
+								<h6 class="fw-bold text-dark d-flex align-items-center mb-2">
+									<i class="bi bi-chat-square-text-fill text-danger me-2"></i>Nguyên nhân mắc bệnh
+								</h6>
+								<p class="text-muted small mb-0" id="diseaseCauses">Causes content</p>
+							</div>
+
+							<div class="bg-white p-3 rounded-4 shadow-sm">
+								<h6 class="fw-bold text-dark d-flex align-items-center mb-2">
+									<i class="bi bi-shield-fill-check text-success me-2"></i>Phương pháp phòng ngừa
+								</h6>
+								<p class="text-muted small mb-0" id="diseasePrevention">Prevention content</p>
+							</div>
+						</div>
+
+						<!-- Right panel: Recommended Drugs -->
+						<div class="col-md-5">
+							<div class="bg-white p-3 rounded-4 shadow-sm h-100 d-flex flex-column">
+								<h6 class="fw-bold text-dark d-flex align-items-center mb-3">
+									<i class="bi bi-capsule-pill text-teal me-2"></i>Thuốc điều trị khuyên dùng
+								</h6>
+								<p class="text-muted small mb-3">Nhấp vào thuốc để xem chi tiết sản phẩm và đặt mua:</p>
+								
+								<div class="flex-grow-1" id="recommendedDrugsList">
+									<!-- Recommended drugs will be inserted here -->
+								</div>
+
+								<div class="mt-3 p-2.5 rounded-3 bg-light text-center">
+									<span class="text-muted small" style="font-size: 0.72rem;"><i class="bi bi-info-circle me-1"></i>Vui lòng tham khảo ý kiến dược sĩ trước khi mua.</span>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer border-0 p-3 bg-white">
+					<button type="button" class="btn btn-secondary px-4 rounded-pill" data-bs-dismiss="modal">Đóng</button>
+					<a href="/Home/PrescriptionUpload?mode=consult" class="btn btn-primary px-4 rounded-pill">Tư vấn nhanh</a>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Disease Database & Interactive Logic script -->
+	<script>
+		// Mapped from DB dynamically via ViewData
+		const rawDiseases = @Html.Raw(Json.Serialize(ViewData["DiseasesList"] ?? new List<Web_Quản_Lí_Nhà_Thuốc.Models.Benh>()));
+		const diseaseDb = rawDiseases.map(d => ({
+			id: d.maBenh || d.MaBenh || "",
+			name: d.tenBenh || d.TenBenh || "",
+			group: d.nhomBenh || d.NhomBenh || "",
+			symptomCodes: d.trieuChungCodes ? d.trieuChungCodes.split(',').map(s => s.trim()) : [],
+			symptomsText: d.moTaTrieuChung || d.MoTaTrieuChung || "",
+			overview: d.tongQuan || d.TongQuan || "",
+			causes: d.nguyenNhan || d.NguyenNhan || "",
+			prevention: d.phongNgua || d.PhongNgua || "",
+			drugs: d.thuocKhuyenDung ? d.thuocKhuyenDung.split(',').map(s => s.trim()) : []
+		}));
+
+		let activeDiseaseGroup = 'All';
+
+		// Filter and render diseases
+		function renderDiseases() {
+			const grid = document.getElementById("diseasesGrid");
+			if (!grid) return;
+
+			// Get selected symptoms from checkboxes
+			const selectedSymptoms = Array.from(document.querySelectorAll('.symptom-filter-checkbox:checked'))
+										   .map(cb => cb.value);
+
+			// Get search keyword
+			const searchInput = document.getElementById("diseaseKeywordInput");
+			const keyword = searchInput ? searchInput.value.trim().toLowerCase() : '';
+
+			grid.innerHTML = '';
+			let count = 0;
+
+			diseaseDb.forEach(disease => {
+				// Filter by group
+				const matchGroup = (activeDiseaseGroup === 'All' || disease.group === activeDiseaseGroup);
+
+				// Filter by keyword
+				const matchKeyword = !keyword || 
+									 disease.name.toLowerCase().includes(keyword) || 
+									 disease.symptomsText.toLowerCase().includes(keyword) ||
+									 disease.overview.toLowerCase().includes(keyword);
+
+				// Filter by symptoms (must match ALL checked symptoms, if any are checked)
+				let matchSymptoms = true;
+				if (selectedSymptoms.length > 0) {
+					matchSymptoms = selectedSymptoms.every(symp => disease.symptomCodes.includes(symp));
+				}
+
+				if (matchGroup && matchKeyword && matchSymptoms) {
+					count++;
+					let badgeClass = 'bg-primary';
+					if (disease.group === 'Hô hấp') badgeClass = 'bg-info text-dark';
+					else if (disease.group === 'Tiêu hóa') badgeClass = 'bg-success';
+					else if (disease.group === 'Tim mạch') badgeClass = 'bg-danger';
+					else if (disease.group === 'Xương khớp') badgeClass = 'bg-warning text-dark';
+					else if (disease.group === 'Da liễu') badgeClass = 'bg-secondary';
+					else if (disease.group === 'Truyền nhiễm') badgeClass = 'bg-dark';
+
+					// Build symptom tags list
+					const sympTags = disease.symptomCodes.map(code => {
+						let text = code;
+						if (code === 'sot') text = 'Sốt';
+						else if (code === 'ho') text = 'Ho';
+						else if (code === 'dau-dau') text = 'Đau đầu';
+						else if (code === 'dau-hong') text = 'Đau họng';
+						else if (code === 'so-mui') text = 'Sổ mũi';
+						else if (code === 'dau-bung') text = 'Đau bụng';
+						else if (code === 'ngua') text = 'Mẩn ngứa';
+						else if (code === 'dau-khop') text = 'Đau khớp';
+						else if (code === 'kho-tho') text = 'Khó thở';
+						else if (code === 'met-moi') text = 'Mệt mỏi';
+						return `<span class="badge bg-light text-muted border me-1 mb-1" style="font-size: 0.68rem; font-weight: normal;"># ${text}</span>`;
+					}).join('');
+
+					const cardHtml = `
+						<div class="col-md-6 col-lg-4">
+							<div class="card border-0 shadow-sm h-100 disease-card" style="border-radius: 16px;">
+								<div class="card-body p-4 d-flex flex-column">
+									<div class="d-flex justify-content-between align-items-start mb-2">
+										<span class="badge ${badgeClass} rounded-pill px-2.5 py-1 text-uppercase small" style="font-size: 0.65rem; font-weight: 600;">${disease.group}</span>
+									</div>
+									<h5 class="fw-bold text-dark mb-2">${disease.name}</h5>
+									
+									<div class="mb-3 d-flex flex-wrap">
+										${sympTags}
+									</div>
+
+									<p class="text-muted small mb-4 text-truncate-3" style="line-height: 1.5; font-size: 0.8rem; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;">
+										${disease.symptomsText}
+									</p>
+									
+									<div class="mt-auto">
+										<button class="btn btn-teal-btn w-100 rounded-pill py-2 small fw-semibold" onclick="showDiseaseDetail('${disease.id}')">
+											Xem chi tiết &amp; Điều trị <i class="bi bi-arrow-right-short ms-1"></i>
+										</button>
+									</div>
+								</div>
+							</div>
+						</div>
+					`;
+					grid.insertAdjacentHTML('beforeend', cardHtml);
+				}
+			});
+
+			if (count === 0) {
+				grid.innerHTML = `
+					<div class="col-12 text-center py-5 bg-light rounded-4 w-100">
+						<div class="text-muted mb-3"><i class="bi bi-search fs-1"></i></div>
+						<h5 class="fw-bold text-dark">Không tìm thấy bệnh lý phù hợp</h5>
+						<p class="text-muted small">Hãy thử chọn triệu chứng khác hoặc thay đổi từ khóa tìm kiếm.</p>
+					</div>
+				`;
+			}
+		}
+
+		// Filter by group button clicked
+		function filterDiseases(type, value, btn) {
+			if (type === 'group') {
+				activeDiseaseGroup = value;
+				document.querySelectorAll('.disease-group-btn').forEach(b => {
+					b.classList.remove('btn-teal-active');
+					b.classList.add('btn-outline-secondary');
+				});
+				btn.classList.remove('btn-outline-secondary');
+				btn.classList.add('btn-teal-active');
+			}
+			renderDiseases();
+		}
+
+		// Clear all symptom checkboxes
+		function clearSymptomFilters() {
+			document.querySelectorAll('.symptom-filter-checkbox').forEach(cb => cb.checked = false);
+			renderDiseases();
+		}
+
+		// Show details in modal
+		function showDiseaseDetail(id) {
+			const disease = diseaseDb.find(d => d.id === id);
+			if (!disease) return;
+
+			document.getElementById("diseaseDetailModalLabel").innerText = disease.name;
+			
+			const badge = document.getElementById("diseaseDetailBadge");
+			badge.innerText = disease.group.toUpperCase();
+			
+			// Set header gradient based on group
+			const header = document.getElementById("modalHeader");
+			if (disease.group === 'Hô hấp') {
+				header.style.background = 'linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)';
+				badge.className = 'badge text-white rounded-pill px-3 py-1 mb-2 fw-medium small';
+			} else if (disease.group === 'Tiêu hóa') {
+				header.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+			} else if (disease.group === 'Tim mạch') {
+				header.style.background = 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)';
+			} else if (disease.group === 'Xương khớp') {
+				header.style.background = 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)';
+			} else if (disease.group === 'Da liễu') {
+				header.style.background = 'linear-gradient(135deg, #6b7280 0%, #4b5563 100%)';
+			} else if (disease.group === 'Truyền nhiễm') {
+				header.style.background = 'linear-gradient(135deg, #1f2937 0%, #111827 100%)';
+			} else {
+				header.style.background = 'linear-gradient(135deg, #0d9488 0%, #0f766e 100%)';
+			}
+
+			document.getElementById("diseaseOverview").innerText = disease.overview;
+			document.getElementById("diseaseSymptoms").innerText = disease.symptomsText;
+			document.getElementById("diseaseCauses").innerText = disease.causes;
+			document.getElementById("diseasePrevention").innerText = disease.prevention;
+
+			// Render recommended drugs
+			const drugsList = document.getElementById("recommendedDrugsList");
+			drugsList.innerHTML = '';
+			
+			disease.drugs.forEach(drugName => {
+				const drugHtml = `
+					<a href="/Catalog/Index?cat=thuoc&query=${encodeURIComponent(drugName)}" target="_blank" class="d-flex align-items-center p-2.5 mb-2 border rounded-3 text-dark text-decoration-none drug-recommend-item" style="transition: all 0.2s;">
+						<div class="bg-teal bg-opacity-10 text-teal rounded p-2 me-3 d-flex align-items-center justify-content-center" style="width: 38px; height: 38px; background-color: rgba(13, 148, 136, 0.1) !important;">
+							<i class="bi bi-capsule-pill fs-5 text-teal"></i>
+						</div>
+						<div class="flex-grow-1 min-w-0">
+							<div class="fw-bold small text-truncate text-dark mb-0">${drugName}</div>
+							<span class="text-muted" style="font-size: 0.68rem;">Xem chi tiết trong kho hàng</span>
+						</div>
+						<i class="bi bi-chevron-right text-muted small ms-2"></i>
+					</a>
+				`;
+				drugsList.insertAdjacentHTML('beforeend', drugHtml);
+			});
+
+			// Trigger BS5 Modal
+			const myModal = new bootstrap.Modal(document.getElementById('diseaseDetailModal'));
+			myModal.show();
+		}
+
+		// Setup event listeners
+		document.addEventListener("DOMContentLoaded", function() {
+			// Initial render
+			renderDiseases();
+
+			// Search input typing listener
+			const searchInput = document.getElementById("diseaseKeywordInput");
+			if (searchInput) {
+				searchInput.addEventListener("input", function() {
+					renderDiseases();
+				});
+				
+				// Focus indicator for search bar
+				const wrapper = searchInput.closest(".input-group");
+				if (wrapper) {
+					searchInput.addEventListener("focus", function() {
+						wrapper.classList.add("input-group-focus");
+					});
+					searchInput.addEventListener("blur", function() {
+						wrapper.classList.remove("input-group-focus");
+					});
+				}
+			}
+
+			// Checkbox changes listener
+			document.querySelectorAll('.symptom-filter-checkbox').forEach(cb => {
+				cb.addEventListener("change", function() {
+					renderDiseases();
+				});
+			});
+		});
+	</script>
+
+	<style>
+		:root {
+			--primary-color: #0d9488;
+			--primary-hover: #0f766e;
+		}
+		.text-teal {
+			color: var(--primary-color) !important;
+		}
+		.bg-teal {
+			background-color: var(--primary-color) !important;
+		}
+		.btn-teal-active {
+			background-color: var(--primary-color) !important;
+			color: white !important;
+			border-color: var(--primary-color) !important;
+		}
+		.btn-teal-active:hover {
+			background-color: var(--primary-hover) !important;
+			color: white !important;
+		}
+		.btn-teal-btn {
+			background-color: var(--primary-color) !important;
+			color: white !important;
+			border: none !important;
+			transition: background-color 0.2s, transform 0.1s;
+		}
+		.btn-teal-btn:hover {
+			background-color: var(--primary-hover) !important;
+			color: white !important;
+			transform: translateY(-1px);
+		}
+		.btn-teal-btn:active {
+			transform: translateY(1px);
+		}
+		.disease-card {
+			border: 1px solid #f1f5f9 !important;
+			transition: transform 0.25s ease, box-shadow 0.25s ease !important;
+		}
+		.disease-card:hover {
+			transform: translateY(-6px);
+			box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.08), 0 10px 15px -5px rgba(0, 0, 0, 0.04) !important;
+		}
+		.drug-recommend-item:hover {
+			background-color: #f0fdfa !important;
+			border-color: rgba(13, 148, 136, 0.3) !important;
+			transform: translateX(4px);
+		}
+		.shadow-3xs {
+			box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+		}
+		.form-check-input:checked {
+			background-color: #0d9488 !important;
+			border-color: #0d9488 !important;
+		}
+		.form-check-label {
+			cursor: pointer;
+		}
+		.symptom-checkbox-list .form-check {
+			padding: 6px 10px 6px 30px;
+			margin-bottom: 2px !important;
+			border-radius: 8px;
+			transition: background-color 0.2s ease;
+		}
+		.symptom-checkbox-list .form-check:hover {
+			background-color: #f8fafc;
+		}
+		.symptom-checkbox-list .form-check-input {
+			margin-top: 0.2rem;
+			cursor: pointer;
+		}
+		.disease-group-btn {
+			transition: all 0.2s ease;
+		}
+		.disease-group-btn:hover {
+			background-color: rgba(13, 148, 136, 0.1) !important;
+			color: #0d9488 !important;
+			border-color: #0d9488 !important;
+		}
+		.input-group-focus {
+			border-color: rgba(13, 148, 136, 0.4) !important;
+			box-shadow: 0 0 0 4px rgba(13, 148, 136, 0.1) !important;
+		}
+		.scrollbar-hidden::-webkit-scrollbar {
+			display: none;
+		}
+		.scrollbar-hidden {
+			-ms-overflow-style: none;
+			scrollbar-width: none;
+		}
+	</style>
+}
+else
+{
+	<div class="container mt-4">
+		<div class="row">
+			<div class="col-lg-3 mb-4">
+				<div class="category-sidebar p-3 rounded shadow-sm">
+					<h6 class="fw-bold mb-2">Danh mục thuốc</h6>
+					<ul class="list-unstyled mb-0">
+						<li><a class="d-block py-2" href="/Catalog/Index?cat=thuoc">Tất cả</a></li>
+						@if (ViewData["AllCategories"] is IEnumerable<Web_Quản_Lí_Nhà_Thuốc.Models.LoaiThuoc> cats)
+						{
+							foreach(var c in cats) {
+								<li><a class="d-block py-2" href="/Catalog/Index?cat=thuoc&loaiId=@c.Id">@c.TenLoai</a></li>
+							}
+						}
+					</ul>
+				</div>
+			</div>
+
+			<div class="col-lg-9">
+				<div class="d-flex justify-content-between align-items-end mb-3">
+					<div>
+						<h2 class="fw-bold text-dark mb-1">@ViewData["CategoryTitle"]</h2>
+						<p class="text-muted small mb-0">@ViewData["CategoryDescription"]</p>
+					</div>
+					<a href="#" class="text-teal fw-semibold text-decoration-none">Xem tất cả <i class="bi bi-arrow-right"></i></a>
+				</div>
+
+				@if (Model != null && Model.Any()) {
+					<div class="row g-3">
+						@foreach(var p in Model) {
+							<div class="col-6 col-md-4 col-lg-3">
+								@await Html.PartialAsync("~/Views/Shared/_ProductCard.cshtml", p)
+							</div>
+						}
+					</div>
+				}
+				else {
+					<div class="alert alert-secondary">Không có sản phẩm cho danh mục này.</div>
+				}
+			</div>
+		</div>
+
+		@await Html.PartialAsync("~/Views/Shared/_ProductScripts.cshtml")
+	</div>
+}

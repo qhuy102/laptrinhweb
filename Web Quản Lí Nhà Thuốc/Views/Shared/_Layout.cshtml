@@ -74,6 +74,12 @@
                         </a>
                     </li>
                     <li>
+                        <a href="/Benh/Index" class="sidebar-link">
+                            <i class="bi bi-heart-pulse"></i>
+                            <span>Quản lý Bệnh lý</span>
+                        </a>
+                    </li>
+                    <li>
                         <a href="/OrderManagement/Index" class="sidebar-link">
                             <i class="bi bi-box-seam"></i>
                             <span>Quản lý Đơn hàng</span>
@@ -156,15 +162,87 @@
                             <span class="fw-semibold">Danh mục</span>
                             <i class="bi bi-caret-down-fill ms-2"></i>
                         </button>
-                        <ul class="dropdown-menu p-2 shadow" aria-labelledby="categoryDropdown">
-                            <li><a class="dropdown-item" href="/Catalog/Index">Tất cả danh mục</a></li>
-                            <li><a class="dropdown-item" href="/Catalog/Index?cat=thuoc">Thuốc</a></li>
-                            <li><a class="dropdown-item" href="/Catalog/Index?cat=tracuu">Tra cứu bệnh</a></li>
-                            <li><a class="dropdown-item" href="/Catalog/Index?cat=tpcn">Thực phẩm bảo vệ sức khỏe</a></li>
-                            <li><a class="dropdown-item" href="/Catalog/Index?cat=me-be">Mẹ và bé</a></li>
-                            <li><a class="dropdown-item" href="/Catalog/Index?cat=thietbiyte">Thiết bị y tế</a></li>
-                            <li><a class="dropdown-item" href="/Catalog/Index?cat=sanpham-tien-loi">Sản phẩm tiện lợi</a></li>
-                        </ul>
+                        <div class="dropdown-menu p-3 shadow-lg border-0 category-mega-dropdown" aria-labelledby="categoryDropdown" style="width: 580px; border-radius: 16px;">
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <a class="dropdown-item d-flex align-items-center p-3 h-100" href="/Catalog/Index">
+                                        <div class="category-icon-wrapper icon-primary rounded-3 me-3 d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; flex-shrink: 0;">
+                                            <i class="bi bi-grid-3x3-gap-fill fs-4"></i>
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold text-dark small">Tất cả danh mục</div>
+                                            <div class="text-muted small-desc">Khám phá toàn bộ sản phẩm</div>
+                                        </div>
+                                    </a>
+                                </div>
+                                <div class="col-6">
+                                    <a class="dropdown-item d-flex align-items-center p-3 h-100" href="/Catalog/Index?cat=thuoc">
+                                        <div class="category-icon-wrapper icon-teal rounded-3 me-3 d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; flex-shrink: 0;">
+                                            <i class="bi bi-capsule-pill fs-4"></i>
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold text-dark small">Thuốc</div>
+                                            <div class="text-muted small-desc">Thuốc kê đơn và không kê đơn</div>
+                                        </div>
+                                    </a>
+                                </div>
+                                <div class="col-6">
+                                    <a class="dropdown-item d-flex align-items-center p-3 h-100" href="/Catalog/Index?cat=tracuu">
+                                        <div class="category-icon-wrapper icon-danger rounded-3 me-3 d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; flex-shrink: 0;">
+                                            <i class="bi bi-heart-pulse fs-4"></i>
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold text-dark small">Tra cứu bệnh</div>
+                                            <div class="text-muted small-desc">Tra cứu thông tin và cách điều trị</div>
+                                        </div>
+                                    </a>
+                                </div>
+                                <div class="col-6">
+                                    <a class="dropdown-item d-flex align-items-center p-3 h-100" href="/Catalog/Index?cat=tpcn">
+                                        <div class="category-icon-wrapper icon-success rounded-3 me-3 d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; flex-shrink: 0;">
+                                            <i class="bi bi-shield-heart fs-4"></i>
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold text-dark small">Thực phẩm bảo vệ sức khỏe</div>
+                                            <div class="text-muted small-desc">Vitamin & Thực phẩm chức năng</div>
+                                        </div>
+                                    </a>
+                                </div>
+                                <div class="col-6">
+                                    <a class="dropdown-item d-flex align-items-center p-3 h-100" href="/Catalog/Index?cat=me-be">
+                                        <div class="category-icon-wrapper icon-info rounded-3 me-3 d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; flex-shrink: 0;">
+                                            <i class="bi bi-baby-carriage fs-4"></i>
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold text-dark small">Mẹ và bé</div>
+                                            <div class="text-muted small-desc">Sản phẩm cho mẹ bầu và trẻ nhỏ</div>
+                                        </div>
+                                    </a>
+                                </div>
+                                <div class="col-6">
+                                    <a class="dropdown-item d-flex align-items-center p-3 h-100" href="/Catalog/Index?cat=thietbiyte">
+                                        <div class="category-icon-wrapper icon-warning rounded-3 me-3 d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; flex-shrink: 0;">
+                                            <i class="bi bi-thermometer-half fs-4"></i>
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold text-dark small">Thiết bị y tế</div>
+                                            <div class="text-muted small-desc">Máy đo huyết áp, nhiệt kế, thiết bị...</div>
+                                        </div>
+                                    </a>
+                                </div>
+                                <div class="col-6">
+                                    <a class="dropdown-item d-flex align-items-center p-3 h-100" href="/Catalog/Index?cat=sanpham-tien-loi">
+                                        <div class="category-icon-wrapper icon-secondary rounded-3 me-3 d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; flex-shrink: 0;">
+                                            <i class="bi bi-box-seam fs-4"></i>
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold text-dark small">Sản phẩm tiện lợi</div>
+                                            <div class="text-muted small-desc">Khẩu trang, nước rửa tay, hóa mỹ phẩm</div>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 

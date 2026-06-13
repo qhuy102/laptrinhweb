@@ -35,6 +35,8 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Controllers
                 case "tracuu":
                     title = "Tra cứu bệnh";
                     desc = "Tài nguyên tra cứu bệnh";
+                    var benhs = await _context.Benhs.ToListAsync();
+                    ViewData["DiseasesList"] = benhs;
                     break;
                 case "tpcn":
                     title = "Thực phẩm bảo vệ sức khỏe";

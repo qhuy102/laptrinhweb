@@ -33,5 +33,7 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Data
         public DbSet<AuditLog> AuditLogs { get; set; }
 
         public DbSet<LichUongThuoc> LichUongThuocs { get; set; }
+
+        public DbSet<Benh> Benhs { get; set; }
     }
 }
