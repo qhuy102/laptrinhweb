@@ -49,6 +49,12 @@
                         </a>
                     </li>
                     <li>
+                        <a href="/Admin/Membership" class="sidebar-link">
+                            <i class="bi bi-gem text-warning animate-pulse"></i>
+                            <span>Quản lý Hội viên VIP</span>
+                        </a>
+                    </li>
+                    <li>
                         <a href="/Admin/CreatePharmacist" class="sidebar-link">
                             <i class="bi bi-person-plus"></i>
                             <span>Tạo tài khoản Dược sĩ</span>
@@ -315,6 +321,12 @@
                                 @if (!User.IsInRole("Admin") && !User.IsInRole("Pharmacist"))
                                 {
                                     <li>
+                                        <a class="dropdown-item py-2 text-warning fw-bold" href="/User/MembershipUpgrade">
+                                            <i class="bi bi-gem me-2 text-warning"></i>
+                                            Nâng cấp Hội viên VIP
+                                        </a>
+                                    </li>
+                                    <li>
                                         <a class="dropdown-item py-2" href="/User/Dashboard">
                                             <i class="bi bi-speedometer2 me-2"></i>
                                             Dashboard
@@ -361,7 +373,7 @@
                     else
                     {
                         <a href="/Identity/Account/Login" class="btn btn-outline-light btn-sm rounded-pill px-3">Đăng nhập</a>
-                        <a href="/Identity/Account/Register" class="btn btn-primary btn-sm rounded-pill px-3">Đăng ký</a>
+                        <a href="/Identity/Account/Login" class="btn btn-primary btn-sm rounded-pill px-3">Đăng ký</a>
                     }
                 </div>
             </div>

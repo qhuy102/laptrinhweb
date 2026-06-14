@@ -132,5 +132,69 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Controllers
         {
             return View();
         }
+
+        [HttpGet]
+        public async Task<IActionResult> MembershipUpgrade()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Challenge();
+
+            return View(user);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpgradeTier(string tier)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) return Json(new { success = false, message = "Người dùng chưa đăng nhập hoặc phiên làm việc đã hết hạn." });
+
+            int targetPoints = 0;
+            int addPoints = 0;
+            string tierName = "";
+
+            if (tier == "Silver")
+            {
+                addPoints = 500;
+                targetPoints = 500;
+                tierName = "Thành viên Bạc";
+            }
+            else if (tier == "Gold")
+            {
+                addPoints = 1000;
+                targetPoints = 1000;
+                tierName = "VIP Vàng";
+            }
+            else if (tier == "Diamond")
+            {
+                addPoints = 2000;
+                targetPoints = 2000;
+                tierName = "VIP Kim Cương";
+            }
+            else
+            {
+                return Json(new { success = false, message = "Gói nâng cấp không hợp lệ." });
+            }
+
+            // Cập nhật điểm và thăng hạng
+            user.DiemTichLuy += addPoints;
+            if (user.DiemTichLuy < targetPoints)
+            {
+                user.DiemTichLuy = targetPoints;
+            }
+
+            var result = await _userManager.UpdateAsync(user);
+            if (result.Succeeded)
+            {
+                return Json(new { 
+                    success = true, 
+                    message = $"Nâng cấp thành công lên {tierName}!", 
+                    newTier = tierName, 
+                    newPoints = user.DiemTichLuy 
+                });
+            }
+
+            return Json(new { success = false, message = "Không thể cập nhật thông tin tài khoản. Vui lòng thử lại!" });
+        }
     }
 }
+

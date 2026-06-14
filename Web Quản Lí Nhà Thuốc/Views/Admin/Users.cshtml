@@ -40,9 +40,18 @@
                     <tr style="border-bottom: 1px solid #f8fafc;">
                         <td class="py-3">
                             <div class="d-flex align-items-center">
-                                <div class="avatar-sm me-3 d-flex align-items-center justify-content-center fw-bold text-teal bg-teal bg-opacity-10 rounded-circle" style="width: 40px; height: 40px; color: #0d9488; background-color: rgba(13, 148, 136, 0.1);">
-                                    @user.HoTen.Substring(0, Math.Min(2, user.HoTen.Length)).ToUpper()
-                                </div>
+                                @if (user.Role == "Admin")
+                                {
+                                    <div class="avatar-sm me-3 d-flex align-items-center justify-content-center fw-bold text-indigo bg-indigo bg-opacity-10 rounded-circle" style="width: 40px; height: 40px;">
+                                        @user.HoTen.Substring(0, Math.Min(2, user.HoTen.Length)).ToUpper()
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="avatar-sm me-3 d-flex align-items-center justify-content-center fw-bold text-teal bg-teal bg-opacity-10 rounded-circle" style="width: 40px; height: 40px;">
+                                        @user.HoTen.Substring(0, Math.Min(2, user.HoTen.Length)).ToUpper()
+                                    </div>
+                                }
                                 <div class="fw-semibold text-dark">@user.HoTen</div>
                             </div>
                         </td>
@@ -59,19 +68,19 @@
                                 <span class="fw-bold text-dark"><i class="bi bi-award text-warning me-1"></i>@user.DiemTichLuy</span>
                             }
                         </td>
-                        <td class="py-3 text-muted text-truncate" style="max-width: 150px;" title="@(user.Role == "Admin" ? "" : user.DiaChi)">
+                        <td class="py-3 text-muted" title="@(user.Role == "Admin" ? "" : user.DiaChi)">
                             @(user.Role == "Admin" ? "N/A" : user.DiaChi)
                         </td>
                         <td class="py-3">
                             @if (user.Role == "Admin")
                             {
-                                <span class="badge bg-indigo bg-opacity-10 text-indigo border border-indigo-subtle rounded-pill px-3 py-1.5 small fw-semibold">
+                                <span class="badge bg-indigo-subtle text-indigo border border-indigo-subtle rounded-pill px-3 py-1.5 small fw-semibold">
                                     <i class="bi bi-shield-lock-fill me-1"></i>Quản trị viên
                                 </span>
                             }
                             else
                             {
-                                <span class="badge bg-teal bg-opacity-10 text-teal border border-teal-subtle rounded-pill px-3 py-1.5 small fw-semibold">
+                                <span class="badge bg-teal-subtle text-teal border border-teal-subtle rounded-pill px-3 py-1.5 small fw-semibold">
                                     <i class="bi bi-person-fill me-1"></i>Thành viên
                                 </span>
                             }
@@ -98,8 +107,8 @@
         color: var(--primary-color) !important;
     }
 
-    .bg-teal {
-        background-color: var(--primary-color) !important;
+    .bg-teal-subtle {
+        background-color: rgba(13, 148, 136, 0.1) !important;
     }
 
     .border-teal-subtle {
@@ -110,8 +119,8 @@
         color: var(--indigo-color) !important;
     }
 
-    .bg-indigo {
-        background-color: var(--indigo-color) !important;
+    .bg-indigo-subtle {
+        background-color: rgba(79, 70, 229, 0.1) !important;
     }
 
     .border-indigo-subtle {

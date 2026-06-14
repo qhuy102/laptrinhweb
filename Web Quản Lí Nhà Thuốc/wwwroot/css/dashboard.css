@@ -458,11 +458,21 @@ body {
 }
 
 .bg-teal {
-    background-color: #0d9488 !important;
+    --bs-bg-opacity: 1;
+    background-color: rgba(13, 148, 136, var(--bs-bg-opacity)) !important;
 }
 
 .text-teal {
     color: #0d9488 !important;
+}
+
+.bg-indigo {
+    --bs-bg-opacity: 1;
+    background-color: rgba(79, 70, 229, var(--bs-bg-opacity)) !important;
+}
+
+.text-indigo {
+    color: #4f46e5 !important;
 }
 
 /* Custom Category Icon Wrappers (since Bootstrap 5.0.1 does not support bg-opacity) */

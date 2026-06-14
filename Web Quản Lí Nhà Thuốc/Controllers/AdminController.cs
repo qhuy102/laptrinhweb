@@ -273,6 +273,77 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Controllers
             TempData["SuccessMessage"] = $"Đã cập nhật trạng thái ưu đãi cho thuốc: {thuoc.TenThuoc}";
             return RedirectToAction(nameof(Deals));
         }
+
+        // Membership Management Dashboard (GET)
+        public async Task<IActionResult> Membership()
+        {
+            var users = await _userManager.Users.ToListAsync();
+            var memberList = new List<UserViewModel>();
+
+            foreach (var user in users)
+            {
+                var roles = await _userManager.GetRolesAsync(user);
+                var primaryRole = roles.FirstOrDefault() ?? "User";
+                
+                // Chỉ hiển thị hội viên là khách hàng thông thường (User)
+                if (primaryRole == "User")
+                {
+                    memberList.Add(new UserViewModel
+                    {
+                        Id = user.Id,
+                        HoTen = user.HoTen,
+                        Email = user.Email ?? "N/A",
+                        PhoneNumber = user.PhoneNumber ?? "N/A",
+                        Role = primaryRole,
+                        DiemTichLuy = user.DiemTichLuy,
+                        Tuoi = user.Tuoi,
+                        DiaChi = user.DiaChi ?? "Chưa có"
+                    });
+                }
+            }
+
+            return View(memberList);
+        }
+
+        // Quick update points (POST)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateMemberPoints(string userId, int points)
+        {
+            if (string.IsNullOrEmpty(userId)) return NotFound();
+
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null) return NotFound();
+
+            int oldPoints = user.DiemTichLuy;
+            user.DiemTichLuy = points;
+            var result = await _userManager.UpdateAsync(user);
+
+            if (result.Succeeded)
+            {
+                // Ghi nhận nhật ký hoạt động
+                var audit = new AuditLog
+                {
+                    UserId = _userManager.GetUserId(User),
+                    UserEmail = User.Identity?.Name,
+                    Action = "MANUAL_ADJUST",
+                    MoTa = $"Admin đã thay đổi điểm tích lũy của {user.Email}: {oldPoints} điểm -> {points} điểm.",
+                    ThoiGian = DateTime.Now,
+                    IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString(),
+                    IsSuspicious = false
+                };
+                _context.AuditLogs.Add(audit);
+                await _context.SaveChangesAsync();
+
+                TempData["SuccessMessage"] = $"Đã cập nhật thành công điểm tích lũy của {user.HoTen} thành {points} điểm.";
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Có lỗi xảy ra khi cập nhật điểm tích lũy.";
+            }
+
+            return RedirectToAction(nameof(Membership));
+        }
     }
 
     public class CreatePharmacistViewModel

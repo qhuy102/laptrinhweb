@@ -1,0 +1,533 @@
+@model Web_Quản_Lí_Nhà_Thuốc.Models.ApplicationUser
+@{
+    ViewData["Title"] = "Đăng ký đặc quyền Hội viên VIP - PharmaHub";
+
+    // Determine current user membership tier details
+    string currentTier = "Thành viên";
+    string currentTierClass = "bg-secondary";
+    int currentPoints = Model.DiemTichLuy;
+
+    if (currentPoints >= 2000)
+    {
+        currentTier = "VIP Kim Cương";
+        currentTierClass = "bg-indigo-badge";
+    }
+    else if (currentPoints >= 1000)
+    {
+        currentTier = "VIP Vàng";
+        currentTierClass = "bg-gold-badge";
+    }
+    else if (currentPoints >= 500)
+    {
+        currentTier = "Thành viên Bạc";
+        currentTierClass = "bg-silver-badge";
+    }
+}
+
+<div class="container py-5">
+    <!-- Header Section -->
+    <div class="text-center mb-5 animate-fade-in">
+        <span class="badge bg-teal bg-opacity-10 text-teal rounded-pill px-3 py-1.5 mb-2.5 fw-bold text-uppercase tracking-wider">
+            <i class="bi bi-gem me-1.5"></i> Chương trình đặc quyền hội viên
+        </span>
+        <h1 class="display-5 fw-extrabold text-slate-900 mb-3">Nâng Cấp Hội Viên VIP</h1>
+        <p class="lead text-muted mx-auto" style="max-width: 650px;">
+            Đăng ký sở hữu các đặc quyền VIP độc quyền tại PharmaHub: Chiết khấu trực tiếp lên tới 15%, ưu tiên chuẩn bị hàng và tư vấn miễn phí cùng dược sĩ chuyên sâu.
+        </p>
+
+        <!-- Current Status Card -->
+        <div class="d-inline-flex align-items-center gap-3 bg-white p-3 rounded-4 shadow-sm border border-light-subtle mt-2 animate-pulse">
+            <div class="avatar-circle bg-teal bg-opacity-10 text-teal rounded-circle d-flex align-items-center justify-content-center" style="width: 48px; height: 48px;">
+                <i class="bi bi-person-fill-check fs-4"></i>
+            </div>
+            <div class="text-start">
+                <div class="text-muted small fw-medium">Tài khoản: <strong class="text-dark">@Model.HoTen</strong></div>
+                <div class="d-flex align-items-center gap-2 mt-0.5">
+                    <span class="small text-muted">Hạng hiện tại:</span>
+                    <span class="badge @currentTierClass text-white fw-bold rounded-pill" id="user-current-tier">@currentTier</span>
+                    <span class="badge bg-light text-teal border border-teal-subtle fw-semibold rounded-pill" id="user-current-points">@Model.DiemTichLuy điểm</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tiers Row -->
+    <div class="row g-4 justify-content-center align-items-stretch mb-5">
+        <!-- Bạc -->
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm overflow-hidden tier-card" style="border-radius: 20px; background: #ffffff; border: 1.5px solid #e2e8f0; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);">
+                <div class="p-4 text-center text-white" style="background: linear-gradient(135deg, #64748b 0%, #475569 100%);">
+                    <div class="tier-icon-wrapper mx-auto mb-3 bg-white bg-opacity-20 rounded-circle d-flex align-items-center justify-content-center" style="width: 56px; height: 56px;">
+                        <i class="bi bi-award fs-3 text-white"></i>
+                    </div>
+                    <h4 class="fw-bold mb-1">Thành Viên Bạc</h4>
+                    <p class="text-white text-opacity-80 small mb-0">Tiết kiệm & Tiện ích tiêu chuẩn</p>
+                </div>
+                <div class="card-body p-4 d-flex flex-column">
+                    <div class="text-center mb-4">
+                        <span class="text-muted small">Chỉ với</span>
+                        <h2 class="display-6 fw-extrabold text-slate-800 mb-0">99.000 ₫</h2>
+                        <span class="text-muted small">Nhận ngay +500 điểm tích lũy</span>
+                    </div>
+
+                    <div class="bg-light rounded-3 p-3 mb-4 text-center">
+                        <span class="small text-muted d-block mb-1">Mức ưu đãi giảm giá</span>
+                        <h4 class="fw-bold text-teal mb-0">-5% <span class="fs-6 text-muted font-normal">/ đơn hàng</span></h4>
+                    </div>
+
+                    <ul class="list-unstyled small text-muted flex-grow-1 mb-4 space-y-2">
+                        <li class="d-flex align-items-start gap-2">
+                            <i class="bi bi-patch-check-fill text-teal mt-0.5"></i>
+                            <span>Giảm giá 5% tất cả đơn hàng trực tuyến.</span>
+                        </li>
+                        <li class="d-flex align-items-start gap-2">
+                            <i class="bi bi-patch-check-fill text-teal mt-0.5"></i>
+                            <span>Nhận điểm thưởng tích lũy thăng hạng.</span>
+                        </li>
+                        <li class="d-flex align-items-start gap-2">
+                            <i class="bi bi-patch-check-fill text-teal mt-0.5"></i>
+                            <span>Quà tặng sinh nhật hội viên hàng năm.</span>
+                        </li>
+                        <li class="d-flex align-items-start gap-2">
+                            <i class="bi bi-patch-check-fill text-teal mt-0.5"></i>
+                            <span>Ưu đãi phí ship tiêu chuẩn.</span>
+                        </li>
+                    </ul>
+
+                    <button class="btn btn-outline-slate btn-lg w-100 rounded-pill fw-bold text-uppercase mt-auto py-2.5" onclick="openPaymentModal('Silver', 'Thành Viên Bạc', 99000)" style="font-size: 0.85rem; border: 2px solid #64748b; color: #475569;">
+                        Đăng ký & Thanh toán
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vàng -->
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-lg overflow-hidden tier-card position-relative" style="border-radius: 20px; background: #ffffff; border: 2px solid #fbbf24; transform: translateY(-8px); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);">
+                <div class="position-absolute top-0 end-0 m-3" style="z-index: 10;">
+                    <span class="badge bg-warning text-dark fw-bold rounded-pill px-3 py-1 shadow-sm" style="font-size: 0.7rem;">PHỔ BIẾN NHẤT</span>
+                </div>
+                
+                <div class="p-4 text-center text-white" style="background: linear-gradient(135deg, #d97706 0%, #b45309 100%);">
+                    <div class="tier-icon-wrapper mx-auto mb-3 bg-white bg-opacity-20 rounded-circle d-flex align-items-center justify-content-center" style="width: 56px; height: 56px;">
+                        <i class="bi bi-award-fill fs-3 text-white"></i>
+                    </div>
+                    <h4 class="fw-bold mb-1">VIP Vàng</h4>
+                    <p class="text-white text-opacity-80 small mb-0">Hội viên VIP chuyên nghiệp</p>
+                </div>
+                <div class="card-body p-4 d-flex flex-column">
+                    <div class="text-center mb-4">
+                        <span class="text-muted small">Chỉ với</span>
+                        <h2 class="display-6 fw-extrabold text-amber-600 mb-0" style="color: #d97706;">199.000 ₫</h2>
+                        <span class="text-muted small">Nhận ngay +1.000 điểm tích lũy</span>
+                    </div>
+
+                    <div class="bg-amber bg-opacity-10 rounded-3 p-3 mb-4 text-center" style="background-color: rgba(251, 191, 36, 0.1);">
+                        <span class="small text-amber-800 d-block mb-1" style="color: #92400e;">Mức ưu đãi giảm giá</span>
+                        <h4 class="fw-bold text-amber-600 mb-0" style="color: #d97706;">-10% <span class="fs-6 text-muted font-normal">/ đơn hàng</span></h4>
+                    </div>
+
+                    <ul class="list-unstyled small text-muted flex-grow-1 mb-4 space-y-2">
+                        <li class="d-flex align-items-start gap-2">
+                            <i class="bi bi-patch-check-fill text-amber-600 mt-0.5" style="color: #d97706;"></i>
+                            <span>Giảm giá 10% trực tiếp đơn hàng.</span>
+                        </li>
+                        <li class="d-flex align-items-start gap-2">
+                            <i class="bi bi-patch-check-fill text-amber-600 mt-0.5" style="color: #d97706;"></i>
+                            <span>Bao gồm toàn bộ đặc quyền hạng Bạc.</span>
+                        </li>
+                        <li class="d-flex align-items-start gap-2">
+                            <i class="bi bi-patch-check-fill text-amber-600 mt-0.5" style="color: #d97706;"></i>
+                            <span>Ưu tiên chuẩn bị đơn & giao hàng siêu tốc.</span>
+                        </li>
+                        <li class="d-flex align-items-start gap-2">
+                            <i class="bi bi-patch-check-fill text-amber-600 mt-0.5" style="color: #d97706;"></i>
+                            <span>Voucher ưu đãi tháng gửi tặng định kỳ.</span>
+                        </li>
+                    </ul>
+
+                    <button class="btn btn-warning btn-lg w-100 rounded-pill fw-bold text-uppercase mt-auto py-2.5 text-white" onclick="openPaymentModal('Gold', 'VIP Vàng', 199000)" style="font-size: 0.85rem; background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%); border: none;">
+                        Đăng ký & Thanh toán
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Kim Cương -->
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm overflow-hidden tier-card" style="border-radius: 20px; background: #ffffff; border: 1.5px solid #e2e8f0; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);">
+                <div class="p-4 text-center text-white" style="background: linear-gradient(135deg, #4f46e5 0%, #312e81 100%);">
+                    <div class="tier-icon-wrapper mx-auto mb-3 bg-white bg-opacity-20 rounded-circle d-flex align-items-center justify-content-center" style="width: 56px; height: 56px;">
+                        <i class="bi bi-gem fs-3 text-white"></i>
+                    </div>
+                    <h4 class="fw-bold mb-1">VIP Kim Cương</h4>
+                    <p class="text-white text-opacity-80 small mb-0">Trải nghiệm thượng lưu tối thượng</p>
+                </div>
+                <div class="card-body p-4 d-flex flex-column">
+                    <div class="text-center mb-4">
+                        <span class="text-muted small">Chỉ với</span>
+                        <h2 class="display-6 fw-extrabold text-indigo-600 mb-0" style="color: #4f46e5;">399.000 ₫</h2>
+                        <span class="text-muted small">Nhận ngay +2.000 điểm tích lũy</span>
+                    </div>
+
+                    <div class="bg-indigo bg-opacity-10 rounded-3 p-3 mb-4 text-center" style="background-color: rgba(79, 70, 229, 0.1);">
+                        <span class="small text-indigo-800 d-block mb-1" style="color: #3730a3;">Mức ưu đãi giảm giá</span>
+                        <h4 class="fw-bold text-indigo mb-0" style="color: #4f46e5;">-15% <span class="fs-6 text-muted font-normal">/ đơn hàng</span></h4>
+                    </div>
+
+                    <ul class="list-unstyled small text-muted flex-grow-1 mb-4 space-y-2">
+                        <li class="d-flex align-items-start gap-2">
+                            <i class="bi bi-patch-check-fill text-indigo mt-0.5" style="color: #4f46e5;"></i>
+                            <span>Giảm giá 15% tối đa mọi đơn hàng trực tuyến.</span>
+                        </li>
+                        <li class="d-flex align-items-start gap-2">
+                            <i class="bi bi-patch-check-fill text-indigo mt-0.5" style="color: #4f46e5;"></i>
+                            <span>Nhận đặc quyền cao cấp nhất của gói Vàng.</span>
+                        </li>
+                        <li class="d-flex align-items-start gap-2">
+                            <i class="bi bi-patch-check-fill text-indigo mt-0.5" style="color: #4f46e5;"></i>
+                            <span>Quà tặng tri ân VIP độc quyền cuối năm.</span>
+                        </li>
+                        <li class="d-flex align-items-start gap-2">
+                            <i class="bi bi-patch-check-fill text-indigo mt-0.5" style="color: #4f46e5;"></i>
+                            <span>Ưu tiên tư vấn chuyên sâu riêng từ Dược sĩ Trưởng.</span>
+                        </li>
+                    </ul>
+
+                    <button class="btn btn-outline-indigo btn-lg w-100 rounded-pill fw-bold text-uppercase mt-auto py-2.5" onclick="openPaymentModal('Diamond', 'VIP Kim Cương', 399000)" style="font-size: 0.85rem; border: 2px solid #4f46e5; color: #4f46e5;">
+                        Đăng ký & Thanh toán
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Thanh Toán Giả Lập -->
+<div class="modal fade" id="paymentModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true" style="z-index: 1060;">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 550px;">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 24px; overflow: hidden;">
+            <!-- Modal Header -->
+            <div class="modal-header border-0 bg-light p-4">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 44px; height: 44px;">
+                        <i class="bi bi-credit-card-2-front-fill fs-5"></i>
+                    </div>
+                    <div>
+                        <h5 class="modal-title fw-bold text-dark mb-0">Thanh toán & Đăng ký hội viên</h5>
+                        <p class="text-muted small mb-0">Vui lòng quét mã QR chuyển khoản ngân hàng dưới đây</p>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="btn-close-modal"></button>
+            </div>
+
+            <!-- Modal Body (Main flow states) -->
+            <div class="modal-body p-4" id="modal-body-content">
+                <!-- State 1: QR Display & Bank details -->
+                <div id="payment-state-qr">
+                    <div class="row align-items-center g-4">
+                        <div class="col-md-6 text-center">
+                            <!-- VietQR container -->
+                            <div class="bg-white p-3 d-inline-block rounded-4 border shadow-2xs position-relative" style="min-height: 200px; min-width: 200px;">
+                                <div id="modal-qr-spinner" class="spinner-border text-primary position-absolute top-50 start-50 translate-middle" role="status"></div>
+                                <img id="modal-qr-image" src="" alt="Mã VietQR Hội Viên" class="img-fluid" style="display: none; max-width: 170px;" onload="onQrLoaded()" onerror="onQrError()">
+                            </div>
+                            <div class="text-muted small mt-2">
+                                <i class="bi bi-qr-code-scan me-1"></i> Quét mã bằng ứng dụng Ngân hàng
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="p-3 bg-light rounded-4 border border-light-subtle">
+                                <h6 class="fw-bold text-slate-800 mb-3"><i class="bi bi-bank text-primary me-1.5"></i>Thông tin chuyển khoản</h6>
+                                <div class="space-y-2.5 small">
+                                    <div>
+                                        <div class="text-muted text-uppercase" style="font-size: 0.65rem; letter-spacing: 0.5px;">Ngân hàng</div>
+                                        <div class="fw-bold text-dark">MB Bank (Ngân hàng Quân Đội)</div>
+                                    </div>
+                                    <div>
+                                        <div class="text-muted text-uppercase" style="font-size: 0.65rem; letter-spacing: 0.5px;">Chủ tài khoản</div>
+                                        <div class="fw-bold text-dark">NHÀ THUỐC PHARMAHUB</div>
+                                    </div>
+                                    <div>
+                                        <div class="text-muted text-uppercase" style="font-size: 0.65rem; letter-spacing: 0.5px;">Số tài khoản</div>
+                                        <div class="fw-bold text-dark d-flex align-items-center gap-1.5">
+                                            <span id="txt-stk">970422920138294</span>
+                                            <i class="bi bi-copy text-teal cursor-pointer" onclick="copySTK()" style="cursor: pointer;" title="Sao chép"></i>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="text-muted text-uppercase" style="font-size: 0.65rem; letter-spacing: 0.5px;">Số tiền thanh toán</div>
+                                        <div class="fw-bold text-danger fs-5" id="modal-display-price">0 ₫</div>
+                                    </div>
+                                    <div>
+                                        <div class="text-muted text-uppercase" style="font-size: 0.65rem; letter-spacing: 0.5px;">Nội dung chuyển khoản</div>
+                                        <div class="fw-semibold text-primary" id="modal-display-message">PH LOG</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-warning mt-4 mb-3 d-flex align-items-start gap-2.5" style="border-radius: 12px;">
+                        <i class="bi bi-info-circle-fill text-warning mt-0.5 fs-5"></i>
+                        <div class="small">
+                            Hệ thống sẽ ghi nhận nâng cấp đặc quyền VIP tự động và ngay lập tức sau khi giao dịch chuyển khoản thành công.
+                        </div>
+                    </div>
+
+                    <div id="modal-error-alert" class="alert alert-danger mb-3" style="display: none;"></div>
+
+                    <button type="button" class="btn btn-teal-btn btn-lg w-100 rounded-pill fw-bold py-2.5 shadow-sm d-flex align-items-center justify-content-center gap-2" onclick="confirmMockPayment()">
+                        <i class="bi bi-check-circle-fill"></i> XÁC NHẬN ĐÃ CHUYỂN KHOẢN
+                    </button>
+                </div>
+
+                <!-- State 2: Mock Checking (Processing Screen) -->
+                <div id="payment-state-checking" style="display: none;" class="text-center py-5">
+                    <div class="checking-loader mb-4">
+                        <div class="spinner-border text-teal" role="status" style="width: 4.5rem; height: 4.5rem; border-width: 0.35em;">
+                            <span class="visually-hidden">Đang kiểm tra...</span>
+                        </div>
+                    </div>
+                    <h4 class="fw-bold text-slate-800">Đang đối soát giao dịch ngân hàng...</h4>
+                    <p class="text-muted">Vui lòng giữ nguyên màn hình, chúng tôi đang liên kết và kiểm tra biến động số dư với cổng ngân hàng MB Bank.</p>
+                </div>
+
+                <!-- State 3: Success Celeb screen -->
+                <div id="payment-state-success" style="display: none;" class="text-center py-5">
+                    <div class="success-icon-wrapper mb-4 text-success animate-scale-in">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="80" height="80">
+                            <circle cx="50" cy="50" r="46" fill="none" stroke="currentColor" stroke-width="8" />
+                            <path d="M26 50 l16 16 l32 -32" fill="none" stroke="currentColor" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </div>
+                    <h3 class="fw-extrabold text-slate-900 mb-2">Thăng Hạng Thành Công!</h3>
+                    <p class="text-muted px-3" id="modal-success-congrats">Chúc mừng bạn đã nâng cấp thành công lên hội viên VIP.</p>
+                    
+                    <div class="p-3 bg-light rounded-4 border border-light-subtle d-inline-block px-4 mb-4">
+                        <div class="text-muted small">Số điểm tích lũy mới của bạn</div>
+                        <span class="fs-2 fw-extrabold text-teal" id="modal-success-points">0</span> <span class="fw-semibold text-muted">điểm</span>
+                    </div>
+
+                    <div>
+                        <button type="button" class="btn btn-teal-btn rounded-pill px-5 fw-bold py-2.5" onclick="closeModalAndReload()">
+                            Tuyệt vời, Đóng lại
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Premium membership tiers styling */
+    .bg-indigo-badge {
+        background: linear-gradient(135deg, #4f46e5 0%, #312e81 100%) !important;
+    }
+    .bg-gold-badge {
+        background: linear-gradient(135deg, #b45309 0%, #fbbf24 100%) !important;
+    }
+    .bg-silver-badge {
+        background: linear-gradient(135deg, #64748b 0%, #94a3b8 100%) !important;
+    }
+
+    .tier-card:hover {
+        transform: translateY(-12px) !important;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+    }
+
+    .btn-outline-indigo {
+        border-color: #4f46e5 !important;
+        color: #4f46e5 !important;
+        background: transparent;
+        transition: all 0.25s;
+    }
+    .btn-outline-indigo:hover {
+        background: #4f46e5 !important;
+        color: #ffffff !important;
+        transform: translateY(-2px);
+    }
+    
+    .btn-outline-slate:hover {
+        background: #475569 !important;
+        color: #ffffff !important;
+        transform: translateY(-2px);
+    }
+
+    .space-y-2\.5 > * + * {
+        margin-top: 0.625rem;
+    }
+    .space-y-2 > * + * {
+        margin-top: 0.5rem;
+    }
+
+    .cursor-pointer {
+        cursor: pointer;
+    }
+
+    /* Animations */
+    @@keyframes fadeIn {
+        from { opacity: 0; transform: translateY(15px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in {
+        animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @@keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.02); }
+    }
+    .animate-pulse {
+        animation: pulse 3s infinite ease-in-out;
+    }
+
+    @@keyframes scaleIn {
+        from { transform: scale(0.85); opacity: 0; }
+        to { transform: scale(1); opacity: 1; }
+    }
+    .animate-scale-in {
+        animation: scaleIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    }
+</style>
+
+@section Scripts {
+    <script>
+        var selectedTier = null;
+        var selectedTierPrice = 0;
+        var selectedTierName = "";
+        var bootstrapPaymentModalInstance = null;
+
+        function openPaymentModal(tier, tierName, price) {
+            selectedTier = tier;
+            selectedTierPrice = price;
+            selectedTierName = tierName;
+
+            // Reset modal states to step 1
+            document.getElementById('payment-state-qr').style.display = 'block';
+            document.getElementById('payment-state-checking').style.display = 'none';
+            document.getElementById('payment-state-success').style.display = 'none';
+            document.getElementById('modal-error-alert').style.display = 'none';
+            document.getElementById('btn-close-modal').style.display = 'block';
+
+            // Set dynamic fields
+            document.getElementById('modal-display-price').innerText = price.toLocaleString('vi-VN') + ' ₫';
+            
+            var usernameText = "@(Model.UserName?.Split('@')[0] ?? "user")";
+            var description = `UPGRADE VIP ${tier.toUpperCase()} ${usernameText.toUpperCase()}`;
+            // Clean Vietnamese letters or symbols if needed
+            description = description.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^A-Z0-9 ]/g, "");
+            document.getElementById('modal-display-message').innerText = description;
+
+            // Generate QR Code URL
+            var qrImg = document.getElementById('modal-qr-image');
+            var qrSpinner = document.getElementById('modal-qr-spinner');
+            qrImg.style.display = 'none';
+            qrSpinner.style.display = 'block';
+
+            var bankId = "MB";
+            var accountNo = "970422920138294";
+            var template = "compact";
+            var accountName = encodeURIComponent("NHA THUOC PHARMAHUB");
+            qrImg.src = `https://img.vietqr.io/image/${bankId}-${accountNo}-${template}.png?amount=${price}&addInfo=${encodeURIComponent(description)}&accountName=${accountName}`;
+
+            // Initialize and show modal
+            bootstrapPaymentModalInstance = new bootstrap.Modal(document.getElementById('paymentModal'));
+            bootstrapPaymentModalInstance.show();
+        }
+
+        function onQrLoaded() {
+            document.getElementById('modal-qr-spinner').style.display = 'none';
+            document.getElementById('modal-qr-image').style.display = 'block';
+        }
+
+        function onQrError() {
+            document.getElementById('modal-qr-spinner').style.display = 'none';
+            var errorAlert = document.getElementById('modal-error-alert');
+            errorAlert.innerText = "Lỗi khi tạo mã QR chuyển khoản. Quý khách vẫn có thể chuyển khoản thủ công tới số tài khoản bên cạnh.";
+            errorAlert.style.display = 'block';
+        }
+
+        function copySTK() {
+            var stk = document.getElementById('txt-stk').innerText;
+            navigator.clipboard.writeText(stk).then(function() {
+                alert("Đã sao chép số tài khoản MB Bank vào bộ nhớ tạm!");
+            });
+        }
+
+        function confirmMockPayment() {
+            // State 2: Show checking payment status loader
+            document.getElementById('payment-state-qr').style.display = 'none';
+            document.getElementById('payment-state-checking').style.display = 'block';
+            document.getElementById('btn-close-modal').style.display = 'none';
+
+            // Simulate bank verification delay
+            setTimeout(function() {
+                // Call real upgrade API in background
+                var formData = new FormData();
+                formData.append('tier', selectedTier);
+
+                fetch('/User/UpgradeTier', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(function(response) {
+                    if (!response.ok) throw new Error("Lỗi mạng hoặc server không phản hồi.");
+                    return response.json();
+                })
+                .then(function(data) {
+                    if (data.success) {
+                        // State 3: Show success screen
+                        document.getElementById('payment-state-checking').style.display = 'none';
+                        document.getElementById('payment-state-success').style.display = 'block';
+
+                        document.getElementById('modal-success-congrats').innerHTML = `Chúc mừng <strong>@Model.HoTen</strong> đã nâng cấp thành công lên đặc quyền <strong>${data.newTier}</strong>!`;
+                        document.getElementById('modal-success-points').innerText = data.newPoints;
+                        
+                        // Update current page header values instantly
+                        document.getElementById('user-current-tier').innerText = data.newTier;
+                        document.getElementById('user-current-points').innerText = data.newPoints + ' điểm';
+
+                        // Change current tier badge classes on UI
+                        var badge = document.getElementById('user-current-tier');
+                        badge.className = "badge text-white fw-bold rounded-pill ";
+                        if (selectedTier === 'Silver') badge.classList.add('bg-silver-badge');
+                        else if (selectedTier === 'Gold') badge.classList.add('bg-gold-badge');
+                        else if (selectedTier === 'Diamond') badge.classList.add('bg-indigo-badge');
+
+                    } else {
+                        // Back to QR state and show error
+                        document.getElementById('payment-state-checking').style.display = 'none';
+                        document.getElementById('payment-state-qr').style.display = 'block';
+                        document.getElementById('btn-close-modal').style.display = 'block';
+                        
+                        var errorAlert = document.getElementById('modal-error-alert');
+                        errorAlert.innerText = data.message || "Giao dịch chưa được xác nhận. Vui lòng kiểm tra lại.";
+                        errorAlert.style.display = 'block';
+                    }
+                })
+                .catch(function(err) {
+                    document.getElementById('payment-state-checking').style.display = 'none';
+                    document.getElementById('payment-state-qr').style.display = 'block';
+                    document.getElementById('btn-close-modal').style.display = 'block';
+
+                    var errorAlert = document.getElementById('modal-error-alert');
+                    errorAlert.innerText = err.message || "Không kết nối được tới server để đối soát số dư.";
+                    errorAlert.style.display = 'block';
+                });
+
+            }, 2000);
+        }
+
+        function closeModalAndReload() {
+            if (bootstrapPaymentModalInstance) {
+                bootstrapPaymentModalInstance.hide();
+            }
+            window.location.reload();
+        }
+    </script>
+}

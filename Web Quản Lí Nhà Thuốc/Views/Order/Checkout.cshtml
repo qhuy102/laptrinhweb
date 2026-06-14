@@ -253,9 +253,16 @@
 
                                 <div class="border-top pt-3">
                                     <div class="d-flex justify-content-between mb-2 text-muted" style="font-size: 0.95rem;">
-                                        <span>Tổng tiền:</span>
-                                        <span class="fw-semibold text-dark">@((ViewBag.TongTien ?? 0).ToString("N0")) đ</span>
+                                        <span>Tạm tính:</span>
+                                        <span class="fw-semibold text-dark">@(((decimal)(ViewBag.Subtotal ?? ViewBag.TongTien ?? 0)).ToString("N0")) đ</span>
                                     </div>
+                                    @if (ViewBag.DiscountPercent > 0)
+                                    {
+                                        <div class="d-flex justify-content-between mb-2 text-danger" style="font-size: 0.95rem;">
+                                            <span>Chiết khấu hội viên (@ViewBag.TierName -@((int)(ViewBag.DiscountPercent * 100))%):</span>
+                                            <span class="fw-bold">-@(((decimal)ViewBag.DiscountAmount).ToString("N0")) đ</span>
+                                        </div>
+                                    }
                                     <div class="d-flex justify-content-between mb-2 text-muted" style="font-size: 0.95rem;">
                                         <span>Phí giao hàng:</span>
                                         <span class="fw-semibold text-success">+30.000 đ</span>
@@ -308,6 +315,24 @@
                             <span class="text-muted fw-bold">@((item.Thuoc.GiaHienTai * item.SoLuong).ToString("N0")) đ</span>
                         </div>
                     }
+                </div>
+                
+                <div class="border-top pt-3">
+                    <div class="d-flex justify-content-between mb-2 text-muted" style="font-size: 0.95rem;">
+                        <span>Tạm tính:</span>
+                        <span class="fw-semibold text-dark">@(((decimal)(ViewBag.Subtotal ?? ViewBag.TongTien ?? 0)).ToString("N0")) đ</span>
+                    </div>
+                    @if (ViewBag.DiscountPercent > 0)
+                    {
+                        <div class="d-flex justify-content-between mb-2 text-danger animate-pulse" style="font-size: 0.95rem;">
+                            <span>Chiết khấu (@ViewBag.TierName):</span>
+                            <span class="fw-bold">-@(((decimal)ViewBag.DiscountAmount).ToString("N0")) đ</span>
+                        </div>
+                    }
+                    <div class="d-flex justify-content-between mb-2 text-muted" style="font-size: 0.95rem;">
+                        <span>Phí giao hàng:</span>
+                        <span class="fw-semibold text-success" id="summary-shipping-display">0 đ</span>
+                    </div>
                 </div>
                 
                 <div class="d-flex justify-content-between align-items-center border-top pt-3">
@@ -420,16 +445,19 @@
                 document.getElementById('online-panel').style.display = 'none';
                 document.getElementById('ShippingFee').value = '0';
                 updateSummaryTotal(orderTotalAmount);
+                document.getElementById('summary-shipping-display').innerText = '0 đ';
             } else if (method === 'Online') {
                 document.getElementById('qr-banking-panel').style.display = 'none';
                 document.getElementById('online-panel').style.display = 'block';
                 document.getElementById('ShippingFee').value = '30000';
                 updateSummaryTotal(orderTotalAmount + 30000);
+                document.getElementById('summary-shipping-display').innerText = '+30.000 đ';
             } else { // COD
                 document.getElementById('qr-banking-panel').style.display = 'none';
                 document.getElementById('online-panel').style.display = 'none';
                 document.getElementById('ShippingFee').value = '0';
                 updateSummaryTotal(orderTotalAmount);
+                document.getElementById('summary-shipping-display').innerText = '0 đ';
             }
 
             // Clear validations

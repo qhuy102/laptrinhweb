@@ -122,9 +122,15 @@
             margin-top: 20px;
         }
 
-        /* Ẩn bảng hướng dẫn chữ của Routing Machine để giao diện sạch sẽ */
+        /* Hiển thị bảng hướng dẫn chữ của Routing Machine */
         .leaflet-routing-container {
-            display: none !important;
+            background-color: white !important;
+            padding: 10px !important;
+            border-radius: 8px !important;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1) !important;
+            font-size: 13px !important;
+            max-height: 250px !important;
+            overflow-y: auto !important;
         }
     </style>
 </head>
@@ -246,7 +252,7 @@
                                     routeWhileDragging: false,
                                     addWaypoints: false,
                                     showAlternatives: false,
-                                    show: false, // Ẩn bảng hướng dẫn
+                                    show: true, // Hiển thị bảng hướng dẫn
                                     lineOptions: {
                                         styles: [{color: '#ff4757', opacity: 0.8, weight: 6}] // Màu đỏ cho Shipper app
                                     }

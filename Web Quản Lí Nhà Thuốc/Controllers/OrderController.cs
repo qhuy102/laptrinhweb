@@ -34,7 +34,34 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Controllers
                 return RedirectToAction("Index", "Cart");
             }
 
-            var tongTien = cartItems.Sum(c => c.SoLuong * c.Thuoc.GiaHienTai);
+            var subtotal = cartItems.Sum(c => c.SoLuong * c.Thuoc.GiaHienTai);
+            
+            decimal discountPercent = 0;
+            string tierName = "Thành viên";
+            
+            if (user.DiemTichLuy >= 2000)
+            {
+                discountPercent = 0.15m;
+                tierName = "VIP Kim Cương";
+            }
+            else if (user.DiemTichLuy >= 1000)
+            {
+                discountPercent = 0.10m;
+                tierName = "VIP Vàng";
+            }
+            else if (user.DiemTichLuy >= 500)
+            {
+                discountPercent = 0.05m;
+                tierName = "Thành viên Bạc";
+            }
+
+            var discountAmount = subtotal * discountPercent;
+            var tongTien = subtotal - discountAmount;
+
+            ViewBag.Subtotal = subtotal;
+            ViewBag.DiscountPercent = discountPercent;
+            ViewBag.DiscountAmount = discountAmount;
+            ViewBag.TierName = tierName;
             ViewBag.TongTien = tongTien;
             
             return View(cartItems);
@@ -54,8 +81,25 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Controllers
                 return Json(new { success = false, message = "Giỏ hàng của bạn đang trống!" });
             }
 
-            var tongTien = cartItems.Sum(c => c.SoLuong * c.Thuoc.GiaHienTai);
-            var finalTotal = tongTien;
+            var subtotal = cartItems.Sum(c => c.SoLuong * c.Thuoc.GiaHienTai);
+            
+            decimal discountPercent = 0;
+            if (user.DiemTichLuy >= 2000)
+            {
+                discountPercent = 0.15m;
+            }
+            else if (user.DiemTichLuy >= 1000)
+            {
+                discountPercent = 0.10m;
+            }
+            else if (user.DiemTichLuy >= 500)
+            {
+                discountPercent = 0.05m;
+            }
+
+            var discountAmount = subtotal * discountPercent;
+            var finalTotal = subtotal - discountAmount;
+            
             if (shippingFee.HasValue && shippingFee.Value > 0)
             {
                 finalTotal += shippingFee.Value;

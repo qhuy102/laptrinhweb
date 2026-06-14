@@ -4,35 +4,35 @@
     ViewData["Title"] = "Hồ sơ cá nhân";
     
     // Determine membership tier and styling
-    string tierName = "Thành viên Đồng";
+    string tierName = "Thành viên";
     string tierClass = "tier-bronze";
     string tierIcon = "bi-award";
-    int nextTierPoints = 100;
+    int nextTierPoints = 500;
     int prevTierPoints = 0;
     
-    if (Model.DiemTichLuy >= 1000)
+    if (Model.DiemTichLuy >= 2000)
     {
-        tierName = "Thành viên Bạch Kim";
+        tierName = "VIP Kim Cương";
         tierClass = "tier-platinum";
         tierIcon = "bi-gem";
-        nextTierPoints = 1000; // Max tier
+        nextTierPoints = 2000; // Max tier
+        prevTierPoints = 2000;
+    }
+    else if (Model.DiemTichLuy >= 1000)
+    {
+        tierName = "VIP Vàng";
+        tierClass = "tier-gold";
+        tierIcon = "bi-trophy";
+        nextTierPoints = 2000;
         prevTierPoints = 1000;
     }
     else if (Model.DiemTichLuy >= 500)
     {
-        tierName = "Thành viên Vàng";
-        tierClass = "tier-gold";
-        tierIcon = "bi-trophy";
-        nextTierPoints = 1000;
-        prevTierPoints = 500;
-    }
-    else if (Model.DiemTichLuy >= 100)
-    {
         tierName = "Thành viên Bạc";
         tierClass = "tier-silver";
         tierIcon = "bi-shield-shaded";
-        nextTierPoints = 500;
-        prevTierPoints = 100;
+        nextTierPoints = 1000;
+        prevTierPoints = 500;
     }
 
     double progressPercent = 100;
