@@ -210,7 +210,9 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Data
                         CongDung = "Giảm đau đầu, đau răng, đau họng, đau cơ xương, hạ sốt nhanh.",
                         ChongChiDinh = "Mẫn cảm với thành phần của thuốc, trẻ em dưới 12 tuổi.",
                         LieuLuong = "Uống 1-2 viên/lần, cách nhau 4-6 giờ. Tối đa 8 viên/ngày.",
-                        NhomDieuTri = "Hạ sốt - Giảm đau"
+                        NhomDieuTri = "Hạ sốt - Giảm đau",
+                        IsDeal = true,
+                        DiscountPercent = 15
                     },
                     new Thuoc
                     {
@@ -258,7 +260,9 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Data
                         CongDung = "Bổ sung vitamin C, hỗ trợ tăng đề kháng cơ thể, giảm mệt mỏi.",
                         ChongChiDinh = "Người bị sỏi thận, tăng oxalate niệu.",
                         LieuLuong = "Uống 1 viên mỗi ngày sau bữa ăn sáng.",
-                        NhomDieuTri = "Tăng đề kháng & Miễn dịch"
+                        NhomDieuTri = "Tăng đề kháng & Miễn dịch",
+                        IsDeal = true,
+                        DiscountPercent = 20
                     },
                     new Thuoc
                     {
@@ -466,7 +470,9 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Data
                         CongDung = "Lọc khói bụi, kháng khuẩn, phòng tránh các bệnh lây lan qua đường hô hấp.",
                         ChongChiDinh = "Không dùng khẩu trang đã giặt đi giặt lại hoặc bị ướt rách.",
                         LieuLuong = "Sử dụng khẩu trang 1 lần khi đi ra ngoài hoặc làm việc môi trường khói bụi.",
-                        NhomDieuTri = "Khẩu trang & Sát khuẩn"
+                        NhomDieuTri = "Khẩu trang & Sát khuẩn",
+                        IsDeal = true,
+                        DiscountPercent = 10
                     },
                     new Thuoc
                     {

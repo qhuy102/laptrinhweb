@@ -34,7 +34,7 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Controllers
                 return RedirectToAction("Index", "Cart");
             }
 
-            var tongTien = cartItems.Sum(c => c.SoLuong * c.Thuoc.DonGia);
+            var tongTien = cartItems.Sum(c => c.SoLuong * c.Thuoc.GiaHienTai);
             ViewBag.TongTien = tongTien;
             
             return View(cartItems);
@@ -55,7 +55,7 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Controllers
                 return RedirectToAction("Index", "Cart");
             }
 
-            var tongTien = cartItems.Sum(c => c.SoLuong * c.Thuoc.DonGia);
+            var tongTien = cartItems.Sum(c => c.SoLuong * c.Thuoc.GiaHienTai);
 
             var hoaDon = new HoaDon
             {
@@ -78,7 +78,7 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Controllers
                     MaHoaDon = hoaDon.MaHoaDon,
                     MaThuoc = item.MaThuoc,
                     SoLuong = item.SoLuong,
-                    DonGia = item.Thuoc.DonGia,
+                    DonGia = item.Thuoc.GiaHienTai,
                     HoaDon = hoaDon,
                     Thuoc = item.Thuoc
                 };

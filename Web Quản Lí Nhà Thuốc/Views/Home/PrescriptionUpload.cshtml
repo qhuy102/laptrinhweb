@@ -3,7 +3,7 @@
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
 @{
-    ViewData["Title"] = "Cần mua thuốc - Nhận diện đơn thuốc thông minh";
+    ViewData["Title"] = "Tư vấn với Bác sĩ - Chẩn đoán & Kê toa AI";
     var user = SignInManager.IsSignedIn(User) ? await UserManager.GetUserAsync(User) : null;
     var fullName = user?.HoTen ?? "";
     var phoneNumber = user?.PhoneNumber ?? "";
@@ -14,14 +14,14 @@
     <nav aria-label="breadcrumb" class="mb-4">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="/" class="text-teal text-decoration-none">Trang chủ</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Cần mua thuốc</li>
+            <li class="breadcrumb-item active" aria-current="page">Tư vấn với Bác sĩ</li>
         </ol>
     </nav>
 
     <div class="row mb-3">
         <div class="col-12">
-            <h2 class="fw-bold text-dark"><i class="bi bi-file-earmark-medical text-teal me-2"></i>Cần mua thuốc</h2>
-            <p class="text-muted">Gửi ảnh đơn thuốc của bác sĩ hoặc danh sách thuốc cần mua để dược sĩ PharmaCare tư vấn nhanh chóng.</p>
+            <h2 class="fw-bold text-dark"><i class="bi bi-person-heart text-teal me-2"></i>Tư vấn với Bác sĩ</h2>
+            <p class="text-muted">Tải lên hồ sơ bệnh án, ảnh chụp đơn thuốc hoặc mô tả triệu chứng bệnh lý để được Bác sĩ chuyên khoa hỗ trợ trực tuyến.</p>
         </div>
     </div>
 
@@ -41,8 +41,8 @@
                         <input type="tel" id="contactPhone" class="form-control form-control-lg bg-light border-0" placeholder="Nhập số điện thoại liên hệ" value="@phoneNumber" style="border-radius: 10px; font-size: 0.95rem;">
                     </div>
                     <div class="col-12">
-                        <label for="contactNote" class="form-label small fw-semibold text-muted">Ghi chú (Không bắt buộc)</label>
-                        <textarea id="contactNote" class="form-control bg-light border-0" rows="3" placeholder="Ví dụ: Tôi cần tư vấn thuốc về bệnh đau dạ dày, viêm họng..." style="border-radius: 10px; font-size: 0.95rem;"></textarea>
+                        <label for="contactNote" class="form-label small fw-semibold text-muted">Mô tả triệu chứng bệnh lý (Không bắt buộc)</label>
+                        <textarea id="contactNote" class="form-control bg-light border-0" rows="3" placeholder="Ví dụ: Tôi bị đau thắt vùng bụng dưới kèm theo sốt nhẹ từ tối qua, nhờ bác sĩ tư vấn hướng xử lý..." style="border-radius: 10px; font-size: 0.95rem;"></textarea>
                     </div>
                 </div>
             </div>
@@ -50,15 +50,15 @@
             <!-- 2. Prescription Image Upload Card -->
             <div class="card border-0 shadow-sm p-4 mb-4" style="border-radius: 16px;">
                 <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h5 class="fw-bold text-dark mb-0"><i class="bi bi-camera-fill text-teal me-2"></i>Ảnh chụp đơn thuốc</h5>
-                    <span class="badge bg-teal bg-opacity-10 text-teal px-2 py-1 rounded-pill small" style="font-size: 0.75rem;">Thông minh AI</span>
+                    <h5 class="fw-bold text-dark mb-0"><i class="bi bi-camera-fill text-teal me-2"></i>Ảnh hồ sơ sức khỏe hoặc đơn thuốc</h5>
+                    <span class="badge bg-teal bg-opacity-10 text-teal px-2 py-1 rounded-pill small" style="font-size: 0.75rem;">Phân tích AI</span>
                 </div>
 
                 <div id="dropzone" class="dropzone-area p-5 text-center bg-light border-dashed rounded-3" style="cursor: pointer;" onclick="document.getElementById('prescriptionFile').click()">
                     <i class="bi bi-cloud-arrow-up-fill text-teal mb-3" style="font-size: 3.5rem; display: block;"></i>
-                    <h6 class="fw-bold text-dark">Thêm tối đa 5 ảnh đơn thuốc</h6>
+                    <h6 class="fw-bold text-dark">Tải ảnh đơn thuốc hoặc bệnh án (Tối đa 5 ảnh)</h6>
                     <p class="text-muted small mb-0">Hỗ trợ các định dạng ảnh JPG, JPEG, PNG dưới 5MB.</p>
-                    <p class="text-teal small fw-semibold mt-2 mb-0" style="font-size:0.75rem;"><i class="bi bi-info-circle me-1"></i>Mẹo: Đặt tên file chứa "panadol", "amox" hoặc "decolgen" để demo bóc tách OCR.</p>
+                    <p class="text-teal small fw-semibold mt-2 mb-0" style="font-size:0.75rem;"><i class="bi bi-info-circle me-1"></i>Mẹo: Đặt tên file chứa "para", "amox" hoặc "decol" để chạy mô phỏng AI trích xuất thuốc & chẩn đoán.</p>
                     <input type="file" id="prescriptionFile" style="display: none;" accept="image/*" onchange="handleFileSelect(this)" />
                 </div>
 
@@ -79,10 +79,10 @@
 
             <!-- 3. Add Medicines to Consult manually (optional) -->
             <div class="card border-0 shadow-sm p-4 mb-4" style="border-radius: 16px;">
-                <h5 class="fw-bold text-dark mb-3"><i class="bi bi-capsule-pill text-teal me-2"></i>Thêm thuốc cần tư vấn (Không bắt buộc)</h5>
-                <p class="text-muted small">Nếu bạn không có đơn thuốc, hãy nhập tên thuốc hoặc triệu chứng cần tư vấn ở dưới đây.</p>
+                <h5 class="fw-bold text-dark mb-3"><i class="bi bi-capsule-pill text-teal me-2"></i>Thêm triệu chứng hoặc thuốc cần hỏi (Không bắt buộc)</h5>
+                <p class="text-muted small">Nhập chi tiết các triệu chứng cơ thể hoặc các loại thuốc bạn muốn hỏi ý kiến bác sĩ.</p>
                 <div class="input-group mb-3">
-                    <input type="text" id="manualDrugInput" class="form-control bg-light border-0" placeholder="Nhập tên thuốc hoặc sản phẩm cần tư vấn..." style="border-radius: 10px 0 0 10px; font-size: 0.95rem;">
+                    <input type="text" id="manualDrugInput" class="form-control bg-light border-0" placeholder="Nhập triệu chứng (ví dụ: đau họng, sốt) hoặc tên thuốc..." style="border-radius: 10px 0 0 10px; font-size: 0.95rem;">
                     <button class="btn btn-teal px-4" type="button" onclick="addManualDrug()" style="border-radius: 0 10px 10px 0; background-color: var(--primary-color); color: white;"><i class="bi bi-plus-lg me-1"></i>Thêm</button>
                 </div>
                 <div id="manualDrugsList" class="d-flex flex-wrap gap-2">
@@ -97,9 +97,9 @@
                 <div class="card-header bg-teal text-white py-3 px-4 d-flex justify-content-between align-items-center">
                     <div class="d-flex align-items-center">
                         <i class="bi bi-cpu-fill fs-4 me-2"></i>
-                        <h6 class="fw-bold mb-0">Hệ thống Nhận diện & Xử lý Đơn thuốc Thông minh</h6>
+                        <h6 class="fw-bold mb-0">Hệ thống Phân tích Bệnh án & Đơn thuốc thông minh AI</h6>
                     </div>
-                    <span id="ocrStatusBadge" class="badge bg-white bg-opacity-20 text-white rounded-pill px-2.5 py-1" style="font-size: 0.75rem;">Đang chờ xử lý...</span>
+                    <span id="ocrStatusBadge" class="badge bg-white bg-opacity-20 text-white rounded-pill px-2.5 py-1" style="font-size: 0.75rem;">Đang phân tích...</span>
                 </div>
                 <div class="card-body p-4 bg-dark bg-opacity-95 text-light font-monospace" style="min-height: 250px;">
                     <!-- Laser scanning animation wrapper -->
@@ -115,37 +115,37 @@
                     <div class="row g-2 mb-4 text-center text-nowrap" id="stepProgressList">
                         <div class="col-4 col-md-2">
                             <div class="p-2 border rounded border-secondary small ocr-step-box" id="step1">
-                                <div class="fw-bold">B1: Tải đơn</div>
+                                <div class="fw-bold">B1: Đọc hồ sơ</div>
                                 <span class="badge bg-secondary small step-status">Đợi</span>
                             </div>
                         </div>
                         <div class="col-4 col-md-2">
                             <div class="p-2 border rounded border-secondary small ocr-step-box" id="step2">
-                                <div class="fw-bold">B2: Quét OCR</div>
+                                <div class="fw-bold">B2: Quét triệu chứng</div>
                                 <span class="badge bg-secondary small step-status">Đợi</span>
                             </div>
                         </div>
                         <div class="col-4 col-md-2">
                             <div class="p-2 border rounded border-secondary small ocr-step-box" id="step3">
-                                <div class="fw-bold">B3: Trích xuất</div>
+                                <div class="fw-bold">B3: Phân tích AI</div>
                                 <span class="badge bg-secondary small step-status">Đợi</span>
                             </div>
                         </div>
                         <div class="col-4 col-md-2">
                             <div class="p-2 border rounded border-secondary small ocr-step-box" id="step4">
-                                <div class="fw-bold">B4: Đối chiếu</div>
+                                <div class="fw-bold">B4: Chẩn đoán</div>
                                 <span class="badge bg-secondary small step-status">Đợi</span>
                             </div>
                         </div>
                         <div class="col-4 col-md-2">
                             <div class="p-2 border rounded border-secondary small ocr-step-box" id="step5">
-                                <div class="fw-bold">B5: Kiểm kho</div>
+                                <div class="fw-bold">B5: Kê toa mẫu</div>
                                 <span class="badge bg-secondary small step-status">Đợi</span>
                             </div>
                         </div>
                         <div class="col-4 col-md-2">
                             <div class="p-2 border rounded border-secondary small ocr-step-box" id="step6">
-                                <div class="fw-bold">B6: Sinh đơn</div>
+                                <div class="fw-bold">B6: Hoàn tất</div>
                                 <span class="badge bg-secondary small step-status">Đợi</span>
                             </div>
                         </div>
@@ -153,7 +153,7 @@
 
                     <!-- Console logs terminal-style -->
                     <div class="bg-black rounded p-3 text-success mb-3 border border-secondary" style="font-size: 0.82rem; max-height: 180px; overflow-y: auto;" id="ocrConsoleLogs">
-                        <div>&gt; Hệ thống nhận diện PharmaCare AI đã sẵn sàng. Hãy tải tệp tin đơn thuốc để bắt đầu...</div>
+                        <div>&gt; Hệ thống phân tích hồ sơ sức khỏe AI đã sẵn sàng. Vui lòng tải lên tệp tin để bắt đầu...</div>
                     </div>
 
                     <!-- OCR Extracted & Database Matched Output -->
@@ -193,8 +193,8 @@
                         <div class="alert alert-teal bg-teal bg-opacity-10 border-teal-subtle text-teal mt-3 mb-0 d-flex align-items-center rounded-3 p-3">
                             <i class="bi bi-check-circle-fill fs-4 me-3"></i>
                             <div>
-                                <h6 class="fw-bold mb-1" style="font-size: 0.9rem;">Hóa đơn nháp đã được sinh tự động!</h6>
-                                <p class="small mb-0 opacity-90">Hệ thống đã chuẩn hóa tên thuốc, đối chiếu kho và tạo đơn chờ. Bạn có thể nhấn <strong>"Gửi yêu cầu tư vấn"</strong> ở cột bên phải để gửi đơn này cho Dược sĩ duyệt và giao hàng tận nơi!</p>
+                                <h6 class="fw-bold mb-1" style="font-size: 0.9rem;">Chẩn đoán y khoa sơ bộ hoàn tất!</h6>
+                                <p class="small mb-0 opacity-90">Hệ thống đã phân tích bệnh án/đơn thuốc của bạn. Vui lòng nhấn nút <strong>"Gửi yêu cầu tư vấn Bác sĩ"</strong> ở cột bên phải để hồ sơ được chuyển tiếp cho Bác sĩ chuyên khoa xem xét và gọi lại tư vấn trực tiếp!</p>
                             </div>
                         </div>
                     </div>
@@ -206,42 +206,42 @@
         <div class="col-lg-4 col-12">
             <!-- Submit consultation request -->
             <button id="btnSubmitConsultation" class="btn btn-teal btn-lg w-100 py-3 mb-4 shadow-sm text-white fw-bold d-flex align-items-center justify-content-center" onclick="submitPrescriptionRequest()" style="border-radius: 12px; background-color: var(--primary-color);">
-                <i class="bi bi-send-fill me-2"></i> Gửi yêu cầu tư vấn
+                <i class="bi bi-send-fill me-2"></i> Gửi yêu cầu tư vấn Bác sĩ
             </button>
 
             <!-- Consultation Process Card -->
             <div class="card border-0 shadow-sm p-4 mb-4" style="border-radius: 16px;">
-                <h5 class="fw-bold text-dark mb-3"><i class="bi bi-clock-history text-teal me-2"></i>Quy trình tư vấn</h5>
+                <h5 class="fw-bold text-dark mb-3"><i class="bi bi-clock-history text-teal me-2"></i>Quy trình tư vấn Bác sĩ</h5>
                 <div class="position-relative consult-timeline">
                     <!-- Step 1 -->
                     <div class="d-flex mb-3 position-relative" style="z-index:2;">
                         <div class="step-num rounded-circle bg-teal bg-opacity-10 text-teal fw-bold d-flex align-items-center justify-content-center me-3" style="width: 32px; height: 32px; flex-shrink: 0;">1</div>
                         <div>
-                            <h6 class="fw-bold text-dark mb-0 small">Gửi ảnh đơn thuốc</h6>
-                            <p class="text-muted small mb-0">Quý khách điền thông tin và tải ảnh chụp đơn thuốc rõ nét lên hệ thống.</p>
+                            <h6 class="fw-bold text-dark mb-0 small">Gửi hồ sơ sức khỏe</h6>
+                            <p class="text-muted small mb-0">Quý khách điền thông tin liên hệ, triệu chứng lâm sàng và tải lên các ảnh chụp liên quan.</p>
                         </div>
                     </div>
                     <!-- Step 2 -->
                     <div class="d-flex mb-3 position-relative" style="z-index:2;">
                         <div class="step-num rounded-circle bg-teal bg-opacity-10 text-teal fw-bold d-flex align-items-center justify-content-center me-3" style="width: 32px; height: 32px; flex-shrink: 0;">2</div>
                         <div>
-                            <h6 class="fw-bold text-dark mb-0 small">Dược sĩ liên hệ</h6>
-                            <p class="text-muted small mb-0">Dược sĩ chuyên môn của PharmaCare sẽ gọi điện tư vấn và báo giá thuốc miễn phí.</p>
+                            <h6 class="fw-bold text-dark mb-0 small">Bác sĩ chẩn đoán</h6>
+                            <p class="text-muted small mb-0">Bác sĩ chuyên khoa xem hồ sơ và chủ động gọi điện tư vấn chi tiết phương án điều trị.</p>
                         </div>
                     </div>
                     <!-- Step 3 -->
                     <div class="d-flex position-relative" style="z-index:2;">
                         <div class="step-num rounded-circle bg-teal bg-opacity-10 text-teal fw-bold d-flex align-items-center justify-content-center me-3" style="width: 32px; height: 32px; flex-shrink: 0;">3</div>
                         <div>
-                            <h6 class="fw-bold text-dark mb-0 small">Nhận thuốc dễ dàng</h6>
-                            <p class="text-muted small mb-0">Quý khách có thể lựa chọn giao thuốc tận nơi hoặc nhận tại cửa hàng gần nhất.</p>
+                            <h6 class="fw-bold text-dark mb-0 small">Nhận phác đồ y khoa</h6>
+                            <p class="text-muted small mb-0">Hệ thống gửi đơn thuốc y khoa và chỉ định chuyên môn do Bác sĩ ký duyệt.</p>
                         </div>
                     </div>
                 </div>
 
                 <div class="border-top mt-3 pt-3">
-                    <p class="text-muted mb-2" style="font-size: 0.75rem;"><i class="bi bi-exclamation-triangle-fill text-warning me-1"></i><strong>Lưu ý:</strong> Nếu mua thuốc kê đơn, quý khách vui lòng mang theo đơn thuốc giấy gốc khi nhận thuốc.</p>
-                    <p class="text-muted mb-0" style="font-size: 0.75rem;"><i class="bi bi-info-circle-fill text-teal me-1"></i>Dược sĩ vẫn sẽ gọi điện hỗ trợ tận tình kể cả khi không tải ảnh đơn thuốc.</p>
+                    <p class="text-muted mb-2" style="font-size: 0.75rem;"><i class="bi bi-exclamation-triangle-fill text-warning me-1"></i><strong>Lưu ý:</strong> Mọi thông tin tư vấn và hồ sơ bệnh lý của khách hàng đều được cam kết bảo mật tuyệt đối.</p>
+                    <p class="text-muted mb-0" style="font-size: 0.75rem;"><i class="bi bi-info-circle-fill text-teal me-1"></i>Bác sĩ vẫn sẽ gọi điện hỗ trợ trực tiếp kể cả khi bạn không đính kèm tệp tin hình ảnh đơn thuốc.</p>
                 </div>
             </div>
 
@@ -484,10 +484,10 @@
 
         function resetOcrSimulation() {
             if (ocrTimer) clearTimeout(ocrTimer);
-            logsDiv.innerHTML = "<div>&gt; Hệ thống nhận diện PharmaCare AI đã sẵn sàng. Hãy tải tệp tin đơn thuốc để bắt đầu...</div>";
+            logsDiv.innerHTML = "<div>&gt; Hệ thống phân tích hồ sơ sức khỏe AI đã sẵn sàng. Vui lòng tải lên tệp tin để bắt đầu...</div>";
             document.getElementById("scanLaserWrapper").style.display = "none";
             document.getElementById("ocrProcessedResults").style.display = "none";
-            document.getElementById("ocrStatusBadge").innerText = "Đang chờ xử lý...";
+            document.getElementById("ocrStatusBadge").innerText = "Đang phân tích...";
             document.getElementById("ocrStatusBadge").className = "badge bg-white bg-opacity-20 text-white rounded-pill px-2.5 py-1";
 
             ["step1", "step2", "step3", "step4", "step5", "step6"].forEach(id => {
@@ -634,7 +634,7 @@
 
             // Call submit consultation (we can simulate saving it or matching it)
             setTimeout(() => {
-                alert("Yêu cầu tư vấn của bạn đã được gửi thành công! Dược sĩ PharmaCare sẽ liên hệ sớm nhất tới số điện thoại " + phone);
+                alert("Yêu cầu tư vấn của bạn đã được gửi thành công! Bác sĩ chuyên khoa của PharmaHub sẽ liên hệ sớm nhất tới số điện thoại " + phone);
                 // Redirect to orders or catalog
                 window.location.href = "/Order/MyOrders";
             }, 1500);

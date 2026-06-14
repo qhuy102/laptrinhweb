@@ -171,6 +171,28 @@
                             <input asp-for="HinhAnh" class="form-control" placeholder="https://link-anh-san-pham.jpg..." />
                         </div>
                     </div>
+
+                    <div class="form-section-title mt-4">
+                        <i class="bi bi-tag-fill text-teal"></i>
+                        Thiết lập ưu đãi
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-6 col-12 mb-3">
+                            <div class="form-check form-switch mt-2">
+                                <input class="form-check-input" type="checkbox" asp-for="IsDeal" id="IsDealCheckbox">
+                                <label class="form-check-label fw-semibold" for="IsDealCheckbox">Sản phẩm ưu đãi</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-6 col-12 mb-3" id="DiscountPercentGroup" style="display: none;">
+                            <label asp-for="DiscountPercent" class="form-label">Phần trăm giảm giá (%)</label>
+                            <div class="input-group">
+                                <input asp-for="DiscountPercent" type="number" min="0" max="100" class="form-control" placeholder="Ví dụ: 10" />
+                                <span class="input-group-text">%</span>
+                            </div>
+                            <span asp-validation-for="DiscountPercent" class="text-danger small"></span>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Right Side: Medical & Clinical Info -->
@@ -258,6 +280,16 @@
             if (selectEl) {
                 selectEl.addEventListener("change", updateNhomDieuTriSuggestions);
                 updateNhomDieuTriSuggestions();
+            }
+
+            const isDealCheckbox = document.getElementById("IsDealCheckbox");
+            const discountGroup = document.getElementById("DiscountPercentGroup");
+            if (isDealCheckbox && discountGroup) {
+                const toggleDiscount = () => {
+                    discountGroup.style.display = isDealCheckbox.checked ? "block" : "none";
+                };
+                isDealCheckbox.addEventListener("change", toggleDiscount);
+                toggleDiscount();
             }
         });
     </script>

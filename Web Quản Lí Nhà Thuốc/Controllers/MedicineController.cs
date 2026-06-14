@@ -37,7 +37,7 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Controllers
         // POST: Medicine/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("MaThuoc,TenThuoc,DonGia,SoLuong,MoTa,HinhAnh,HanSuDung,LoaiThuocId,DonViCoBan,HoatChat,ViTriKe,CongDung,ChongChiDinh,LieuLuong,NhomDieuTri")] Thuoc thuoc)
+        public async Task<IActionResult> Create([Bind("MaThuoc,TenThuoc,DonGia,SoLuong,MoTa,HinhAnh,HanSuDung,LoaiThuocId,DonViCoBan,HoatChat,ViTriKe,CongDung,ChongChiDinh,LieuLuong,NhomDieuTri,IsDeal,DiscountPercent")] Thuoc thuoc)
         {
             if (ModelState.IsValid)
             {
@@ -64,7 +64,7 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Controllers
         // POST: Medicine/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("MaThuoc,TenThuoc,DonGia,SoLuong,MoTa,HinhAnh,HanSuDung,LoaiThuocId,DonViCoBan,HoatChat,ViTriKe,CongDung,ChongChiDinh,LieuLuong,NhomDieuTri")] Thuoc thuoc)
+        public async Task<IActionResult> Edit(int id, [Bind("MaThuoc,TenThuoc,DonGia,SoLuong,MoTa,HinhAnh,HanSuDung,LoaiThuocId,DonViCoBan,HoatChat,ViTriKe,CongDung,ChongChiDinh,LieuLuong,NhomDieuTri,IsDeal,DiscountPercent")] Thuoc thuoc)
         {
             if (id != thuoc.MaThuoc) return NotFound();
 

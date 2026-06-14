@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Web_Quản_Lí_Nhà_Thuốc.Models.GioHang>
+@model IEnumerable<Web_Quản_Lí_Nhà_Thuốc.Models.GioHang>
 
 @{
     ViewData["Title"] = "Giỏ hàng";
@@ -27,7 +27,16 @@
                 <td>@item.Thuoc.TenThuoc</td>
 
                 <td>
-                    @item.Thuoc.DonGia.ToString("N0") đ
+                    @if (item.Thuoc.IsDeal)
+                    {
+                        <div class="text-danger fw-bold">@item.Thuoc.GiaHienTai.ToString("N0") đ</div>
+                        <div class="text-decoration-line-through text-muted small" style="font-size: 0.8rem; line-height: 1;">@item.Thuoc.DonGia.ToString("N0") đ</div>
+                        <span class="badge bg-danger px-1.5 py-0.5 rounded text-white small" style="font-size: 0.7rem;">-@item.Thuoc.DiscountPercent%</span>
+                    }
+                    else
+                    {
+                        <span>@item.Thuoc.DonGia.ToString("N0") đ</span>
+                    }
                 </td>
 
                 <td>
@@ -35,7 +44,7 @@
                 </td>
 
                 <td>
-                    @((item.Thuoc.DonGia * item.SoLuong).ToString("N0")) đ
+                    @((item.Thuoc.GiaHienTai * item.SoLuong).ToString("N0")) đ
                 </td>
 
                 <td>

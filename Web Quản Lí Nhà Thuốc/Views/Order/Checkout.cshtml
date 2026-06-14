@@ -57,8 +57,12 @@
                             <div>
                                 <h6 class="my-0">@item.Thuoc.TenThuoc</h6>
                                 <small class="text-muted">Số lượng: @item.SoLuong</small>
+                                @if (item.Thuoc.IsDeal)
+                                {
+                                    <span class="badge bg-danger bg-opacity-10 text-danger border border-danger-subtle rounded-3 ms-1 small" style="font-size: 0.68rem;">-@item.Thuoc.DiscountPercent%</span>
+                                }
                             </div>
-                            <span class="text-muted fw-bold">@((item.Thuoc.DonGia * item.SoLuong).ToString("N0")) đ</span>
+                            <span class="text-muted fw-bold">@((item.Thuoc.GiaHienTai * item.SoLuong).ToString("N0")) đ</span>
                         </div>
                     }
                 </div>

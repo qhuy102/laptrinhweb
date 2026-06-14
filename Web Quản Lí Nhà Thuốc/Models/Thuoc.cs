@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Web_Quản_Lí_Nhà_Thuốc.Models
 {
@@ -48,6 +49,13 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Models
 
         [StringLength(100)]
         public string? NhomDieuTri { get; set; }
+
+        public bool IsDeal { get; set; } = false;
+
+        public int DiscountPercent { get; set; } = 0;
+
+        [NotMapped]
+        public decimal GiaHienTai => IsDeal ? DonGia * (100 - DiscountPercent) / 100m : DonGia;
 
         public ICollection<LoThuoc>? LoThuocs { get; set; }
 

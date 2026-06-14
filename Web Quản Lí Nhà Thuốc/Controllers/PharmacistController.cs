@@ -94,7 +94,7 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Controllers
             {
                 var all = await _context.Thuocs
                     .Include(t => t.DonViQuyDois)
-                    .Select(t => new { t.MaThuoc, t.TenThuoc, t.HoatChat, t.DonGia, t.SoLuong, t.DonViCoBan, t.ViTriKe })
+                    .Select(t => new { t.MaThuoc, t.TenThuoc, t.HoatChat, t.DonGia, t.IsDeal, t.DiscountPercent, GiaHienTai = t.IsDeal ? t.DonGia * (100 - t.DiscountPercent) / 100m : t.DonGia, t.SoLuong, t.DonViCoBan, t.ViTriKe })
                     .ToListAsync();
                 return Json(all);
             }
@@ -120,6 +120,9 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Controllers
                 x.Drug.TenThuoc,
                 x.Drug.HoatChat,
                 x.Drug.DonGia,
+                IsDeal = x.Drug.IsDeal,
+                DiscountPercent = x.Drug.DiscountPercent,
+                GiaHienTai = x.Drug.GiaHienTai,
                 x.Drug.SoLuong,
                 x.Drug.DonViCoBan,
                 x.Drug.ViTriKe,

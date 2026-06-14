@@ -38,8 +38,12 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Controllers
                 return View("AdminIndex");
             }
 
-            // Customer or Guest: get list of medicines from DB to display
-            var products = await _context.Thuocs.Include(t => t.LoaiThuoc).Take(8).ToListAsync();
+            // Customer or Guest: get list of regular (non-deal) medicines from DB to display
+            var products = await _context.Thuocs.Include(t => t.LoaiThuoc).Where(t => !t.IsDeal).Take(8).ToListAsync();
+            
+            // Get deal products (promotions)
+            ViewBag.DealProducts = await _context.Thuocs.Include(t => t.LoaiThuoc).Where(t => t.IsDeal).Take(3).ToListAsync();
+
             return View("CustomerIndex", products);
         }
 
@@ -73,6 +77,9 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Controllers
                     t.HoatChat,
                     t.DonGia,
                     t.HinhAnh,
+                    t.IsDeal,
+                    t.DiscountPercent,
+                    GiaHienTai = t.IsDeal ? t.DonGia * (100 - t.DiscountPercent) / 100m : t.DonGia,
                     LoaiThuoc = t.LoaiThuoc != null ? t.LoaiThuoc.TenLoai : ""
                 })
                 .ToListAsync();
@@ -258,6 +265,12 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Controllers
                 items = stockDetails,
                 total = totalDraftAmount
             });
+        }
+
+        public IActionResult Policies(string tab)
+        {
+            ViewBag.ActiveTab = tab ?? "delivery";
+            return View();
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

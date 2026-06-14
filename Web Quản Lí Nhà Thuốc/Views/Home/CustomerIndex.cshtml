@@ -165,6 +165,99 @@
     }
 </div>
 
+<!-- Daily Deals Section -->
+@{
+    var dealProducts = ViewBag.DealProducts as List<Web_Quản_Lí_Nhà_Thuốc.Models.Thuoc> ?? new List<Web_Quản_Lí_Nhà_Thuốc.Models.Thuoc>();
+}
+@if (dealProducts.Any())
+{
+    <div class="daily-deals-section mb-5 p-4 p-md-5 rounded-4 position-relative overflow-hidden" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); box-shadow: 0 20px 40px rgba(15, 23, 42, 0.15); margin-top: 2rem;">
+        <div class="position-absolute top-0 end-0 p-3 opacity-10" style="font-size: 10rem; color: #2dd4bf; transform: translate(30px, -30px); pointer-events: none;">
+            <i class="bi bi-percent"></i>
+        </div>
+        
+        <div class="row align-items-center mb-4 g-3 position-relative z-2">
+            <div class="col-md-6 text-center text-md-start">
+                <span class="badge bg-danger rounded-pill px-3 py-1.5 mb-2 animate-pulse fw-bold"><i class="bi bi-fire me-1"></i>GIỜ VÀNG GIÁ SỐC</span>
+                <h2 class="fw-bold text-white mb-0">Ưu đãi thuốc trong ngày</h2>
+                <p class="text-slate-400 small mb-0 mt-1">Chương trình ưu đãi sức khỏe đặc biệt chỉ áp dụng trong ngày hôm nay.</p>
+            </div>
+            <div class="col-md-6 d-flex justify-content-center justify-content-md-end align-items-center">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="text-white small fw-medium">Kết thúc trong:</span>
+                    <div class="d-flex align-items-center gap-1.5" id="dealCountdown">
+                        <div class="countdown-box" id="countdown-hours">04</div>
+                        <span class="text-teal font-monospace fw-bold">:</span>
+                        <div class="countdown-box" id="countdown-minutes">32</div>
+                        <span class="text-teal font-monospace fw-bold">:</span>
+                        <div class="countdown-box" id="countdown-seconds">15</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4 position-relative z-2">
+            @for (int i = 0; i < dealProducts.Count; i++)
+            {
+                var item = dealProducts[i];
+                var discountPercent = item.DiscountPercent;
+                var salePrice = item.GiaHienTai;
+                var soldPercentage = item.SoLuong > 0 ? (int)(100 - (item.SoLuong * 100 / (item.SoLuong + 25))) : 100;
+                if (soldPercentage < 20) soldPercentage = 25; // look nice
+                var itemsLeft = item.SoLuong;
+
+                <div class="col-12 col-md-4">
+                    <div class="card border-0 rounded-3 overflow-hidden h-100 daily-deal-card bg-slate-800 text-white">
+                        <div class="position-relative">
+                            <span class="badge bg-danger position-absolute top-3 start-3 z-3 py-1.5 px-2.5 rounded-3 fw-bold" style="font-size: 0.85rem;">Giảm @discountPercent%</span>
+                            
+                            <!-- Product Image Area with API Cascade -->
+                            <div class="drug-img-area text-center bg-white p-4 position-relative d-flex align-items-center justify-content-center" 
+                                 style="height: 180px;" 
+                                 data-drug-name="@item.TenThuoc" 
+                                 data-hoatChat="@item.HoatChat">
+                                <div class="drug-spinner spinner-border text-teal position-absolute" role="status" style="width: 2rem; height: 2rem;"></div>
+                                <img class="img-fluid drug-loaded-img" src="" alt="@item.TenThuoc" style="max-height: 140px; display: none; object-fit: contain;">
+                                <div class="drug-placeholder d-none align-items-center justify-content-center text-muted" style="width: 100%; height: 100%;">
+                                    <i class="bi bi-capsule fs-1"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card-body p-4 d-flex flex-column justify-content-between">
+                            <div>
+                                <span class="badge bg-teal bg-opacity-20 text-teal mb-2 font-monospace px-2 py-1" style="font-size: 0.72rem; font-weight: 500;">@item.LoaiThuoc?.TenLoai</span>
+                                <h6 class="fw-bold text-white text-truncate mb-1">@item.TenThuoc</h6>
+                                <p class="text-slate-400 small text-truncate mb-3" style="font-size: 0.78rem;">H/C: @(item.HoatChat ?? "Xem chi tiết")</p>
+                                
+                                <div class="d-flex align-items-baseline gap-2 mb-3">
+                                    <span class="fs-4 fw-extrabold text-teal">@salePrice.ToString("N0") đ</span>
+                                    <span class="text-slate-500 text-decoration-line-through small" style="font-size:0.82rem;">@item.DonGia.ToString("N0") đ</span>
+                                </div>
+                            </div>
+
+                            <div>
+                                <!-- Stock Progress Bar -->
+                                <div class="d-flex justify-content-between align-items-center mb-1.5 small text-slate-400">
+                                    <span>Đã bán @soldPercentage%</span>
+                                    <span class="text-danger fw-semibold">Còn @itemsLeft sản phẩm</span>
+                                </div>
+                                <div class="progress bg-slate-700 mb-3" style="height: 6px; border-radius: 4px;">
+                                    <div class="progress-bar bg-danger" role="progressbar" style="width: @soldPercentage%; border-radius: 4px;" aria-valuenow="@soldPercentage" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+
+                                <a href="/Cart/AddToCart/@item.MaThuoc" class="btn btn-teal-btn w-100 py-2.5 rounded-3 fw-bold d-flex align-items-center justify-content-center gap-2 mt-2">
+                                    <i class="bi bi-cart-plus-fill fs-5"></i> Thêm vào giỏ hàng
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}
+
 <!-- Auto-load drug images via API cascade -->
 <script>
 (function() {
@@ -342,6 +435,45 @@ function filterProducts(type, value, btn) {
         if (emptyMsg) emptyMsg.style.display = 'none';
     }
 }
+
+// Countdown Timer for Daily Deals
+function startDailyDealsTimer() {
+    const now = new Date();
+    const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59);
+    
+    function updateTimer() {
+        const currentTime = new Date();
+        const difference = endOfDay - currentTime;
+        
+        if (difference <= 0) {
+            const elH = document.getElementById("countdown-hours");
+            const elM = document.getElementById("countdown-minutes");
+            const elS = document.getElementById("countdown-seconds");
+            if (elH) elH.innerText = "00";
+            if (elM) elM.innerText = "00";
+            if (elS) elS.innerText = "00";
+            return;
+        }
+        
+        const hours = Math.floor((difference / (1000 * 60 * 60)) % 24);
+        const minutes = Math.floor((difference / 1000 / 60) % 60);
+        const seconds = Math.floor((difference / 1000) % 60);
+        
+        const elH = document.getElementById("countdown-hours");
+        const elM = document.getElementById("countdown-minutes");
+        const elS = document.getElementById("countdown-seconds");
+        if (elH) elH.innerText = hours.toString().padStart(2, '0');
+        if (elM) elM.innerText = minutes.toString().padStart(2, '0');
+        if (elS) elS.innerText = seconds.toString().padStart(2, '0');
+    }
+    
+    updateTimer();
+    setInterval(updateTimer, 1000);
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+    startDailyDealsTimer();
+});
 </script>
 
 
@@ -479,5 +611,45 @@ function filterProducts(type, value, btn) {
         transform: translateY(-5px) !important;
         box-shadow: 0 12px 25px rgba(13, 148, 136, 0.08) !important;
         border-color: rgba(13, 148, 136, 0.3) !important;
+    }
+
+    /* Daily Deals Section Styles */
+    .text-slate-400 {
+        color: #94a3b8 !important;
+    }
+    .text-slate-500 {
+        color: #64748b !important;
+    }
+    .bg-slate-700 {
+        background-color: #334155 !important;
+    }
+    .bg-slate-800 {
+        background-color: #1e293b !important;
+    }
+    .fw-extrabold {
+        font-weight: 800 !important;
+    }
+
+    .countdown-box {
+        background-color: #334155;
+        color: #2dd4bf;
+        font-family: 'Courier New', Courier, monospace;
+        font-weight: bold;
+        font-size: 1.15rem;
+        padding: 0.35rem 0.6rem;
+        border-radius: 8px;
+        min-width: 40px;
+        text-align: center;
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .daily-deal-card {
+        transition: all 0.3s ease;
+        border: 1px solid #334155 !important;
+    }
+    .daily-deal-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.3) !important;
+        border-color: #2dd4bf !important;
     }
 </style>

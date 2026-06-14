@@ -1,0 +1,411 @@
+@{
+    ViewData["Title"] = "Trung tâm Hỗ trợ & Chính sách";
+    var activeTab = ViewBag.ActiveTab as string ?? "delivery";
+}
+
+<div class="container py-5">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/" class="text-teal text-decoration-none"><i class="bi bi-house-door-fill me-1"></i>Trang chủ</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Chính sách & Hỗ trợ</li>
+        </ol>
+    </nav>
+
+    <!-- Support Center Header -->
+    <div class="support-header text-center mb-5 p-5 rounded-4 position-relative overflow-hidden shadow-sm" style="background: linear-gradient(135deg, #0f766e 0%, #0d9488 100%);">
+        <div class="position-absolute top-0 start-0 w-100 h-100 bg-grid-white" style="opacity: 0.05; background-image: radial-gradient(circle, #fff 10%, transparent 11%), radial-gradient(circle, #fff 10%, transparent 11%); background-size: 20px 20px; background-position: 0 0, 10px 10px;"></div>
+        <div class="position-relative z-1">
+            <h1 class="text-white fw-extrabold mb-2">Trung tâm Hỗ trợ &amp; Chính sách</h1>
+            <p class="text-white-50 fs-5 mb-4 max-w-600 mx-auto">Chúng tôi luôn sẵn sàng hỗ trợ và mang lại trải nghiệm dịch vụ chăm sóc sức khỏe tốt nhất cho bạn.</p>
+            <div class="search-faq-container mx-auto" style="max-width: 500px;">
+                <div class="input-group rounded-pill shadow-sm bg-white p-1">
+                    <span class="input-group-text border-0 bg-transparent text-muted"><i class="bi bi-search fs-5"></i></span>
+                    <input type="text" id="policySearchInput" class="form-control border-0" placeholder="Tìm câu hỏi hoặc chính sách cần tra cứu..." style="box-shadow: none;">
+                    <button class="btn btn-teal rounded-pill px-4" onclick="searchPolicies()">Tìm kiếm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="row g-4">
+        <!-- Sidebar Navigation -->
+        <div class="col-lg-3">
+            <div class="card border-0 shadow-sm rounded-4 p-3 sticky-sidebar">
+                <h5 class="fw-bold text-dark mb-4 px-2">Chủ đề hỗ trợ</h5>
+                <div class="nav flex-column nav-pills policy-tabs" role="tablist">
+                    <button class="nav-link w-100 text-start d-flex align-items-center gap-3 py-3 px-3 mb-2 rounded-3 active" 
+                            id="tab-delivery-btn" data-tab="delivery" type="button" role="tab" onclick="switchTab('delivery')">
+                        <div class="icon-wrapper d-flex align-items-center justify-content-center bg-teal-subtle text-teal rounded-3" style="width: 40px; height: 40px; flex-shrink: 0;">
+                            <i class="bi bi-truck fs-5"></i>
+                        </div>
+                        <div>
+                            <span class="fw-semibold d-block">Chính sách Giao hàng</span>
+                            <span class="text-muted small-desc">Vận chuyển hỏa tốc, phí ship</span>
+                        </div>
+                    </button>
+                    
+                    <button class="nav-link w-100 text-start d-flex align-items-center gap-3 py-3 px-3 mb-2 rounded-3" 
+                            id="tab-return-btn" data-tab="return" type="button" role="tab" onclick="switchTab('return')">
+                        <div class="icon-wrapper d-flex align-items-center justify-content-center bg-teal-subtle text-teal rounded-3" style="width: 40px; height: 40px; flex-shrink: 0;">
+                            <i class="bi bi-arrow-left-right fs-5"></i>
+                        </div>
+                        <div>
+                            <span class="fw-semibold d-block">Chính sách Đổi trả</span>
+                            <span class="text-muted small-desc">Đổi trả thuốc, hoàn tiền</span>
+                        </div>
+                    </button>
+                    
+                    <button class="nav-link w-100 text-start d-flex align-items-center gap-3 py-3 px-3 mb-2 rounded-3" 
+                            id="tab-privacy-btn" data-tab="privacy" type="button" role="tab" onclick="switchTab('privacy')">
+                        <div class="icon-wrapper d-flex align-items-center justify-content-center bg-teal-subtle text-teal rounded-3" style="width: 40px; height: 40px; flex-shrink: 0;">
+                            <i class="bi bi-shield-lock fs-5"></i>
+                        </div>
+                        <div>
+                            <span class="fw-semibold d-block">Chính sách Bảo mật</span>
+                            <span class="text-muted small-desc">Bảo vệ thông tin cá nhân</span>
+                        </div>
+                    </button>
+                    
+                    <button class="nav-link w-100 text-start d-flex align-items-center gap-3 py-3 px-3 mb-2 rounded-3" 
+                            id="tab-faqs-btn" data-tab="faqs" type="button" role="tab" onclick="switchTab('faqs')">
+                        <div class="icon-wrapper d-flex align-items-center justify-content-center bg-teal-subtle text-teal rounded-3" style="width: 40px; height: 40px; flex-shrink: 0;">
+                            <i class="bi bi-question-circle fs-5"></i>
+                        </div>
+                        <div>
+                            <span class="fw-semibold d-block">Câu hỏi thường gặp</span>
+                            <span class="text-muted small-desc">Hỏi đáp nhanh thắc mắc</span>
+                        </div>
+                    </button>
+                </div>
+
+                <hr class="my-4 text-muted">
+                
+                <div class="p-3 bg-light rounded-3 text-center">
+                    <h6 class="fw-bold mb-2">Cần dược sĩ tư vấn?</h6>
+                    <p class="text-muted small mb-3">Kết nối trực tuyến với dược sĩ PharmaHub chuyên môn cao để được giải đáp thắc mắc về y tế.</p>
+                    <a href="/Pharmacist/Consult" class="btn btn-outline-teal btn-sm w-100 py-2 rounded-pill fw-semibold"><i class="bi bi-chat-dots-fill me-1"></i>Tư vấn ngay</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content Area -->
+        <div class="col-lg-9">
+            <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 min-vh-60">
+                <!-- Delivery Content Panel -->
+                <div class="policy-panel active" id="panel-delivery" role="tabpanel">
+                    <div class="d-flex align-items-center gap-3 mb-4 pb-3 border-bottom">
+                        <i class="bi bi-truck fs-2 text-teal"></i>
+                        <h3 class="fw-bold text-dark mb-0">Chính sách Giao hàng & Vận chuyển</h3>
+                    </div>
+                    
+                    <div class="policy-body text-muted">
+                        <div class="alert alert-info border-0 rounded-3 d-flex align-items-center gap-3 p-3 mb-4">
+                            <i class="bi bi-lightning-charge-fill text-info fs-3"></i>
+                            <div>
+                                <strong class="text-dark">Hỗ trợ giao hỏa tốc 2h</strong><br>
+                                Áp dụng đối với các quận nội thành TP. Hồ Chí Minh cho các đơn đặt trước 20:00 hàng ngày.
+                            </div>
+                        </div>
+
+                        <h5 class="fw-bold text-dark mb-3">1. Biểu phí vận chuyển</h5>
+                        <table class="table table-bordered border-light-subtle rounded overflow-hidden mb-4">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Khu vực giao hàng</th>
+                                    <th>Giá trị đơn hàng</th>
+                                    <th>Phí vận chuyển</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td rowspan="2" class="align-middle fw-medium text-dark">Nội thành TP. HCM</td>
+                                    <td>Từ 300,000đ trở lên</td>
+                                    <td class="text-success fw-bold">Miễn phí (Free Ship)</td>
+                                </tr>
+                                <tr>
+                                    <td>Dưới 300,000đ</td>
+                                    <td>25,000đ (Giao thường) / 40,000đ (Hỏa tốc 2h)</td>
+                                </tr>
+                                <tr>
+                                    <td rowspan="2" class="align-middle fw-medium text-dark">Ngoại thành & Các Tỉnh khác</td>
+                                    <td>Từ 600,000đ trở lên</td>
+                                    <td class="text-success fw-bold">Miễn phí (Free Ship)</td>
+                                </tr>
+                                <tr>
+                                    <td>Dưới 600,000đ</td>
+                                    <td>35,000đ (Thời gian nhận hàng 2 - 4 ngày)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <h5 class="fw-bold text-dark mb-3">2. Thời gian giao hàng</h5>
+                        <ul>
+                            <li class="mb-2"><strong>Giao hỏa tốc (2h):</strong> Áp dụng cho các quận nội thành đối với các sản phẩm có sẵn tại nhà thuốc.</li>
+                            <li class="mb-2"><strong>Giao nhanh tiêu chuẩn:</strong> Từ 12 - 24 giờ kể từ thời điểm nhân viên xác nhận đơn hàng thành công.</li>
+                            <li class="mb-2"><strong>Giao đi các tỉnh lân cận:</strong> Thời gian trung bình từ 2 - 4 ngày làm việc tùy thuộc vào đơn vị vận chuyển đối tác.</li>
+                        </ul>
+
+                        <h5 class="fw-bold text-dark mb-3 mt-4">3. Quy trình đồng kiểm nhận hàng</h5>
+                        <p>Nhằm đảm bảo tối đa quyền lợi khách hàng, PharmaHub áp dụng chính sách cho phép <strong>đồng kiểm khi nhận hàng</strong>. Khách hàng có quyền mở gói hàng kiểm tra số lượng, tên thuốc, hạn sử dụng và tình trạng hộp bên ngoài trước khi thanh toán hoặc ký nhận.</p>
+                        <p class="text-danger fw-semibold"><i class="bi bi-exclamation-triangle-fill me-1"></i> Lưu ý: Không hỗ trợ khách hàng thử thuốc, bóc tem niêm phong hoặc mở hộp thuốc để uống thử trước khi thanh toán.</p>
+                    </div>
+                </div>
+
+                <!-- Return Content Panel -->
+                <div class="policy-panel" id="panel-return" role="tabpanel">
+                    <div class="d-flex align-items-center gap-3 mb-4 pb-3 border-bottom">
+                        <i class="bi bi-arrow-left-right fs-2 text-teal"></i>
+                        <h3 class="fw-bold text-dark mb-0">Chính sách Đổi trả sản phẩm & Hoàn tiền</h3>
+                    </div>
+                    
+                    <div class="policy-body text-muted">
+                        <div class="alert alert-warning border-0 rounded-3 d-flex align-items-start gap-3 p-3 mb-4">
+                            <i class="bi bi-info-circle-fill text-warning fs-3 mt-1"></i>
+                            <div>
+                                <strong class="text-dark">Thời hạn đổi trả trong vòng 3 ngày</strong><br>
+                                Tính từ ngày hệ thống xác nhận khách hàng nhận sản phẩm thành công theo biên bản hoặc lịch trình vận chuyển.
+                            </div>
+                        </div>
+
+                        <h5 class="fw-bold text-dark mb-3">1. Điều kiện đổi trả hàng</h5>
+                        <p>Khách hàng được quyền đổi hoặc trả sản phẩm trong các trường hợp sau:</p>
+                        <ul>
+                            <li class="mb-2">Sản phẩm bị lỗi đóng gói từ nhà sản xuất (hộp rách nát, chai thủy tinh nứt vỡ, mất tem niêm phong).</li>
+                            <li class="mb-2">Giao sai chủng loại sản phẩm, sai hàm lượng hoặc sai số lượng so với đơn đặt hàng đã xác nhận.</li>
+                            <li class="mb-2">Sản phẩm cận date (hạn sử dụng còn dưới 3 tháng đối với thuốc hoặc dưới 2 tháng đối với thực phẩm chức năng).</li>
+                        </ul>
+
+                        <h5 class="fw-bold text-dark mb-3 mt-4">2. Các trường hợp không áp dụng đổi trả</h5>
+                        <p>Để đảm bảo an toàn y tế và sức khỏe cộng đồng, chúng tôi **không hỗ trợ đổi trả** các nhóm sản phẩm sau trừ khi phát sinh lỗi từ nhà thuốc hoặc nhà sản xuất:</p>
+                        <div class="row g-2 mb-4">
+                            <div class="col-md-6">
+                                <div class="p-2 border rounded bg-light d-flex align-items-center gap-2">
+                                    <i class="bi bi-x-circle-fill text-danger"></i> Thuốc kê đơn y tế.
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="p-2 border rounded bg-light d-flex align-items-center gap-2">
+                                    <i class="bi bi-x-circle-fill text-danger"></i> Thuốc cần bảo quản lạnh đặc biệt.
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="p-2 border rounded bg-light d-flex align-items-center gap-2">
+                                    <i class="bi bi-x-circle-fill text-danger"></i> Hàng tặng kèm, hàng trong chương trình xả kho.
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="p-2 border rounded bg-light d-flex align-items-center gap-2">
+                                    <i class="bi bi-x-circle-fill text-danger"></i> Sản phẩm đã rách nát niêm phong hoặc bóc nhãn.
+                                </div>
+                            </div>
+                        </div>
+
+                        <h5 class="fw-bold text-dark mb-3">3. Quy trình đổi trả hàng & Hoàn tiền</h5>
+                        <ol>
+                            <li class="mb-2"><strong>Bước 1:</strong> Khách hàng liên hệ Hotline <a href="tel:18006000" class="text-teal text-decoration-none fw-bold">1800 6000</a> hoặc nhắn tin qua kênh Zalo của nhà thuốc để thông báo tình trạng kèm ảnh sản phẩm chụp thực tế.</li>
+                            <li class="mb-2"><strong>Bước 2:</strong> Mang sản phẩm kèm hóa đơn tới cửa hàng PharmaHub gần nhất hoặc gửi ship về kho trung tâm nếu ở xa.</li>
+                            <li class="mb-2"><strong>Bước 3:</strong> Nhà thuốc tiến hành kiểm tra tình trạng hàng. Nếu đạt yêu cầu đổi trả, chúng tôi sẽ hoàn trả tiền qua tài khoản ngân hàng trong 24h - 48h hoặc đổi sản phẩm mới tương đương.</li>
+                        </ol>
+                    </div>
+                </div>
+
+                <!-- Privacy Content Panel -->
+                <div class="policy-panel" id="panel-privacy" role="tabpanel">
+                    <div class="d-flex align-items-center gap-3 mb-4 pb-3 border-bottom">
+                        <i class="bi bi-shield-lock fs-2 text-teal"></i>
+                        <h3 class="fw-bold text-dark mb-0">Chính sách Bảo mật Thông tin Khách hàng</h3>
+                    </div>
+                    
+                    <div class="policy-body text-muted">
+                        <p class="lead">Nhà Thuốc PharmaHub cam kết bảo mật tuyệt đối thông tin cá nhân và thông tin y tế, bệnh lý của quý khách hàng theo các tiêu chuẩn pháp luật hiện hành về an toàn thông tin số.</p>
+
+                        <h5 class="fw-bold text-dark mb-3 mt-4">1. Mục đích thu thập thông tin cá nhân</h5>
+                        <p>Chúng tôi chỉ thu thập các thông tin cơ bản sau từ khách hàng:</p>
+                        <ul>
+                            <li class="mb-1">Họ và tên, Địa chỉ nhận hàng, Số điện thoại liên lạc.</li>
+                            <li class="mb-1">Lịch sử đơn hàng, nhu cầu sử dụng thuốc hoặc hồ sơ tư vấn y tế đã trao đổi với Dược sĩ.</li>
+                            <li class="mb-1">Hình ảnh đơn thuốc được tải lên để dược sĩ hỗ trợ ra đơn và giao thuốc.</li>
+                        </ul>
+
+                        <h5 class="fw-bold text-dark mb-3 mt-4">2. Phạm vi sử dụng thông tin</h5>
+                        <p>Thông tin thu thập chỉ được dùng trong nội bộ hệ thống nhà thuốc cho các mục đích:</p>
+                        <ul>
+                            <li class="mb-1">Giao hàng theo đúng địa chỉ cung cấp và giải quyết các khiếu nại liên quan.</li>
+                            <li class="mb-1">Tư vấn cách sử dụng thuốc chính xác và an toàn bởi dược sĩ chuyên môn.</li>
+                            <li class="mb-1">Thông báo về tiến độ đơn hàng và nhắc nhở liệu trình uống thuốc (nếu có đăng ký dịch vụ).</li>
+                        </ul>
+
+                        <h5 class="fw-bold text-dark mb-3 mt-4">3. Thời gian lưu trữ & Cam kết bảo mật</h5>
+                        <p>Thông tin của quý khách được lưu trữ an toàn trên máy chủ của hệ thống nhà thuốc cho đến khi nhận được yêu cầu hủy bỏ chính thức từ khách hàng. Chúng tôi cam kết <strong>không chia sẻ, mua bán hoặc tiết lộ</strong> dữ liệu cá nhân hay hồ sơ bệnh án y khoa của khách hàng cho bất cứ bên thứ ba nào ngoại trừ các trường hợp yêu cầu đặc biệt từ cơ quan thanh tra quản lý y tế hoặc tòa án có thẩm quyền.</p>
+                    </div>
+                </div>
+
+                <!-- FAQs Content Panel -->
+                <div class="policy-panel" id="panel-faqs" role="tabpanel">
+                    <div class="d-flex align-items-center gap-3 mb-4 pb-3 border-bottom">
+                        <i class="bi bi-question-circle fs-2 text-teal"></i>
+                        <h3 class="fw-bold text-dark mb-0">Các Câu Hỏi Thường Gặp (FAQs)</h3>
+                    </div>
+                    
+                    <div class="policy-body text-muted">
+                        <p class="mb-4">Những thắc mắc phổ biến của người bệnh trong quá trình tư vấn mua thuốc và sử dụng dịch vụ tại PharmaHub đã được giải đáp chi tiết dưới đây.</p>
+                        
+                        <div class="accordion accordion-flush" id="faqAccordion">
+                            <!-- FAQ 1 -->
+                            <div class="accordion-item border-bottom py-2">
+                                <h2 class="accordion-header" id="headingOne">
+                                    <button class="accordion-button collapsed fw-semibold text-dark fs-6 bg-transparent" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                                        Làm sao tôi có thể mua được thuốc kê đơn online?
+                                    </button>
+                                </h2>
+                                <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne" data-bs-parent="#faqAccordion">
+                                    <div class="accordion-body text-muted pt-1">
+                                        Để nhận tư vấn điều trị y khoa chuyên sâu, bạn vui lòng sử dụng chức năng <a href="/Home/PrescriptionUpload" class="text-teal text-decoration-none fw-bold">Tư vấn với bác sĩ</a> dưới chân trang. Bác sĩ chuyên khoa sẽ tiếp nhận, phân tích hồ sơ và liên hệ trực tiếp để đưa ra phác đồ điều trị an toàn cho bạn.
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- FAQ 2 -->
+                            <div class="accordion-item border-bottom py-2">
+                                <h2 class="accordion-header" id="headingTwo">
+                                    <button class="accordion-button collapsed fw-semibold text-dark fs-6 bg-transparent" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                        Tôi ở Tỉnh xa thì nhận thuốc và thanh toán thế nào?
+                                    </button>
+                                </h2>
+                                <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#faqAccordion">
+                                    <div class="accordion-body text-muted pt-1">
+                                        PharmaHub giao hàng trên toàn quốc. Khi nhận hàng từ nhân viên bưu tá, bạn được phép mở hộp kiểm tra đúng thuốc, hạn sử dụng rõ ràng rồi mới thanh toán tiền mặt (COD) trực tiếp cho bưu tá, hoặc chọn thanh toán chuyển khoản ngân hàng trước.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- FAQ 3 -->
+                            <div class="accordion-item border-bottom py-2">
+                                <h2 class="accordion-header" id="headingThree">
+                                    <button class="accordion-button collapsed fw-semibold text-dark fs-6 bg-transparent" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                        Tại sao một số sản phẩm thuốc không được hiển thị nút đặt hàng nhanh?
+                                    </button>
+                                </h2>
+                                <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#faqAccordion">
+                                    <div class="accordion-body text-muted pt-1">
+                                        Các loại thuốc nằm trong danh mục thuốc bán theo đơn theo quy định của Bộ Y tế sẽ không được phép đặt mua trực tuyến trực tiếp. Đối với các loại thuốc này, quý khách phải tải lên đơn thuốc hợp lệ hoặc liên hệ trực tiếp với dược sĩ thông qua nút tư vấn để được hỗ trợ kê đơn thủ công.
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- FAQ 4 -->
+                            <div class="accordion-item border-bottom py-2">
+                                <h2 class="accordion-header" id="headingFour">
+                                    <button class="accordion-button collapsed fw-semibold text-dark fs-6 bg-transparent" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                                        Thời gian làm việc của tổng đài dược sĩ hỗ trợ trực tuyến là bao lâu?
+                                    </button>
+                                </h2>
+                                <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#faqAccordion">
+                                    <div class="accordion-body text-muted pt-1">
+                                        Đội ngũ Dược sĩ tư vấn trực tuyến và Hotline miễn phí <a href="tel:18006000" class="text-teal text-decoration-none fw-bold">1800 6000</a> hoạt động liên tục 24/7 (kể cả ngày Lễ, Tết) nhằm đáp ứng nhanh nhất các thắc mắc của bệnh nhân.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Read active tab from ViewBag/URL and initialize
+            const activeTab = '@activeTab';
+            switchTab(activeTab);
+
+            // Setup real-time filtering for search bar
+            const searchInput = document.getElementById("policySearchInput");
+            if (searchInput) {
+                searchInput.addEventListener("input", function() {
+                    const filter = searchInput.value.toLowerCase().trim();
+                    searchPolicies(filter);
+                });
+            }
+        });
+
+        function switchTab(tabId) {
+            // 1. Update tab button state
+            const buttons = document.querySelectorAll(".policy-tabs button");
+            buttons.forEach(btn => {
+                if (btn.getAttribute("data-tab") === tabId) {
+                    btn.classList.add("active");
+                } else {
+                    btn.classList.remove("active");
+                }
+            });
+
+            // 2. Update visible content panel
+            const panels = document.querySelectorAll(".policy-panel");
+            panels.forEach(panel => {
+                if (panel.getAttribute("id") === "panel-" + tabId) {
+                    panel.classList.add("active");
+                } else {
+                    panel.classList.remove("active");
+                }
+            });
+
+            // 3. Update URL query parameter without reloading page
+            const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + "?tab=" + tabId;
+            window.history.pushState({ path: newUrl }, '', newUrl);
+        }
+
+        function searchPolicies(keyword) {
+            const query = keyword || document.getElementById("policySearchInput").value.toLowerCase().trim();
+            
+            // If query is empty, reset all panel highlights and show active one
+            if (!query) {
+                const hiddenElements = document.querySelectorAll(".policy-panel p, .policy-panel li, .accordion-item, .policy-panel tr");
+                hiddenElements.forEach(el => {
+                    el.style.display = "";
+                    el.style.backgroundColor = "";
+                });
+                return;
+            }
+
+            // We switch to FAQ tab automatically if user is typing a question to show FAQs search results
+            if (query.length > 2 && document.querySelector(".policy-panel.active").getAttribute("id") !== "panel-faqs") {
+                switchTab('faqs');
+            }
+
+            // If we are on FAQs, filter accordion items
+            if (document.getElementById("panel-faqs").classList.contains("active")) {
+                const accordionItems = document.querySelectorAll("#faqAccordion .accordion-item");
+                accordionItems.forEach(item => {
+                    const text = item.innerText.toLowerCase();
+                    if (text.includes(query)) {
+                        item.style.display = "";
+                        // Highlight match subtly
+                        item.style.backgroundColor = "rgba(45, 212, 191, 0.05)";
+                    } else {
+                        item.style.display = "none";
+                        item.style.backgroundColor = "";
+                    }
+                });
+            } else {
+                // Otherwise highlight/filter paragraphs in the active policy panel
+                const activePanel = document.querySelector(".policy-panel.active");
+                const paragraphs = activePanel.querySelectorAll("p, li, tr");
+                paragraphs.forEach(el => {
+                    const text = el.innerText.toLowerCase();
+                    if (text.includes(query)) {
+                        el.style.display = "";
+                        el.style.backgroundColor = "rgba(45, 212, 191, 0.1)";
+                    } else {
+                        el.style.display = "none";
+                        el.style.backgroundColor = "";
+                    }
+                });
+            }
+        }
+    </script>
+}

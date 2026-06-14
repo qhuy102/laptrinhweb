@@ -234,6 +234,45 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Controllers
             var logs = await _context.AuditLogs.OrderByDescending(l => l.ThoiGian).Take(100).ToListAsync();
             return View(logs);
         }
+
+        // Deals Management Dashboard (GET)
+        public async Task<IActionResult> Deals()
+        {
+            var medicines = await _context.Thuocs.Include(t => t.LoaiThuoc).ToListAsync();
+            return View(medicines);
+        }
+
+        // Update Deal status & discount percent (POST)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateDeal(int id, bool isDeal, int discountPercent)
+        {
+            var thuoc = await _context.Thuocs.FindAsync(id);
+            if (thuoc == null) return NotFound();
+
+            thuoc.IsDeal = isDeal;
+            thuoc.DiscountPercent = isDeal ? discountPercent : 0;
+
+            _context.Thuocs.Update(thuoc);
+            await _context.SaveChangesAsync();
+
+            // Log this action
+            var audit = new AuditLog
+            {
+                UserId = _userManager.GetUserId(User),
+                UserEmail = User.Identity?.Name,
+                Action = "UPDATE_DEAL",
+                MoTa = $"Admin đã cập nhật ưu đãi cho thuốc {thuoc.TenThuoc}: IsDeal={isDeal}, Giảm={discountPercent}%",
+                ThoiGian = DateTime.Now,
+                IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString(),
+                IsSuspicious = false
+            };
+            _context.AuditLogs.Add(audit);
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = $"Đã cập nhật trạng thái ưu đãi cho thuốc: {thuoc.TenThuoc}";
+            return RedirectToAction(nameof(Deals));
+        }
     }
 
     public class CreatePharmacistViewModel
