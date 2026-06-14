@@ -63,6 +63,7 @@ app.MapControllerRoute(
 
 app.MapRazorPages();
 app.MapHub<InventoryHub>("/inventoryHub");
+app.MapHub<ChatHub>("/chatHub");
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;

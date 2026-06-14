@@ -41,7 +41,7 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Checkout(string diaChi, double? customerLat, double? customerLng)
+        public async Task<IActionResult> Checkout(string diaChi, double? customerLat, double? customerLng, string paymentMethod, decimal? shippingFee)
         {
             var user = await _userManager.GetUserAsync(User);
             var cartItems = await _context.GioHangs
@@ -51,21 +51,26 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Controllers
 
             if (!cartItems.Any())
             {
-                TempData["ErrorMessage"] = "Giỏ hàng của bạn đang trống!";
-                return RedirectToAction("Index", "Cart");
+                return Json(new { success = false, message = "Giỏ hàng của bạn đang trống!" });
             }
 
             var tongTien = cartItems.Sum(c => c.SoLuong * c.Thuoc.GiaHienTai);
+            var finalTotal = tongTien;
+            if (shippingFee.HasValue && shippingFee.Value > 0)
+            {
+                finalTotal += shippingFee.Value;
+            }
 
             var hoaDon = new HoaDon
             {
                 UserId = user.Id,
                 NgayDat = DateTime.Now,
-                TongTien = tongTien,
+                TongTien = finalTotal,
                 TrangThai = "Chờ Xử Lý",
                 DiaChiGiaoHang = diaChi,
                 CustomerLat = customerLat,
-                CustomerLng = customerLng
+                CustomerLng = customerLng,
+                PaymentMethod = paymentMethod
             };
 
             _context.HoaDons.Add(hoaDon);
@@ -99,8 +104,7 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Controllers
 
             await _context.SaveChangesAsync();
 
-            TempData["SuccessMessage"] = "Đặt hàng thành công!";
-            return RedirectToAction(nameof(MyOrders));
+            return Json(new { success = true, orderId = hoaDon.MaHoaDon, message = "Đặt hàng thành công!" });
         }
 
         public async Task<IActionResult> MyOrders()

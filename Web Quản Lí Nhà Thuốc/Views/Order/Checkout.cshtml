@@ -6,16 +6,107 @@
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <style>
-    #map { height: 400px; width: 100%; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 2px solid #dee2e6; z-index: 1; }
-    .checkout-card { border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border: none; }
-    .order-summary { background-color: #f8f9fa; border-radius: 15px; padding: 20px; }
+    #map { height: 400px; width: 100%; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border: 1px solid #dee2e6; z-index: 1; }
+    .checkout-card { border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.06); border: none; }
+    .order-summary { background-color: #f8f9fa; border-radius: 16px; padding: 25px; border: 1px solid #e9ecef; }
+    
+    /* Modern Payment Card styles */
+    .payment-method-card {
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        cursor: pointer;
+        background-color: #ffffff;
+        position: relative;
+        overflow: hidden;
+    }
+    .payment-method-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 16px rgba(0,0,0,0.05);
+        border-color: #cbd5e1;
+    }
+    .payment-method-card.active {
+        border-color: #0d6efd !important;
+        background-color: #f0f7ff !important;
+        box-shadow: 0 4px 12px rgba(13, 110, 253, 0.08);
+    }
+    .payment-method-card.active i.main-icon {
+        color: #0d6efd !important;
+    }
+    .payment-method-card .method-radio-icon {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        color: #cbd5e1;
+        font-size: 1.15rem;
+        transition: color 0.2s;
+    }
+    .payment-method-card.active .method-radio-icon {
+        color: #0d6efd;
+    }
+    
+    /* Online Provider Card styles */
+    .online-provider-card {
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        transition: all 0.2s;
+        cursor: pointer;
+        background-color: #ffffff;
+        text-align: center;
+    }
+    .online-provider-card:hover {
+        border-color: #cbd5e1;
+        transform: scale(1.03);
+    }
+    .online-provider-card.active {
+        border-color: #0d6efd !important;
+        background-color: #f0f7ff !important;
+        box-shadow: 0 4px 8px rgba(13, 110, 253, 0.05);
+    }
+    
+    .payment-details-panel {
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        background-color: #f8f9fa;
+        animation: slideDown 0.3s ease-out;
+    }
+    
+    .btn-dark-green {
+        background-color: #157347 !important;
+        color: #ffffff !important;
+        border: none !important;
+        transition: all 0.25s;
+    }
+    .btn-dark-green:hover {
+        background-color: #198754 !important;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(25, 135, 84, 0.25);
+    }
+    .btn-dark-green:disabled {
+        background-color: #6c757d !important;
+        transform: none;
+        box-shadow: none;
+    }
+    
+    .success-icon-wrapper {
+        animation: scaleIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    
+    @@keyframes slideDown {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    @@keyframes scaleIn {
+        from { transform: scale(0); opacity: 0; }
+        to { transform: scale(1); opacity: 1; }
+    }
 </style>
 
 <div class="container mt-4 mb-5">
     <h2 class="mb-4 fw-bold text-primary"><i class="bi bi-cart-check-fill me-2"></i>Thanh Toán Đơn Hàng</h2>
 
     <div class="row">
-        <!-- Cột trái: Form thông tin & Bản đồ -->
+        <!-- Cột trái: Form thông tin & Bản đồ & Phương thức thanh toán -->
         <div class="col-lg-7">
             <div class="card checkout-card mb-4">
                 <div class="card-body p-4">
@@ -24,9 +115,12 @@
                     
                     <div id="map"></div>
 
-                    <form asp-action="Checkout" method="post" id="checkoutForm">
+                    <form id="checkoutForm">
                         <input type="hidden" id="CustomerLat" name="customerLat" required />
                         <input type="hidden" id="CustomerLng" name="customerLng" required />
+                        <input type="hidden" id="PaymentMethod" name="paymentMethod" value="COD" />
+                        <input type="hidden" id="ShippingFee" name="shippingFee" value="0" />
+                        <input type="hidden" id="SelectedOnlineProvider" name="selectedOnlineProvider" value="" />
 
                         <div class="mb-3">
                             <label for="diaChi" class="form-label fw-bold">Địa chỉ chi tiết (Số nhà, tên đường...)</label>
@@ -37,8 +131,157 @@
                             <i class="bi bi-info-circle-fill me-2"></i> Hệ thống sẽ dựa vào tọa độ trên bản đồ để Shipper giao hàng chính xác đến bạn.
                         </div>
 
-                        <button type="button" class="btn btn-success btn-lg w-100 mt-3 rounded-pill fw-bold" onclick="submitOrder()">
-                            <i class="bi bi-check-circle-fill me-2"></i>XÁC NHẬN ĐẶT HÀNG
+                        <!-- Thêm mục mới: Phương thức thanh toán -->
+                        <div class="mb-4 mt-4 border-top pt-4">
+                            <label class="form-label fw-bold mb-3 d-flex align-items-center fs-5 text-dark">
+                                <i class="bi bi-credit-card-2-front-fill text-primary me-2"></i> Phương thức thanh toán
+                            </label>
+
+                            <div class="row g-3">
+                                <!-- COD Card -->
+                                <div class="col-md-4">
+                                    <div class="card payment-method-card active h-100" id="card-COD" onclick="selectPaymentMethod('COD')">
+                                        <i class="bi bi-check-circle-fill method-radio-icon" id="radio-COD"></i>
+                                        <div class="card-body text-center py-4">
+                                            <i class="bi bi-truck fs-1 text-secondary main-icon mb-3 d-block"></i>
+                                            <h6 class="fw-bold mb-1" style="font-size: 0.95rem;">Thanh toán COD</h6>
+                                            <small class="text-muted" style="font-size: 0.75rem;">Khi nhận hàng</small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- QR Banking Card -->
+                                <div class="col-md-4">
+                                    <div class="card payment-method-card h-100" id="card-QR_Banking" onclick="selectPaymentMethod('QR_Banking')">
+                                        <i class="bi bi-circle method-radio-icon" id="radio-QR_Banking"></i>
+                                        <div class="card-body text-center py-4">
+                                            <i class="bi bi-qr-code fs-1 text-secondary main-icon mb-3 d-block"></i>
+                                            <h6 class="fw-bold mb-1" style="font-size: 0.95rem;">QR Banking</h6>
+                                            <small class="text-muted" style="font-size: 0.75rem;">Quét mã chuyển khoản</small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Online Payment Card -->
+                                <div class="col-md-4">
+                                    <div class="card payment-method-card h-100" id="card-Online" onclick="selectPaymentMethod('Online')">
+                                        <i class="bi bi-circle method-radio-icon" id="radio-Online"></i>
+                                        <div class="card-body text-center py-4">
+                                            <i class="bi bi-wallet2 fs-1 text-secondary main-icon mb-3 d-block"></i>
+                                            <h6 class="fw-bold mb-1" style="font-size: 0.95rem;">Thanh toán Online</h6>
+                                            <small class="text-muted" style="font-size: 0.75rem;">Ví điện tử / Thẻ</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- QR Banking Drawer (Initially Hidden) -->
+                            <div id="qr-banking-panel" class="payment-details-panel mt-3 p-4" style="display: none;">
+                                <div class="row align-items-center">
+                                    <div class="col-md-7">
+                                        <h6 class="fw-bold text-dark mb-3"><i class="bi bi-bank me-2 text-primary"></i>Thông tin chuyển khoản</h6>
+                                        <table class="table table-sm table-borderless mb-0" style="font-size: 0.9rem;">
+                                            <tbody>
+                                                <tr>
+                                                    <td class="text-muted py-1 ps-0" style="width: 110px;">Ngân hàng:</td>
+                                                    <td class="fw-bold text-dark py-1">MB Bank (Ngân hàng Quân Đội)</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="text-muted py-1 ps-0">Số tài khoản:</td>
+                                                    <td class="fw-bold text-dark py-1">970422920138294</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="text-muted py-1 ps-0">Chủ tài khoản:</td>
+                                                    <td class="fw-bold text-dark py-1">NHÀ THUỐC PHARMAHUB</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        <button type="button" class="btn btn-primary btn-sm mt-3 rounded-pill px-4 fw-bold" onclick="generateQR()">
+                                            <i class="bi bi-qr-code-scan me-1"></i> Tạo mã QR
+                                        </button>
+                                    </div>
+                                    <div class="col-md-5 text-center mt-3 mt-md-0">
+                                        <div id="qr-display-container" class="bg-white p-3 d-inline-block rounded-3 border shadow-sm" style="display: none; min-width: 170px; min-height: 170px;">
+                                            <div id="qr-spinner" class="spinner-border text-primary my-4" role="status" style="display: none;"></div>
+                                            <img id="qr-image" src="" alt="VietQR Code" class="img-fluid" style="display: none; max-width: 150px;">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Online Payment Drawer (Initially Hidden) -->
+                            <div id="online-panel" class="payment-details-panel mt-3 p-4" style="display: none;">
+                                <h6 class="fw-bold text-dark mb-3"><i class="bi bi-shield-lock-fill me-2 text-primary"></i>Chọn ví điện tử / thẻ thanh toán</h6>
+                                
+                                <div class="row g-3 mb-4">
+                                    <!-- VNPay -->
+                                    <div class="col-4">
+                                        <div class="card online-provider-card p-3 h-100" id="card-VNPay" onclick="selectOnlineProvider('VNPay')">
+                                            <div class="mx-auto mb-2 d-flex align-items-center justify-content-center" style="height: 30px;">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 50" width="75" height="25">
+                                                    <text x="75" y="36" font-family="'Segoe UI', Roboto, sans-serif" font-weight="900" font-size="32" fill="#005baa" text-anchor="middle">VN<tspan fill="#e03c31">PAY</tspan></text>
+                                                </svg>
+                                            </div>
+                                            <div class="fw-bold text-dark" style="font-size: 0.75rem;">VNPay</div>
+                                        </div>
+                                    </div>
+                                    <!-- MoMo -->
+                                    <div class="col-4">
+                                        <div class="card online-provider-card p-3 h-100" id="card-MoMo" onclick="selectOnlineProvider('MoMo')">
+                                            <div class="mx-auto mb-2 d-flex align-items-center justify-content-center" style="height: 30px;">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="30" height="30">
+                                                    <rect width="100" height="100" rx="22" fill="#a50064"/>
+                                                    <text x="50" y="63" font-family="'Segoe UI', Roboto, sans-serif" font-weight="bold" font-size="28" fill="#ffffff" text-anchor="middle">momo</text>
+                                                </svg>
+                                            </div>
+                                            <div class="fw-bold text-dark" style="font-size: 0.75rem;">Ví MoMo</div>
+                                        </div>
+                                    </div>
+                                    <!-- ZaloPay -->
+                                    <div class="col-4">
+                                        <div class="card online-provider-card p-3 h-100" id="card-ZaloPay" onclick="selectOnlineProvider('ZaloPay')">
+                                            <div class="mx-auto mb-2 d-flex align-items-center justify-content-center" style="height: 30px;">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 150 50" width="75" height="25">
+                                                    <rect width="150" height="50" rx="12" fill="#008fe5"/>
+                                                    <text x="75" y="35" font-family="'Segoe UI', Roboto, sans-serif" font-weight="bold" font-size="24" fill="#ffffff" text-anchor="middle">Zalo<tspan fill="#a4f321">Pay</tspan></text>
+                                                </svg>
+                                            </div>
+                                            <div class="fw-bold text-dark" style="font-size: 0.75rem;">Ví ZaloPay</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="border-top pt-3">
+                                    <div class="d-flex justify-content-between mb-2 text-muted" style="font-size: 0.95rem;">
+                                        <span>Tổng tiền:</span>
+                                        <span class="fw-semibold text-dark">@((ViewBag.TongTien ?? 0).ToString("N0")) đ</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-2 text-muted" style="font-size: 0.95rem;">
+                                        <span>Phí giao hàng:</span>
+                                        <span class="fw-semibold text-success">+30.000 đ</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-3 border-bottom pb-2" style="font-size: 0.95rem;">
+                                        <span class="fw-bold text-dark fs-5">Thành tiền:</span>
+                                        <span class="fw-extrabold text-danger fs-4" id="online-total-display">@(((ViewBag.TongTien ?? 0) + 30000).ToString("N0")) đ</span>
+                                    </div>
+
+                                    <div class="form-check mt-3">
+                                        <input class="form-check-input" type="checkbox" id="termsAgreement" style="cursor: pointer;">
+                                        <label class="form-check-label text-muted small fw-medium" for="termsAgreement" style="cursor: pointer; user-select: none;">
+                                            Tôi đồng ý điều khoản thanh toán
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Validation Error Display -->
+                        <div id="validationAlert" class="alert alert-danger mt-3" style="display: none;">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i> <span id="validationAlertText">Vui lòng điền đầy đủ thông tin.</span>
+                        </div>
+
+                        <button type="button" class="btn btn-dark-green btn-lg w-100 mt-4 rounded-pill fw-bold" onclick="submitCheckoutForm()">
+                            <i class="bi bi-credit-card-fill me-2"></i>THANH TOÁN VÀ ĐẶT HÀNG
                         </button>
                     </form>
                 </div>
@@ -69,8 +312,33 @@
                 
                 <div class="d-flex justify-content-between align-items-center border-top pt-3">
                     <h5 class="mb-0 fw-bold">Tổng cộng:</h5>
-                    <h4 class="mb-0 text-danger fw-bold">@((ViewBag.TongTien ?? 0).ToString("N0")) đ</h4>
+                    <h4 class="mb-0 text-danger fw-bold" id="summary-total-display">@((ViewBag.TongTien ?? 0).ToString("N0")) đ</h4>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Đặt Hàng Thành Công -->
+<div class="modal fade" id="successOrderModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true" style="z-index: 9999;">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-body text-center p-5">
+                <div class="success-icon-wrapper mb-4 d-inline-flex align-items-center justify-content-center bg-success bg-opacity-10 text-success rounded-circle" style="width: 80px; height: 80px;">
+                    <i class="bi bi-check-circle-fill" style="font-size: 3.5rem;"></i>
+                </div>
+                <h3 class="fw-bold text-dark mb-2">Đặt hàng thành công!</h3>
+                <p class="text-muted mb-4">Cảm ơn bạn đã tin tưởng và mua sắm tại Nhà Thuốc PharmaHub.</p>
+                
+                <div class="p-3 bg-light rounded-3 mb-4">
+                    <span class="text-muted small d-block mb-1">MÃ ĐƠN HÀNG CỦA BẠN</span>
+                    <strong class="fs-4 text-primary" id="modal-order-id">#0000</strong>
+                </div>
+                
+                <button type="button" class="btn btn-primary btn-lg rounded-pill px-5 fw-bold shadow-sm" onclick="redirectToTracking()">
+                    <i class="bi bi-geo-alt-fill me-2"></i>Theo dõi đơn hàng
+                </button>
+                <div class="text-muted small mt-3">Tự động chuyển trang sau <span id="countdown-sec" class="fw-bold">5</span> giây...</div>
             </div>
         </div>
     </div>
@@ -126,13 +394,204 @@
         // Đảm bảo có tọa độ mặc định ban đầu
         updateHiddenInputs(10.762622, 106.660172);
 
-        function submitOrder() {
+        // Logic xử lý phương thức thanh toán
+        var orderTotalAmount = @(ViewBag.TongTien ?? 0);
+        var createdOrderId = null;
+
+        function selectPaymentMethod(method) {
+            // Update hidden inputs
+            document.getElementById('PaymentMethod').value = method;
+            
+            // Update card UI active states
+            document.querySelectorAll('.payment-method-card').forEach(function(card) {
+                card.classList.remove('active');
+            });
+            document.getElementById('card-' + method).classList.add('active');
+
+            // Update radio icons
+            document.querySelectorAll('.method-radio-icon').forEach(function(icon) {
+                icon.className = 'bi bi-circle method-radio-icon';
+            });
+            document.getElementById('radio-' + method).className = 'bi bi-check-circle-fill method-radio-icon';
+
+            // Show or hide drawers
+            if (method === 'QR_Banking') {
+                document.getElementById('qr-banking-panel').style.display = 'block';
+                document.getElementById('online-panel').style.display = 'none';
+                document.getElementById('ShippingFee').value = '0';
+                updateSummaryTotal(orderTotalAmount);
+            } else if (method === 'Online') {
+                document.getElementById('qr-banking-panel').style.display = 'none';
+                document.getElementById('online-panel').style.display = 'block';
+                document.getElementById('ShippingFee').value = '30000';
+                updateSummaryTotal(orderTotalAmount + 30000);
+            } else { // COD
+                document.getElementById('qr-banking-panel').style.display = 'none';
+                document.getElementById('online-panel').style.display = 'none';
+                document.getElementById('ShippingFee').value = '0';
+                updateSummaryTotal(orderTotalAmount);
+            }
+
+            // Clear validations
+            hideValidationError();
+        }
+
+        function updateSummaryTotal(amount) {
+            document.getElementById('summary-total-display').innerText = amount.toLocaleString('vi-VN') + ' đ';
+        }
+
+        function selectOnlineProvider(provider) {
+            document.getElementById('SelectedOnlineProvider').value = provider;
+            
+            document.querySelectorAll('.online-provider-card').forEach(function(card) {
+                card.classList.remove('active');
+            });
+            document.getElementById('card-' + provider).classList.add('active');
+            
+            hideValidationError();
+        }
+
+        function generateQR() {
+            var container = document.getElementById('qr-display-container');
+            var spinner = document.getElementById('qr-spinner');
+            var img = document.getElementById('qr-image');
+
+            container.style.display = 'inline-block';
+            spinner.style.display = 'inline-block';
+            img.style.display = 'none';
+
+            // API VietQR to generate code
+            var bankId = "MB";
+            var accountNo = "970422920138294";
+            var template = "compact";
+            var description = encodeURIComponent("PHARMAHUB CK");
+            var accountName = encodeURIComponent("NHA THUOC PHARMAHUB");
+            var qrUrl = `https://img.vietqr.io/image/${bankId}-${accountNo}-${template}.png?amount=${orderTotalAmount}&addInfo=${description}&accountName=${accountName}`;
+
+            img.onload = function() {
+                spinner.style.display = 'none';
+                img.style.display = 'block';
+            };
+            img.onerror = function() {
+                spinner.style.display = 'none';
+                container.style.display = 'none';
+                showValidationError("Lỗi không thể tải ảnh mã QR. Vui lòng thử lại!");
+            };
+            img.src = qrUrl;
+        }
+
+        function showValidationError(text) {
+            var alertDiv = document.getElementById('validationAlert');
+            document.getElementById('validationAlertText').innerText = text;
+            alertDiv.style.display = 'block';
+            alertDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function hideValidationError() {
+            document.getElementById('validationAlert').style.display = 'none';
+        }
+
+        // Submit form via AJAX
+        function submitCheckoutForm() {
+            hideValidationError();
+
             var form = document.getElementById('checkoutForm');
-            if(form.checkValidity()) {
-                form.submit();
-            } else {
-                form.reportValidity();
+            var address = document.getElementById('diaChi').value.trim();
+            var paymentMethod = document.getElementById('PaymentMethod').value;
+            
+            // Standard validation
+            if (!address) {
+                showValidationError("Vui lòng nhập địa chỉ giao hàng cụ thể.");
+                document.getElementById('diaChi').focus();
+                return;
+            }
+
+            // Payment validations
+            if (paymentMethod === 'Online') {
+                var provider = document.getElementById('SelectedOnlineProvider').value;
+                if (!provider) {
+                    showValidationError("Vui lòng chọn một ví điện tử hoặc cổng thanh toán Online.");
+                    return;
+                }
+                
+                var agreement = document.getElementById('termsAgreement').checked;
+                if (!agreement) {
+                    showValidationError("Bạn phải đồng ý với điều khoản thanh toán để tiếp tục.");
+                    return;
+                }
+            }
+
+            var lat = document.getElementById('CustomerLat').value;
+            var lng = document.getElementById('CustomerLng').value;
+            var shippingFee = document.getElementById('ShippingFee').value;
+
+            // Prepare AJAX data
+            var formData = new FormData();
+            formData.append('diaChi', address);
+            formData.append('customerLat', lat);
+            formData.append('customerLng', lng);
+            formData.append('paymentMethod', paymentMethod + (paymentMethod === 'Online' ? ' (' + document.getElementById('SelectedOnlineProvider').value + ')' : ''));
+            formData.append('shippingFee', shippingFee);
+
+            // Disable submit button and show loading state
+            var submitBtn = document.querySelector('.btn-dark-green');
+            var originalBtnHtml = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Đang xử lý đặt hàng...';
+
+            fetch('/Order/Checkout', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(function(response) {
+                if (!response.ok) {
+                    throw new Error("Lỗi mạng hoặc server không phản hồi.");
+                }
+                return response.json();
+            })
+            .then(function(data) {
+                if (data.success) {
+                    createdOrderId = data.orderId;
+                    
+                    // Show success modal
+                    document.getElementById('modal-order-id').innerText = '#' + createdOrderId;
+                    var successModal = new bootstrap.Modal(document.getElementById('successOrderModal'));
+                    successModal.show();
+
+                    // Start countdown
+                    var secondsLeft = 5;
+                    var countdownEl = document.getElementById('countdown-sec');
+                    countdownEl.innerText = secondsLeft;
+                    
+                    var timer = setInterval(function() {
+                        secondsLeft--;
+                        countdownEl.innerText = secondsLeft;
+                        if (secondsLeft <= 0) {
+                            clearInterval(timer);
+                            redirectToTracking();
+                        }
+                    }, 1000);
+                } else {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalBtnHtml;
+                    showValidationError(data.message || "Đã xảy ra lỗi khi xử lý đặt hàng.");
+                }
+            })
+            .catch(function(error) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalBtnHtml;
+                showValidationError(error.message || "Đã xảy ra lỗi kết nối. Vui lòng thử lại sau.");
+            });
+        }
+
+        function redirectToTracking() {
+            if (createdOrderId) {
+                window.location.href = '/OrderManagement/MapTracking/' + createdOrderId;
             }
         }
     </script>
 }
+

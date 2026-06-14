@@ -616,6 +616,674 @@
         window.updateTopbarCounts = updateTopbarCounts;
     </script>
 
+    <!-- SignalR & Tesseract.js CDNs -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+
+    <!-- Chatbot CSS Styles -->
+    <style>
+        /* Floating Chat Button */
+        .chatbot-float-btn {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #0d6efd, #0dcaf0);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(13, 110, 253, 0.35);
+            cursor: pointer;
+            z-index: 9998;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .chatbot-float-btn:hover {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 6px 20px rgba(13, 110, 253, 0.45);
+        }
+        .chatbot-float-btn.pulse-active {
+            animation: botPulse 2s infinite;
+        }
+        @@keyframes botPulse {
+            0% { box-shadow: 0 0 0 0 rgba(13, 110, 253, 0.5); }
+            70% { box-shadow: 0 0 0 12px rgba(13, 110, 253, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(13, 110, 253, 0); }
+        }
+        .chatbot-float-btn .avatar-badge {
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            width: 14px;
+            height: 14px;
+            background-color: #198754;
+            border: 2px solid white;
+            border-radius: 50%;
+        }
+
+        /* Chatbot Window */
+        .chatbot-window {
+            position: fixed;
+            bottom: 95px;
+            right: 25px;
+            width: 420px;
+            height: 600px;
+            background-color: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.12);
+            display: flex;
+            flex-direction: column;
+            z-index: 9999;
+            overflow: hidden;
+            border: 1px solid rgba(0,0,0,0.08);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            transform: scale(0);
+            transform-origin: bottom right;
+            opacity: 0;
+        }
+        .chatbot-window.open {
+            transform: scale(1);
+            opacity: 1;
+        }
+        
+        /* Header */
+        .chatbot-header {
+            background: linear-gradient(135deg, #0d6efd, #0b5ed7);
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .chatbot-header-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .chatbot-header-info .bot-img-wrapper {
+            width: 38px;
+            height: 38px;
+            background-color: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+        .chatbot-header-info .online-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #39FF14;
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 8px #39FF14;
+        }
+        
+        /* Body */
+        .chatbot-messages {
+            flex-grow: 1;
+            padding: 15px;
+            overflow-y: auto;
+            background-color: #f8f9fa;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .chat-bubble-container {
+            display: flex;
+            gap: 8px;
+            max-width: 85%;
+        }
+        .chat-bubble-container.user-msg {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+        .chat-bubble-container.bot-msg {
+            align-self: flex-start;
+        }
+        .chat-bubble-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+        .chat-bubble-avatar.bot-avatar {
+            background-color: #0d6efd;
+            color: white;
+        }
+        .chat-bubble-avatar.user-avatar {
+            background-color: #6c757d;
+            color: white;
+        }
+        .chat-bubble {
+            padding: 10px 14px;
+            border-radius: 16px;
+            font-size: 0.88rem;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+        .chat-bubble-container.user-msg .chat-bubble {
+            background-color: #0d6efd;
+            color: white;
+            border-top-right-radius: 4px;
+            box-shadow: 0 2px 5px rgba(13, 110, 253, 0.15);
+        }
+        .chat-bubble-container.bot-msg .chat-bubble {
+            background-color: white;
+            color: #333333;
+            border-top-left-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            border: 1px solid #e9ecef;
+        }
+        
+        /* Typing Indicator */
+        .typing-indicator-container {
+            align-self: flex-start;
+            display: flex;
+            gap: 8px;
+        }
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 10px 14px;
+            background-color: white;
+            border-radius: 16px;
+            border-top-left-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            border: 1px solid #e9ecef;
+        }
+        .typing-dot {
+            width: 6px;
+            height: 6px;
+            background-color: #6c757d;
+            border-radius: 50%;
+            animation: typingDot 1.4s infinite ease-in-out both;
+        }
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+        @@keyframes typingDot {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+        
+        /* Suggestion Chips */
+        .suggestion-chips-panel {
+            padding: 8px 12px;
+            background-color: #f8f9fa;
+            display: flex;
+            gap: 6px;
+            overflow-x: auto;
+            white-space: nowrap;
+            border-top: 1px solid #e9ecef;
+            scrollbar-width: none; /* Firefox */
+        }
+        .suggestion-chips-panel::-webkit-scrollbar {
+            display: none; /* Chrome/Safari */
+        }
+        .suggestion-chip {
+            background-color: white;
+            border: 1px solid #dee2e6;
+            color: #495057;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.78rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-block;
+        }
+        .suggestion-chip:hover {
+            background-color: #f0f7ff;
+            border-color: #0d6efd;
+            color: #0d6efd;
+        }
+
+        /* Footer / Input Group */
+        .chatbot-footer {
+            padding: 10px 12px;
+            background-color: white;
+            border-top: 1px solid #e9ecef;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .chatbot-footer textarea {
+            flex-grow: 1;
+            border: 1px solid #ced4da;
+            border-radius: 18px;
+            padding: 8px 12px;
+            resize: none;
+            height: 36px;
+            font-size: 0.88rem;
+            line-height: 1.3;
+            max-height: 60px;
+        }
+        .chatbot-footer textarea:focus {
+            outline: none;
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 0.15rem rgba(13, 110, 253, 0.15);
+        }
+        .chatbot-footer .action-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        .chatbot-footer .btn-upload {
+            background-color: #f8f9fa;
+            color: #6c757d;
+            font-size: 1.05rem;
+        }
+        .chatbot-footer .btn-upload:hover {
+            background-color: #e9ecef;
+            color: #495057;
+        }
+        .chatbot-footer .btn-send {
+            background-color: #198754;
+            color: white;
+            font-size: 0.95rem;
+        }
+        .chatbot-footer .btn-send:hover {
+            background-color: #157347;
+        }
+        
+        /* Responsive */
+        @@media (max-width: 576px) {
+            .chatbot-window {
+                width: 100%;
+                height: 100%;
+                bottom: 0;
+                right: 0;
+                border-radius: 0;
+                z-index: 10000;
+            }
+        }
+    </style>
+
+    <!-- Chatbot UI Markup -->
+    <div class="chatbot-float-btn pulse-active" onclick="toggleChatbot()" title="Trợ lý Nhà Thuốc AI">
+        <i class="bi bi-robot fs-4"></i>
+        <div class="avatar-badge"></div>
+    </div>
+
+    <div class="chatbot-window" id="pharmacistChatbot">
+        <!-- Header -->
+        <div class="chatbot-header">
+            <div class="chatbot-header-info">
+                <div class="bot-img-wrapper">
+                    <i class="bi bi-person-workspace"></i>
+                </div>
+                <div>
+                    <h6 class="fw-bold mb-0 text-white" style="font-size: 0.95rem;">🤖 Trợ lý Nhà Thuốc AI</h6>
+                    <small class="text-white-50 d-flex align-items-center gap-1" style="font-size: 0.72rem;">
+                        <span class="online-dot"></span> Đang hoạt động
+                    </small>
+                </div>
+            </div>
+            <button type="button" class="btn-close btn-close-white" aria-label="Close" onclick="toggleChatbot()"></button>
+        </div>
+        
+        <!-- Messages Area -->
+        <div class="chatbot-messages" id="chatbotMessagesList">
+            <!-- Greeting -->
+            <div class="chat-bubble-container bot-msg">
+                <div class="chat-bubble-avatar bot-avatar">
+                    <i class="bi bi-robot"></i>
+                </div>
+                <div class="chat-bubble">
+                    Xin chào! Tôi là <strong>Trợ lý Nhà Thuốc AI</strong> của PharmaHub. 🧑‍⚕️<br/>
+                    Tôi có thể hỗ trợ bạn tìm kiếm thuốc nhanh, tư vấn triệu chứng cơ bản và phát hiện tương tác thuốc. Hãy đặt câu hỏi cho tôi hoặc upload ảnh chụp đơn thuốc nhé!<br/><br/>
+                    <em class="text-muted" style="font-size: 0.78rem;">"Hỏi về thuốc, triệu chứng, đơn thuốc hoặc cách sử dụng."</em>
+                </div>
+            </div>
+        </div>
+
+        <!-- Suggestion Chips -->
+        <div class="suggestion-chips-panel">
+            <span class="suggestion-chip" onclick="sendQuickMessage('Tra cứu thuốc')">Tra thuốc</span>
+            <span class="suggestion-chip" onclick="sendQuickMessage('Đau đầu')">Đau đầu</span>
+            <span class="suggestion-chip" onclick="sendQuickMessage('Ho')">Ho</span>
+            <span class="suggestion-chip" onclick="sendQuickMessage('Sốt')">Sốt</span>
+            <span class="suggestion-chip" onclick="sendQuickMessage('Tìm Vitamin')">Vitamin</span>
+            <span class="suggestion-chip" onclick="sendQuickMessage('Tra cứu đơn thuốc')">Đơn thuốc</span>
+        </div>
+
+        <!-- Footer / Input Form -->
+        <div class="chatbot-footer">
+            <input type="file" id="chatbotPrescriptionInput" accept="image/*" style="display: none;" onchange="handlePrescriptionUpload(this)" />
+            <button type="button" class="action-btn btn-upload" onclick="document.getElementById('chatbotPrescriptionInput').click()" title="Tải ảnh đơn thuốc (OCR)">
+                <i class="bi bi-camera"></i>
+            </button>
+            <textarea id="chatbotInputField" placeholder="Nhập câu hỏi..." onkeydown="handleInputKeydown(event)"></textarea>
+            <button type="button" class="action-btn btn-send" onclick="sendUserMessage()" id="chatbotSendBtn">
+                <i class="bi bi-send-fill"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal Chi Tiết Sản Phẩm Chatbot -->
+    <div class="modal fade" id="drugDetailModal" tabindex="-1" aria-hidden="true" style="z-index: 10050;">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg rounded-4">
+                <div class="modal-header bg-primary text-white border-0 py-3">
+                    <h5 class="modal-title fw-bold" id="detailModalTitle">Chi Tiết Sản Phẩm</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="text-center mb-3">
+                        <img id="detailModalImg" src="" alt="Hình ảnh thuốc" class="img-fluid rounded border p-2 bg-white" style="max-height: 180px; object-fit: contain;">
+                    </div>
+                    <h4 class="fw-bold text-dark mb-1" id="detailModalName">Tên thuốc</h4>
+                    <div class="text-danger fw-bold fs-5 mb-3" id="detailModalPrice">0 đ</div>
+                    
+                    <div class="mb-3">
+                        <strong class="text-dark d-block mb-1" style="font-size: 0.9rem;">Mô tả sản phẩm:</strong>
+                        <p class="text-muted small mb-0" id="detailModalDesc" style="white-space: pre-line;">Mô tả chi tiết...</p>
+                    </div>
+                    <div class="mb-3">
+                        <strong class="text-dark d-block mb-1" style="font-size: 0.9rem;">Công dụng:</strong>
+                        <p class="text-muted small mb-0" id="detailModalUsage">Công dụng...</p>
+                    </div>
+                    <div>
+                        <strong class="text-dark d-block mb-1" style="font-size: 0.9rem;">Liều lượng tham khảo:</strong>
+                        <p class="text-muted small mb-0" id="detailModalDose">Liều lượng...</p>
+                    </div>
+                </div>
+                <div class="modal-footer border-top-0 py-3">
+                    <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">Đóng</button>
+                    <button type="button" class="btn btn-success rounded-pill px-4 fw-bold" id="detailModalAddBtn">
+                        <i class="bi bi-cart-plus me-1"></i>Thêm vào giỏ
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chatbot JS Integration Logic -->
+    <script>
+        var chatConnection = new signalR.HubConnectionBuilder()
+            .withUrl("/chatHub")
+            .build();
+
+        chatConnection.on("ReceiveUserMessage", function (message) {
+            appendUserBubble(message);
+        });
+
+        chatConnection.on("ReceiveBotMessage", function (message) {
+            appendBotBubble(message);
+        });
+
+        chatConnection.on("ReceiveTypingStatus", function (isTyping) {
+            toggleTypingIndicator(isTyping);
+        });
+
+        chatConnection.start().then(function() {
+            console.log("Connected to ChatHub successfully!");
+        }).catch(function (err) {
+            console.error("SignalR ChatHub Connection Error: ", err);
+        });
+
+        function toggleChatbot() {
+            var botWindow = document.getElementById('pharmacistChatbot');
+            botWindow.classList.toggle('open');
+            if(botWindow.classList.contains('open')) {
+                document.querySelector('.chatbot-float-btn').classList.remove('pulse-active');
+                scrollToChatBottom();
+                document.getElementById('chatbotInputField').focus();
+            } else {
+                document.querySelector('.chatbot-float-btn').classList.add('pulse-active');
+            }
+        }
+
+        function handleInputKeydown(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendUserMessage();
+            }
+        }
+
+        function sendUserMessage() {
+            var inputField = document.getElementById('chatbotInputField');
+            var msg = inputField.value.trim();
+            if (!msg) return;
+
+            inputField.value = "";
+            chatConnection.invoke("AskAI", msg).catch(function (err) {
+                console.error(err.toString());
+            });
+        }
+
+        function sendQuickMessage(text) {
+            chatConnection.invoke("AskAI", text).catch(function (err) {
+                console.error(err.toString());
+            });
+        }
+
+        function appendUserBubble(text) {
+            var chatList = document.getElementById('chatbotMessagesList');
+            var bubbleHtml = `
+                <div class="chat-bubble-container user-msg">
+                    <div class="chat-bubble-avatar user-avatar">
+                        <i class="bi bi-person-fill"></i>
+                    </div>
+                    <div class="chat-bubble">
+                        ${text}
+                    </div>
+                </div>`;
+            chatList.innerHTML += bubbleHtml;
+            scrollToChatBottom();
+        }
+
+        function appendBotBubble(text) {
+            var chatList = document.getElementById('chatbotMessagesList');
+            var bubbleHtml = `
+                <div class="chat-bubble-container bot-msg">
+                    <div class="chat-bubble-avatar bot-avatar">
+                        <i class="bi bi-robot"></i>
+                    </div>
+                    <div class="chat-bubble">
+                        ${text}
+                    </div>
+                </div>`;
+            chatList.innerHTML += bubbleHtml;
+            scrollToChatBottom();
+        }
+
+        function toggleTypingIndicator(show) {
+            var chatList = document.getElementById('chatbotMessagesList');
+            var existingIndicator = document.getElementById('botTypingIndicator');
+            
+            if (show) {
+                if (!existingIndicator) {
+                    var indicatorHtml = `
+                        <div class="typing-indicator-container" id="botTypingIndicator">
+                            <div class="chat-bubble-avatar bot-avatar">
+                                <i class="bi bi-robot"></i>
+                            </div>
+                            <div class="typing-indicator">
+                                <div class="typing-dot"></div>
+                                <div class="typing-dot"></div>
+                                <div class="typing-dot"></div>
+                            </div>
+                        </div>`;
+                    chatList.innerHTML += indicatorHtml;
+                }
+            } else {
+                if (existingIndicator) {
+                    existingIndicator.remove();
+                }
+            }
+            scrollToChatBottom();
+        }
+
+        function scrollToChatBottom() {
+            var msgsDiv = document.getElementById('chatbotMessagesList');
+            msgsDiv.scrollTop = msgsDiv.scrollHeight;
+        }
+
+        // Add drug to cart via AJAX
+        function addDrugToCart(id, name) {
+            var formData = new FormData();
+            formData.append('id', id);
+
+            fetch('/Cart/AddToCartAjax', {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    // Update global badges
+                    if (window.updateTopbarCounts) {
+                        window.updateTopbarCounts();
+                    } else {
+                        var badge = document.getElementById("cartBadge");
+                        if (badge) {
+                            badge.innerText = data.cartCount;
+                            badge.style.display = "inline-block";
+                        }
+                    }
+                    
+                    // Display response in chat
+                    appendBotBubble(`✅ Đã thêm <strong>${name}</strong> vào giỏ hàng thành công!`);
+                } else {
+                    appendBotBubble(`❌ Thêm giỏ hàng thất bại: ${data.message}`);
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                appendBotBubble(`❌ Lỗi kết nối khi thêm vào giỏ hàng.`);
+            });
+        }
+
+        // Add all OCR matched drugs to cart
+        async function addAllDrugsToCart(ids) {
+            appendBotBubble("🛒 Đang thêm tất cả thuốc trong đơn vào giỏ hàng của bạn...");
+            toggleTypingIndicator(true);
+
+            let addedCount = 0;
+            for (let id of ids) {
+                try {
+                    var formData = new FormData();
+                    formData.append('id', id);
+                    let res = await fetch('/Cart/AddToCartAjax', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    let data = await res.json();
+                    if (data.success) {
+                        addedCount++;
+                    }
+                } catch (e) {
+                    console.error(e);
+                }
+            }
+
+            toggleTypingIndicator(false);
+            if (window.updateTopbarCounts) {
+                window.updateTopbarCounts();
+            }
+            appendBotBubble(`✅ Thành công! Đã thêm <strong>${addedCount}</strong> thuốc từ đơn vào giỏ hàng của bạn.`);
+        }
+
+        // Open detailed popup from chatbot list
+        function showDetailPopup(id, name, img, price, desc, usage, dose) {
+            document.getElementById('detailModalTitle').innerText = name;
+            document.getElementById('detailModalName').innerText = name;
+            document.getElementById('detailModalPrice').innerText = price;
+            document.getElementById('detailModalImg').src = img;
+            document.getElementById('detailModalDesc').innerText = desc;
+            document.getElementById('detailModalUsage').innerText = usage;
+            document.getElementById('detailModalDose').innerText = dose;
+            
+            document.getElementById('detailModalAddBtn').onclick = function() {
+                addDrugToCart(id, name);
+                var modalEl = document.getElementById('drugDetailModal');
+                var modalInstance = bootstrap.Modal.getInstance(modalEl);
+                if (modalInstance) modalInstance.hide();
+            };
+
+            var detailModal = new bootstrap.Modal(document.getElementById('drugDetailModal'));
+            detailModal.show();
+        }
+
+        // Handle image upload and OCR parsing client-side via Tesseract.js
+        function handlePrescriptionUpload(input) {
+            if (!input.files || !input.files[0]) return;
+            var file = input.files[0];
+            
+            // Log file info
+            appendUserBubble(`📷 <em>Đã tải lên ảnh đơn thuốc: ${file.name}</em>`);
+            toggleTypingIndicator(true);
+            
+            // Render loading text details
+            var chatList = document.getElementById('chatbotMessagesList');
+            var logBubble = document.createElement('div');
+            logBubble.className = "chat-bubble-container bot-msg";
+            logBubble.innerHTML = `
+                <div class="chat-bubble-avatar bot-avatar">
+                    <i class="bi bi-robot"></i>
+                </div>
+                <div class="chat-bubble text-muted small" id="ocrLogBubble">
+                    <i class="bi bi-arrow-repeat spin me-2"></i> Khởi tạo công cụ quét đơn thuốc AI OCR... (0%)
+                </div>`;
+            chatList.appendChild(logBubble);
+            scrollToChatBottom();
+
+            // Run Tesseract.js OCR
+            Tesseract.recognize(
+                file,
+                'eng+vie',
+                {
+                    logger: m => {
+                        if (m.status === 'recognizing') {
+                            var percent = Math.round(m.progress * 100);
+                            var logBubbleEl = document.getElementById('ocrLogBubble');
+                            if (logBubbleEl) {
+                                logBubbleEl.innerHTML = `<i class="bi bi-hourglass-split me-2 text-primary"></i> Đang đọc chữ trên đơn thuốc... (${percent}%)`;
+                            }
+                        }
+                    }
+                }
+            ).then(({ data: { text } }) => {
+                var logBubbleEl = document.getElementById('ocrLogBubble');
+                if (logBubbleEl) logBubbleEl.remove(); // Clean up progress bubble
+                
+                console.log("OCR Result Text: ", text);
+                
+                // Submit text to hub to match database medicines
+                chatConnection.invoke("ProcessPrescriptionText", text).catch(function (err) {
+                    console.error("SignalR ProcessPrescriptionText invoke error: ", err);
+                    toggleTypingIndicator(false);
+                    appendBotBubble("❌ Lỗi xử lý dữ liệu sau OCR trên máy chủ.");
+                });
+            }).catch(err => {
+                console.error("Tesseract OCR Exception: ", err);
+                var logBubbleEl = document.getElementById('ocrLogBubble');
+                if (logBubbleEl) logBubbleEl.remove();
+                toggleTypingIndicator(false);
+                appendBotBubble("❌ Lỗi quét văn bản đơn thuốc. Hãy thử chụp ảnh rõ nét hơn dưới ánh sáng tốt.");
+            });
+
+            // Clear input so same file can be re-uploaded
+            input.value = "";
+        }
+    </script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
+

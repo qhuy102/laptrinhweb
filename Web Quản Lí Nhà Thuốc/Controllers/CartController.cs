@@ -79,5 +79,49 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Controllers
 
             return RedirectToAction("Index");
         }
+
+        [HttpPost]
+        public async Task<IActionResult> AddToCartAjax(int id)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null) 
+            {
+                return Json(new { success = false, message = "Bạn cần đăng nhập để thêm vào giỏ hàng." });
+            }
+
+            var cartItem = await _context.GioHangs
+                .FirstOrDefaultAsync(x => x.UserId == user.Id && x.MaThuoc == id);
+
+            if (cartItem == null)
+            {
+                var thuoc = await _context.Thuocs.FindAsync(id);
+                if (thuoc == null) 
+                {
+                    return Json(new { success = false, message = "Không tìm thấy thuốc này trong hệ thống." });
+                }
+
+                cartItem = new GioHang
+                {
+                    UserId = user.Id,
+                    MaThuoc = id,
+                    SoLuong = 1,
+                    Thuoc = thuoc
+                };
+
+                _context.GioHangs.Add(cartItem);
+            }
+            else
+            {
+                cartItem.SoLuong++;
+            }
+
+            await _context.SaveChangesAsync();
+
+            var totalCount = await _context.GioHangs
+                .Where(x => x.UserId == user.Id)
+                .SumAsync(x => x.SoLuong);
+
+            return Json(new { success = true, cartCount = totalCount });
+        }
     }
 }

@@ -1150,5 +1150,5 @@ C:\Users\Windows 11\Desktop\New folder (2)\laptrinhweb\Web Quản Lí Nhà Thu�
 C:\Users\Windows 11\Desktop\New folder (2)\laptrinhweb\Web Quản Lí Nhà Thuốc\obj\Debug\net8.0\Web Quản Lí Nhà Thuốc.genruntimeconfig.cache
 C:\Users\Windows 11\Desktop\New folder (2)\laptrinhweb\Web Quản Lí Nhà Thuốc\obj\Debug\net8.0\ref\Web Quản Lí Nhà Thuốc.dll
 D:\laptrinhweb\Web Quản Lí Nhà Thuốc\obj\Debug\net8.0\swae.build.ex.cache
-D:\laptrinhweb\Web Quản Lí Nhà Thuốc\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
 C:\Users\Windows 11\Desktop\New folder (2)\laptrinhweb\Web Quản Lí Nhà Thuốc\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
+D:\laptrinhweb\Web Quản Lí Nhà Thuốc\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt

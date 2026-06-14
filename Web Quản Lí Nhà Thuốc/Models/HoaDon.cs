@@ -28,5 +28,6 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Models
 
         public double? CustomerLng { get; set; }
 
+        public string? PaymentMethod { get; set; }
     }
 }
