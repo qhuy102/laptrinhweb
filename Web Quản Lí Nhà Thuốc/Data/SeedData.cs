@@ -134,26 +134,26 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Data
 
         private static async Task SeedMedicines(PharmacyDbContext context)
         {
-            // First check if categories exist
-            if (!context.LoaiThuocs.Any())
+            // Ensure all 7 categories are seeded
+            var catNames = new List<string> { "Thuốc kê đơn", "Thuốc không kê đơn", "Thực phẩm chức năng", "Dược mỹ phẩm", "Mẹ và bé", "Thiết bị y tế", "Sản phẩm tiện lợi" };
+            foreach (var name in catNames)
             {
-                var categories = new List<LoaiThuoc>
+                if (!context.LoaiThuocs.Any(c => c.TenLoai == name))
                 {
-                    new LoaiThuoc { TenLoai = "Thuốc kê đơn" },
-                    new LoaiThuoc { TenLoai = "Thuốc không kê đơn" },
-                    new LoaiThuoc { TenLoai = "Thực phẩm chức năng" },
-                    new LoaiThuoc { TenLoai = "Dược mỹ phẩm" }
-                };
-                await context.LoaiThuocs.AddRangeAsync(categories);
-                await context.SaveChangesAsync();
+                    await context.LoaiThuocs.AddAsync(new LoaiThuoc { TenLoai = name });
+                }
             }
+            await context.SaveChangesAsync();
 
             var keDon = context.LoaiThuocs.FirstOrDefault(c => c.TenLoai == "Thuốc kê đơn");
             var khongKeDon = context.LoaiThuocs.FirstOrDefault(c => c.TenLoai == "Thuốc không kê đơn");
             var tpcn = context.LoaiThuocs.FirstOrDefault(c => c.TenLoai == "Thực phẩm chức năng");
             var duocMyPham = context.LoaiThuocs.FirstOrDefault(c => c.TenLoai == "Dược mỹ phẩm");
+            var meBe = context.LoaiThuocs.FirstOrDefault(c => c.TenLoai == "Mẹ và bé");
+            var thietBiYTe = context.LoaiThuocs.FirstOrDefault(c => c.TenLoai == "Thiết bị y tế");
+            var sanPhamTienLoi = context.LoaiThuocs.FirstOrDefault(c => c.TenLoai == "Sản phẩm tiện lợi");
 
-            if (keDon == null || khongKeDon == null || tpcn == null || duocMyPham == null) return;
+            if (keDon == null || khongKeDon == null || tpcn == null || duocMyPham == null || meBe == null || thietBiYTe == null || sanPhamTienLoi == null) return;
 
             // Remove existing medicines to recreate with complete schema
             var existingDrugs = await context.Thuocs.ToListAsync();
@@ -258,7 +258,87 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Data
                         CongDung = "Bổ sung vitamin C, hỗ trợ tăng đề kháng cơ thể, giảm mệt mỏi.",
                         ChongChiDinh = "Người bị sỏi thận, tăng oxalate niệu.",
                         LieuLuong = "Uống 1 viên mỗi ngày sau bữa ăn sáng.",
-                        NhomDieuTri = "Bổ sung đề kháng - Vitamin"
+                        NhomDieuTri = "Tăng đề kháng & Miễn dịch"
+                    },
+                    new Thuoc
+                    {
+                        TenThuoc = "Ginkgo Biloba 120mg",
+                        DonGia = 8500,
+                        SoLuong = 180,
+                        MoTa = "Hỗ trợ tăng cường tuần hoàn não, giảm các triệu chứng thiểu năng tuần hoàn não như đau đầu, chóng mặt, suy giảm trí nhớ.",
+                        HanSuDung = DateTime.Now.AddYears(2),
+                        LoaiThuocId = tpcn.Id,
+                        DonViCoBan = "Viên",
+                        HoatChat = "Ginkgo Biloba",
+                        ViTriKe = "Kệ D - Tầng 2",
+                        CongDung = "Cải thiện trí nhớ, giảm căng thẳng, tăng cường lưu thông máu não.",
+                        ChongChiDinh = "Người chuẩn bị phẫu thuật, phụ nữ mang thai hoặc đang trong kỳ kinh nguyệt.",
+                        LieuLuong = "Uống 1-2 viên/ngày sau bữa ăn.",
+                        NhomDieuTri = "Bổ não & Giảm căng thẳng"
+                    },
+                    new Thuoc
+                    {
+                        TenThuoc = "Viên uống Dầu Cá Omega-3",
+                        DonGia = 5500,
+                        SoLuong = 220,
+                        MoTa = "Bổ sung axit béo Omega-3 tốt cho mắt, tim mạch và não bộ. Hỗ trợ giảm cholesterol máu, phòng ngừa xơ vữa động mạch.",
+                        HanSuDung = DateTime.Now.AddYears(2),
+                        LoaiThuocId = tpcn.Id,
+                        DonViCoBan = "Viên",
+                        HoatChat = "Fish Oil Omega-3",
+                        ViTriKe = "Kệ D - Tầng 3",
+                        CongDung = "Hỗ trợ tim mạch khỏe mạnh, giảm mỏi mắt, khô mắt, phát triển trí não.",
+                        ChongChiDinh = "Mẫn cảm với dầu cá hoặc các thành phần của sản phẩm.",
+                        LieuLuong = "Uống 1 viên/lần, ngày 2 lần sau ăn.",
+                        NhomDieuTri = "Bổ mắt & Tim mạch"
+                    },
+                    new Thuoc
+                    {
+                        TenThuoc = "Glucosamine Chondroitin 1500mg",
+                        DonGia = 9500,
+                        SoLuong = 140,
+                        MoTa = "Giúp tái tạo sụn khớp, tăng tiết dịch khớp bôi trơn các khớp xương. Hỗ trợ giảm đau khớp do khô khớp, viêm khớp.",
+                        HanSuDung = DateTime.Now.AddYears(2),
+                        LoaiThuocId = tpcn.Id,
+                        DonViCoBan = "Viên",
+                        HoatChat = "Glucosamine",
+                        ViTriKe = "Kệ D - Tầng 4",
+                        CongDung = "Tăng độ dẻo dai của khớp, giảm đau khớp, tái tạo sụn.",
+                        ChongChiDinh = "Người dưới 18 tuổi, phụ nữ có thai hoặc đang cho con bú.",
+                        LieuLuong = "Uống 1 viên mỗi ngày sau bữa ăn.",
+                        NhomDieuTri = "Xương khớp chắc khỏe"
+                    },
+                    new Thuoc
+                    {
+                        TenThuoc = "Men vi sinh Optibac Probiotics",
+                        DonGia = 12000,
+                        SoLuong = 100,
+                        MoTa = "Cung cấp hàng tỷ lợi khuẩn giúp cân bằng hệ vi sinh đường ruột. Hỗ trợ tiêu hóa khỏe mạnh, giảm đầy hơi, táo bón.",
+                        HanSuDung = DateTime.Now.AddYears(1),
+                        LoaiThuocId = tpcn.Id,
+                        DonViCoBan = "Gói",
+                        HoatChat = "Lợi khuẩn đường ruột",
+                        ViTriKe = "Kệ E - Tầng 1",
+                        CongDung = "Bổ sung lợi khuẩn, cải thiện các rối loạn tiêu hóa, tăng khả năng hấp thu.",
+                        ChongChiDinh = "Không có chống chỉ định đặc biệt.",
+                        LieuLuong = "Hòa 1 gói với nước nguội uống mỗi buổi sáng.",
+                        NhomDieuTri = "Hỗ trợ tiêu hóa"
+                    },
+                    new Thuoc
+                    {
+                        TenThuoc = "Viên uống Collagen Glow & White",
+                        DonGia = 15000,
+                        SoLuong = 80,
+                        MoTa = "Bổ sung Collagen peptide, Vitamin E và Glutathione giúp dưỡng trắng da từ sâu bên trong, tăng độ đàn hồi, ngăn ngừa lão hóa.",
+                        HanSuDung = DateTime.Now.AddYears(2),
+                        LoaiThuocId = tpcn.Id,
+                        DonViCoBan = "Viên",
+                        HoatChat = "Collagen & Glutathione",
+                        ViTriKe = "Kệ E - Tầng 2",
+                        CongDung = "Làm chậm quá trình lão hóa da, dưỡng sáng da, giảm thâm nám, giúp tóc móng chắc khỏe.",
+                        ChongChiDinh = "Mẫn cảm với các thành phần của sản phẩm.",
+                        LieuLuong = "Uống 2 viên mỗi ngày trước khi đi ngủ.",
+                        NhomDieuTri = "Đẹp da & Chống lão hóa"
                     },
                     new Thuoc
                     {
@@ -275,6 +355,150 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Data
                         ChongChiDinh = "Không có chong chỉ định đặc biệt, dùng ngoài da.",
                         LieuLuong = "Dùng rửa mặt ngày 2 lần Sáng và Tối.",
                         NhomDieuTri = "Chăm sóc da - Dược mỹ phẩm"
+                    },
+                    new Thuoc
+                    {
+                        TenThuoc = "Sữa bột Similac Newborn 400g",
+                        DonGia = 285000,
+                        SoLuong = 40,
+                        MoTa = "Dinh dưỡng công thức cho trẻ từ 0 - 6 tháng tuổi, bổ sung HMO và DHA giúp trẻ phát triển não bộ và tăng sức đề kháng tự nhiên.",
+                        HanSuDung = DateTime.Now.AddYears(2),
+                        LoaiThuocId = meBe.Id,
+                        DonViCoBan = "Hộp",
+                        HoatChat = "Sữa bột công thức",
+                        ViTriKe = "Kệ Mẹ & Bé - Tầng 1",
+                        CongDung = "Thay thế bữa ăn phụ hoặc bổ sung dinh dưỡng thiếu hụt cho bé sơ sinh.",
+                        ChongChiDinh = "Trẻ bị dị ứng đạm sữa bò.",
+                        LieuLuong = "Pha theo bảng hướng dẫn trên vỏ hộp sữa bột.",
+                        NhomDieuTri = "Trẻ sơ sinh (0 - 6 tháng)"
+                    },
+                    new Thuoc
+                    {
+                        TenThuoc = "Tã dán Bobby Size S 56 miếng",
+                        DonGia = 165000,
+                        SoLuong = 60,
+                        MoTa = "Tã dán siêu thấm, thiết kế mỏng nhẹ, bề mặt 3D giúp mông bé luôn khô thoáng, ngăn ngừa hăm tã hiệu quả.",
+                        HanSuDung = DateTime.Now.AddYears(3),
+                        LoaiThuocId = meBe.Id,
+                        DonViCoBan = "Gói",
+                        HoatChat = "Tã giấy em bé",
+                        ViTriKe = "Kệ Mẹ & Bé - Tầng 2",
+                        CongDung = "Thấm hút chất thải, giữ vệ sinh cho em bé.",
+                        ChongChiDinh = "Không dùng khi da trẻ đang bị viêm nhiễm nặng vùng tã.",
+                        LieuLuong = "Thay tã sau mỗi 3-4 tiếng hoặc sau khi bé tiêu bẩn.",
+                        NhomDieuTri = "Trẻ sơ sinh (0 - 6 tháng)"
+                    },
+                    new Thuoc
+                    {
+                        TenThuoc = "Vitamin Prenatal DHA cho mẹ bầu",
+                        DonGia = 350000,
+                        SoLuong = 50,
+                        MoTa = "Viên uống tổng hợp bổ sung 20 loại vitamin, khoáng chất và DHA chất lượng cao hỗ trợ sự phát triển thai nhi khỏe mạnh.",
+                        HanSuDung = DateTime.Now.AddYears(2),
+                        LoaiThuocId = meBe.Id,
+                        DonViCoBan = "Hộp",
+                        HoatChat = "DHA & Multivitamins",
+                        ViTriKe = "Kệ Mẹ & Bé - Tầng 3",
+                        CongDung = "Bổ sung vitamin tổng hợp và DHA cho phụ nữ chuẩn bị mang thai, đang mang thai và cho con bú.",
+                        ChongChiDinh = "Người mẫn cảm với bất cứ thành phần nào của thuốc.",
+                        LieuLuong = "Uống 1 viên mỗi ngày sau bữa ăn.",
+                        NhomDieuTri = "Dành cho Mẹ bầu"
+                    },
+                    new Thuoc
+                    {
+                        TenThuoc = "Máy đo huyết áp Omron HEM-7121",
+                        DonGia = 980000,
+                        SoLuong = 20,
+                        MoTa = "Máy đo huyết áp bắp tay tự động, sử dụng công nghệ Intellisense tiên tiến cho kết quả nhanh và chính xác cao.",
+                        HanSuDung = DateTime.Now.AddYears(5),
+                        LoaiThuocId = thietBiYTe.Id,
+                        DonViCoBan = "Bộ",
+                        HoatChat = "Thiết bị đo dao động",
+                        ViTriKe = "Kệ Thiết bị - Tầng 1",
+                        CongDung = "Theo dõi huyết áp và nhịp tim tự động tại nhà.",
+                        ChongChiDinh = "Không đo trên tay có vết thương hở hoặc đang truyền dịch.",
+                        LieuLuong = "Đo ngày 1-2 lần vào buổi sáng trước khi ăn và tối trước khi đi ngủ.",
+                        NhomDieuTri = "Máy đo huyết áp"
+                    },
+                    new Thuoc
+                    {
+                        TenThuoc = "Nhiệt kế hồng ngoại Microlife FR1MF1",
+                        DonGia = 650000,
+                        SoLuong = 25,
+                        MoTa = "Nhiệt kế đo trán không tiếp xúc, cho kết quả đo chính xác chỉ trong 1 giây, có cảnh báo sốt thông minh bằng đèn.",
+                        HanSuDung = DateTime.Now.AddYears(5),
+                        LoaiThuocId = thietBiYTe.Id,
+                        DonViCoBan = "Cái",
+                        HoatChat = "Cảm biến hồng ngoại",
+                        ViTriKe = "Kệ Thiết bị - Tầng 2",
+                        CongDung = "Đo thân nhiệt cơ thể, nhiệt độ nước tắm, sữa cho trẻ.",
+                        ChongChiDinh = "Không có chong chỉ định.",
+                        LieuLuong = "Để đầu dò cách trán 1-3cm, bấm nút đo trong 1 giây.",
+                        NhomDieuTri = "Nhiệt kế"
+                    },
+                    new Thuoc
+                    {
+                        TenThuoc = "Máy đo SpO2 cầm tay thông minh",
+                        DonGia = 320000,
+                        SoLuong = 35,
+                        MoTa = "Thiết bị đo nồng độ oxy trong máu SpO2 và nhịp tim qua đầu ngón tay nhỏ gọn, màn hình hiển thị trực quan rõ nét.",
+                        HanSuDung = DateTime.Now.AddYears(5),
+                        LoaiThuocId = thietBiYTe.Id,
+                        DonViCoBan = "Cái",
+                        HoatChat = "Cảm biến quang học SpO2",
+                        ViTriKe = "Kệ Thiết bị - Tầng 3",
+                        CongDung = "Kiểm tra nhanh nhịp tim và độ bão hòa oxy SpO2 cơ thể tại nhà.",
+                        ChongChiDinh = "Không dùng trên ngón tay có sơn móng tay quá dày hoặc bị thương nặng.",
+                        LieuLuong = "Kẹp vào ngón tay, giữ yên tay trong 10-15 giây để đọc kết quả.",
+                        NhomDieuTri = "Máy đo SpO2"
+                    },
+                    new Thuoc
+                    {
+                        TenThuoc = "Khẩu trang y tế 4 lớp kháng khuẩn",
+                        DonGia = 45000,
+                        SoLuong = 120,
+                        MoTa = "Khẩu trang cấu trúc 4 lớp lọc bụi mịn, kháng khuẩn vượt trội, dây đeo tai co giãn êm ái thoải mái.",
+                        HanSuDung = DateTime.Now.AddYears(3),
+                        LoaiThuocId = sanPhamTienLoi.Id,
+                        DonViCoBan = "Hộp",
+                        HoatChat = "Vải không dệt & màng lọc",
+                        ViTriKe = "Kệ Tiện Lợi - Quầy chính",
+                        CongDung = "Lọc khói bụi, kháng khuẩn, phòng tránh các bệnh lây lan qua đường hô hấp.",
+                        ChongChiDinh = "Không dùng khẩu trang đã giặt đi giặt lại hoặc bị ướt rách.",
+                        LieuLuong = "Sử dụng khẩu trang 1 lần khi đi ra ngoài hoặc làm việc môi trường khói bụi.",
+                        NhomDieuTri = "Khẩu trang & Sát khuẩn"
+                    },
+                    new Thuoc
+                    {
+                        TenThuoc = "Nước rửa tay Lifebuoy 500ml",
+                        DonGia = 85000,
+                        SoLuong = 70,
+                        MoTa = "Sữa rửa tay diệt khuẩn vượt trội, bảo vệ khỏi 99.9% vi khuẩn gây hại, bổ sung tinh chất dưỡng da ẩm mịn.",
+                        HanSuDung = DateTime.Now.AddYears(3),
+                        LoaiThuocId = sanPhamTienLoi.Id,
+                        DonViCoBan = "Chai",
+                        HoatChat = "Công thức bảo vệ diệt khuẩn",
+                        ViTriKe = "Kệ Tiện Lợi - Tầng 1",
+                        CongDung = "Làm sạch tay, sát khuẩn bảo vệ sức khỏe gia đình.",
+                        ChongChiDinh = "Tránh tiếp xúc trực tiếp với mắt. Nếu dính vào mắt phải rửa bằng nước sạch.",
+                        LieuLuong = "Lấy một lượng vừa đủ xoa đều tay trong 20 giây rồi rửa lại bằng nước sạch.",
+                        NhomDieuTri = "Khẩu trang & Sát khuẩn"
+                    },
+                    new Thuoc
+                    {
+                        TenThuoc = "Kẹo ngậm ho thảo dược Strepsils Cool",
+                        DonGia = 35000,
+                        SoLuong = 150,
+                        MoTa = "Kẹo ngậm ho thảo dược vị bạc hà mát lạnh, giúp kháng khuẩn nhẹ, làm dịu nhanh rát họng và giảm ho tức thì.",
+                        HanSuDung = DateTime.Now.AddYears(2),
+                        LoaiThuocId = sanPhamTienLoi.Id,
+                        DonViCoBan = "Hộp",
+                        HoatChat = "Amylmetacresol & Dichlorobenzyl Alcohol",
+                        ViTriKe = "Kệ Tiện Lợi - Tầng 2",
+                        CongDung = "Giảm rát họng, giảm ho, thông mũi mát họng.",
+                        ChongChiDinh = "Trẻ em dưới 6 tuổi.",
+                        LieuLuong = "Ngậm 1 viên cách nhau 2-3 giờ. Tối đa 12 viên/ngày.",
+                        NhomDieuTri = "Kẹo ngậm & Đồ uống"
                     }
                 };
 

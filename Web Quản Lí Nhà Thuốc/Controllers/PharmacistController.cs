@@ -502,6 +502,20 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Controllers
             return View(prescriptions);
         }
 
+        // API: Update prescription status
+        [HttpPost]
+        public async Task<IActionResult> UpdatePrescriptionStatus(int id, string status)
+        {
+            var pres = await _context.DonThuocs.FindAsync(id);
+            if (pres == null) return NotFound("Đơn thuốc không tồn tại.");
+
+            pres.TrangThai = status;
+            _context.Entry(pres).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+
+            return Json(new { success = true });
+        }
+
         // API: Simulate OCR Recognition on uploaded file
         [HttpPost]
         public async Task<IActionResult> ProcessPrescriptionOCR()

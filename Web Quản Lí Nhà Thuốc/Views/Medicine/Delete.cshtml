@@ -4,24 +4,129 @@
     ViewData["Title"] = "Xóa Thuốc";
 }
 
-<div class="container mt-4">
-    <h2>Xóa thuốc</h2>
-    <h4 class="text-danger">Bạn có chắc chắn muốn xóa thuốc này không?</h4>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-2">Tên Thuốc</dt>
-        <dd class="col-sm-10">@Model.TenThuoc</dd>
-        
-        <dt class="col-sm-2">Phân Loại</dt>
-        <dd class="col-sm-10">@Model.LoaiThuoc?.TenLoai</dd>
-        
-        <dt class="col-sm-2">Số lượng tồn</dt>
-        <dd class="col-sm-10">@Model.SoLuong</dd>
-    </dl>
-    
-    <form asp-action="Delete">
-        <input type="hidden" asp-for="MaThuoc" />
-        <input type="submit" value="Xác nhận Xóa" class="btn btn-danger" /> |
-        <a asp-action="Index" class="btn btn-secondary">Quay lại danh sách</a>
-    </form>
+<style>
+    .med-delete-card {
+        border: none;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        background: #ffffff;
+        max-width: 600px;
+        margin: 2rem auto;
+    }
+
+    .med-delete-header {
+        background-color: #fff1f2;
+        color: #e11d48;
+        border-radius: 20px 20px 0 0;
+        border-bottom: 1px solid #ffe4e6;
+        padding: 1.5rem;
+    }
+
+    .med-detail-label {
+        font-weight: 600;
+        color: #64748b;
+        font-size: 0.88rem;
+        text-transform: uppercase;
+        letter-spacing: 0.02em;
+    }
+
+    .med-detail-value {
+        font-weight: 500;
+        color: #1e293b;
+        font-size: 1.05rem;
+    }
+
+    .btn-med-delete-confirm {
+        background-color: #e11d48;
+        color: #ffffff;
+        border: none;
+        padding: 0.7rem 1.8rem;
+        border-radius: 12px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        box-shadow: 0 4px 10px rgba(225, 29, 72, 0.15);
+    }
+
+    .btn-med-delete-confirm:hover {
+        background-color: #be123c;
+        color: #ffffff;
+        box-shadow: 0 6px 14px rgba(225, 29, 72, 0.25);
+        transform: translateY(-1px);
+    }
+
+    .btn-med-back {
+        background-color: #f1f5f9;
+        color: #475569;
+        border: none;
+        padding: 0.7rem 1.5rem;
+        border-radius: 12px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+    }
+
+    .btn-med-back:hover {
+        background-color: #e2e8f0;
+        color: #334155;
+    }
+</style>
+
+<div class="container py-4">
+    <div class="card med-delete-card">
+        <div class="med-delete-header text-center">
+            <div class="mb-2">
+                <i class="bi bi-exclamation-octagon-fill fs-1"></i>
+            </div>
+            <h4 class="fw-bold mb-1">Xác nhận xóa thuốc</h4>
+            <p class="small mb-0 opacity-85">Hành động này sẽ xóa vĩnh viễn thuốc ra khỏi hệ thống quản lý kho.</p>
+        </div>
+
+        <div class="card-body p-4">
+            <div class="row g-4 mb-4">
+                <div class="col-12 border-bottom pb-3">
+                    <div class="med-detail-label mb-1">Tên Thuốc</div>
+                    <div class="med-detail-value fw-bold text-dark fs-5">@Model.TenThuoc</div>
+                </div>
+                
+                <div class="col-sm-6 col-12">
+                    <div class="med-detail-label mb-1">Phân Loại</div>
+                    <div class="med-detail-value">
+                        <span class="badge bg-light text-secondary border px-2.5 py-1.5 rounded">
+                            <i class="bi bi-tag me-1"></i>
+                            @(Model.LoaiThuoc?.TenLoai ?? "Chưa phân loại")
+                        </span>
+                    </div>
+                </div>
+
+                <div class="col-sm-6 col-12">
+                    <div class="med-detail-label mb-1">Số lượng tồn kho</div>
+                    <div class="med-detail-value fw-semibold text-danger">@Model.SoLuong @(Model.DonViCoBan ?? "Viên")</div>
+                </div>
+
+                <div class="col-sm-6 col-12">
+                    <div class="med-detail-label mb-1">Giá bán</div>
+                    <div class="med-detail-value text-teal fw-semibold">@Model.DonGia.ToString("N0") ₫</div>
+                </div>
+
+                <div class="col-sm-6 col-12">
+                    <div class="med-detail-label mb-1">Hạn sử dụng</div>
+                    <div class="med-detail-value">@Model.HanSuDung.ToString("dd/MM/yyyy")</div>
+                </div>
+            </div>
+
+            <hr class="my-4 text-muted" />
+
+            <form asp-action="Delete">
+                <input type="hidden" asp-for="MaThuoc" />
+                <div class="d-flex justify-content-between align-items-center">
+                    <a asp-action="Index" class="btn btn-med-back d-flex align-items-center gap-1">
+                        <i class="bi bi-arrow-left"></i> Quay lại
+                    </a>
+                    <button type="submit" class="btn btn-med-delete-confirm d-flex align-items-center gap-1">
+                        <i class="bi bi-trash"></i> Xác nhận Xóa
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
+

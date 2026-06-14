@@ -3,6 +3,10 @@
 @{
 	ViewData["Title"] = ViewData["CategoryTitle"] ?? "Danh mục";
 	var isTraCuu = ViewData["CategoryKey"]?.ToString() == "tracuu";
+	var isTpcn = ViewData["CategoryKey"]?.ToString() == "tpcn";
+	var isMeBe = ViewData["CategoryKey"]?.ToString() == "me-be";
+	var isThietBiYTe = ViewData["CategoryKey"]?.ToString() == "thietbiyte";
+	var isTienLoi = ViewData["CategoryKey"]?.ToString() == "sanpham-tien-loi";
 }
 
 @if (isTraCuu)
@@ -503,45 +507,1416 @@
 		}
 	</style>
 }
-else
+else if (isTpcn)
 {
+	var activeQuery = Context.Request.Query["query"].ToString();
+	var allCats = ViewData["AllCategories"] as IEnumerable<Web_Quản_Lí_Nhà_Thuốc.Models.LoaiThuoc>;
+
+	<style>
+		.tpcn-hero {
+			background: linear-gradient(135deg, #059669 0%, #10b981 50%, #0d9488 100%);
+			box-shadow: 0 10px 30px rgba(16, 185, 129, 0.15) !important;
+			border-radius: 20px;
+		}
+		.wellness-goal-card {
+			cursor: pointer;
+			transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+			border: 1px solid #e2e8f0;
+			border-radius: 16px;
+			background-color: #ffffff;
+		}
+		.wellness-goal-card:hover {
+			transform: translateY(-5px);
+			box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+			border-color: #10b981;
+		}
+		.wellness-goal-card.active {
+			border-color: #10b981;
+			background-color: #f0fdf4;
+			box-shadow: 0 10px 20px rgba(16, 185, 129, 0.1);
+		}
+		.wellness-icon-box {
+			width: 48px;
+			height: 48px;
+			border-radius: 12px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-size: 1.5rem;
+			transition: all 0.2s ease;
+		}
+		.wellness-goal-card:hover .wellness-icon-box {
+			transform: scale(1.1);
+		}
+		.wellness-goal-card.active .wellness-icon-box {
+			background-color: #10b981 !important;
+			color: #ffffff !important;
+		}
+		.tpcn-search-toolbar-wrapper .input-group-focus {
+			border-color: rgba(16, 185, 129, 0.4) !important;
+			box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1) !important;
+		}
+		.btn-wellness-btn {
+			background-color: #10b981 !important;
+			color: white !important;
+			border: none !important;
+			transition: background-color 0.2s;
+		}
+		.btn-wellness-btn:hover {
+			background-color: #059669 !important;
+			color: white !important;
+		}
+		.icon-mint { background-color: #ecfeff; color: #0891b2; }
+		.icon-emerald { background-color: #f0fdf4; color: #10b981; }
+		.icon-gold { background-color: #fffbeb; color: #d97706; }
+		.icon-pink { background-color: #fdf2f8; color: #db2777; }
+		.icon-indigo { background-color: #e0e7ff; color: #4f46e5; }
+		.icon-orange { background-color: #fff7ed; color: #ea580c; }
+		
+		.wellness-assistant-box {
+			background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+			border: 1px dashed #a7f3d0;
+			border-radius: 16px;
+			padding: 24px;
+		}
+	</style>
+
 	<div class="container mt-4">
+		<!-- Hero section for TPCN -->
+		<div class="tpcn-hero text-white rounded-4 p-5 mb-4 shadow-sm overflow-hidden position-relative">
+			<div class="hero-content position-relative" style="z-index: 2; max-width: 750px;">
+				<span class="badge text-white rounded-pill px-3 py-2 mb-3 fw-semibold text-uppercase tracking-wider" style="font-size: 0.8rem; backdrop-filter: blur(5px); background-color: rgba(255, 255, 255, 0.2);">
+					Giải Pháp Sức Khỏe Chủ Động
+				</span>
+				<h1 class="display-5 fw-bold mb-3">Thực Phẩm Bảo Vệ Sức Khỏe &amp; Vitamin</h1>
+				<p class="lead text-white text-opacity-95 mb-0">Chăm sóc bản thân và gia đình mỗi ngày với các sản phẩm bổ sung vi chất dinh dưỡng, hỗ trợ tăng đề kháng và phục hồi thể trạng chất lượng cao.</p>
+				
+				<div class="d-flex gap-4 mt-4 text-white text-opacity-90 small">
+					<div class="d-flex align-items-center"><i class="bi bi-shield-check text-warning me-2 fs-5"></i> 100% Chính Hãng</div>
+					<div class="d-flex align-items-center"><i class="bi bi-patch-check text-warning me-2 fs-5"></i> Đã Kiểm Định GPP</div>
+					<div class="d-flex align-items-center"><i class="bi bi-heart-pulse text-warning me-2 fs-5"></i> Dược Sĩ Khuyên Dùng</div>
+				</div>
+			</div>
+			<div style="position: absolute; top: 0; right: 0; bottom: 0; left: 0; background-image: radial-gradient(circle at 85% 30%, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0) 50%); pointer-events: none;"></div>
+		</div>
+
+		<!-- Interactive Wellness Goals / Needs Selection -->
+		<div class="row mb-4">
+			<div class="col-12">
+				<div class="card border-0 shadow-sm p-4 bg-white" style="border-radius: 16px;">
+					<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+						<div>
+							<h5 class="fw-bold text-dark mb-1 d-flex align-items-center">
+								<i class="bi bi-compass-fill text-success me-2"></i>
+								Chọn giải pháp chăm sóc sức khỏe theo nhu cầu của bạn
+							</h5>
+							<p class="text-muted small mb-0">Hệ thống sẽ lọc các sản phẩm phù hợp nhất dựa trên mục tiêu sức khỏe bạn chọn.</p>
+						</div>
+						<button class="btn btn-outline-secondary btn-sm rounded-pill px-3" onclick="resetWellnessFilter()">Hiển thị tất cả</button>
+					</div>
+
+					<div class="row g-2 justify-content-center">
+						<div class="col-6 col-md-3 col-lg">
+							<div class="wellness-goal-card p-3 h-100 text-center d-flex flex-column align-items-center active" id="goal_All" onclick="filterByWellness('All', this)">
+								<div class="wellness-icon-box icon-emerald mb-3">
+									<i class="bi bi-collection-fill"></i>
+								</div>
+								<h6 class="fw-bold small mb-1 text-dark">Tất cả sản phẩm</h6>
+								<span class="text-muted" style="font-size: 0.7rem;">Hiển thị trọn bộ</span>
+							</div>
+						</div>
+						<div class="col-6 col-md-3 col-lg">
+							<div class="wellness-goal-card p-3 h-100 text-center d-flex flex-column align-items-center" id="goal_dekhang" onclick="filterByWellness('Tăng đề kháng & Miễn dịch', this)">
+								<div class="wellness-icon-box icon-mint mb-3">
+									<i class="bi bi-shield-plus"></i>
+								</div>
+								<h6 class="fw-bold small mb-1 text-dark">Tăng đề kháng</h6>
+								<span class="text-muted" style="font-size: 0.7rem;">Hệ miễn dịch, Vitamin C</span>
+							</div>
+						</div>
+						<div class="col-6 col-md-3 col-lg">
+							<div class="wellness-goal-card p-3 h-100 text-center d-flex flex-column align-items-center" id="goal_naobo" onclick="filterByWellness('Bổ não & Giảm căng thẳng', this)">
+								<div class="wellness-icon-box icon-indigo mb-3">
+									<i class="bi bi-lightbulb-fill"></i>
+								</div>
+								<h6 class="fw-bold small mb-1 text-dark">Trí não &amp; Stress</h6>
+								<span class="text-muted" style="font-size: 0.7rem;">Giảm mệt mỏi, bổ não</span>
+							</div>
+						</div>
+						<div class="col-6 col-md-3 col-lg">
+							<div class="wellness-goal-card p-3 h-100 text-center d-flex flex-column align-items-center" id="goal_mat" onclick="filterByWellness('Bổ mắt & Tim mạch', this)">
+								<div class="wellness-icon-box icon-gold mb-3">
+									<i class="bi bi-eye-fill"></i>
+								</div>
+								<h6 class="fw-bold small mb-1 text-dark">Mắt &amp; Tim mạch</h6>
+								<span class="text-muted" style="font-size: 0.7rem;">Dầu cá, Omega-3</span>
+							</div>
+						</div>
+						<div class="col-6 col-md-3 col-lg">
+							<div class="wellness-goal-card p-3 h-100 text-center d-flex flex-column align-items-center" id="goal_xuongkhop" onclick="filterByWellness('Xương khớp chắc khỏe', this)">
+								<div class="wellness-icon-box icon-orange mb-3">
+									<i class="bi bi-activity"></i>
+								</div>
+								<h6 class="fw-bold small mb-1 text-dark">Xương &amp; Khớp</h6>
+								<span class="text-muted" style="font-size: 0.7rem;">Sụn khớp, Glucosamine</span>
+							</div>
+						</div>
+						<div class="col-6 col-md-3 col-lg">
+							<div class="wellness-goal-card p-3 h-100 text-center d-flex flex-column align-items-center" id="goal_tieuhoa" onclick="filterByWellness('Hỗ trợ tiêu hóa', this)">
+								<div class="wellness-icon-box icon-mint mb-3" style="background-color: #ecfeff; color: #0891b2;">
+									<i class="bi bi-droplet-half"></i>
+								</div>
+								<h6 class="fw-bold small mb-1 text-dark">Tiêu hóa</h6>
+								<span class="text-muted" style="font-size: 0.7rem;">Men vi sinh, lợi khuẩn</span>
+							</div>
+						</div>
+						<div class="col-6 col-md-3 col-lg">
+							<div class="wellness-goal-card p-3 h-100 text-center d-flex flex-column align-items-center" id="goal_lamdep" onclick="filterByWellness('Đẹp da & Chống lão hóa', this)">
+								<div class="wellness-icon-box icon-pink mb-3">
+									<i class="bi bi-stars"></i>
+								</div>
+								<h6 class="fw-bold small mb-1 text-dark">Đẹp da &amp; Tóc</h6>
+								<span class="text-muted" style="font-size: 0.7rem;">Trắng da, Collagen</span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
 		<div class="row">
+			<!-- Sidebar -->
 			<div class="col-lg-3 mb-4">
-				<div class="category-sidebar p-3 rounded shadow-sm">
-					<h6 class="fw-bold mb-2">Danh mục thuốc</h6>
-					<ul class="list-unstyled mb-0">
-						<li><a class="d-block py-2" href="/Catalog/Index?cat=thuoc">Tất cả</a></li>
-						@if (ViewData["AllCategories"] is IEnumerable<Web_Quản_Lí_Nhà_Thuốc.Models.LoaiThuoc> cats)
-						{
-							foreach(var c in cats) {
-								<li><a class="d-block py-2" href="/Catalog/Index?cat=thuoc&loaiId=@c.Id">@c.TenLoai</a></li>
-							}
-						}
-					</ul>
+				<!-- Health Assistant Widget -->
+				<div class="wellness-assistant-box shadow-3xs text-center mb-4">
+					<div class="text-success fs-3 mb-2"><i class="bi bi-magic"></i></div>
+					<h6 class="fw-bold text-dark mb-1">Trợ Lý Sức Khỏe</h6>
+					<p class="text-muted small mb-3">Chọn tình trạng bạn gặp phải để tìm sản phẩm bổ trợ:</p>
+					
+					<select class="form-select form-select-sm rounded-pill border mb-3 text-dark small" id="assistantProblemSelect" style="height: 38px;" onchange="runAssistantSelection()">
+						<option value="All">-- Chọn tình trạng của bạn --</option>
+						<option value="dekhang">Cơ thể suy nhược, dễ cảm cúm</option>
+						<option value="naobo">Đau nửa đầu, mất tập trung</option>
+						<option value="mat">Mỏi mắt do xem màn hình nhiều</option>
+						<option value="xuongkhop">Đau nhức khớp khi vận động</option>
+						<option value="tieuhoa">Đầy hơi, khó tiêu hóa thức ăn</option>
+						<option value="lamdep">Da thâm sạm, thiếu săn chắc</option>
+					</select>
+					<button class="btn btn-wellness-btn btn-sm w-100 rounded-pill py-2 text-white small fw-semibold" onclick="resetWellnessFilter()"><i class="bi bi-arrow-counterclockwise me-1"></i> Thiết lập lại</button>
+				</div>
+
+				<!-- Consultation box -->
+				<div class="card border-0 shadow-sm p-4 text-center bg-white" style="border-radius: 16px; background: linear-gradient(180deg, #f0fdf4 0%, #ffffff 100%) !important;">
+					<div class="text-success fs-3 mb-2"><i class="bi bi-chat-heart-fill"></i></div>
+					<h6 class="fw-bold mb-1">Tư vấn sức khỏe miễn phí</h6>
+					<p class="text-muted small mb-3">Đội ngũ Dược sĩ giàu kinh nghiệm luôn sẵn sàng lắng nghe và tư vấn tận tâm.</p>
+					<a href="/Home/PrescriptionUpload?mode=consult" class="btn btn-wellness-btn btn-sm rounded-pill w-100 py-2">Nhận tư vấn ngay</a>
 				</div>
 			</div>
 
+			<!-- Supplements Grid -->
 			<div class="col-lg-9">
-				<div class="d-flex justify-content-between align-items-end mb-3">
+				<!-- Search toolbar -->
+				<div class="card border-0 shadow-sm p-3 bg-white mb-4 tpcn-search-toolbar-wrapper" style="border-radius: 16px;">
+					<form method="get" action="/Catalog/Index" class="row g-2 align-items-center">
+						<input type="hidden" name="cat" value="tpcn" />
+						<div class="col-md-8 col-12">
+							<div class="input-group border rounded-pill overflow-hidden bg-light">
+								<span class="input-group-text bg-transparent border-0"><i class="bi bi-search text-muted"></i></span>
+								<input type="text" name="query" class="form-control border-0 bg-transparent" placeholder="Tìm kiếm thực phẩm chức năng, vitamin..." value="@activeQuery" style="box-shadow: none; height: 42px;">
+							</div>
+						</div>
+						<div class="col-md-4 col-12 d-flex gap-2 justify-content-md-end">
+							<button class="btn btn-wellness-btn rounded-pill px-4 flex-grow-1" type="submit" style="height: 42px;">Tìm kiếm</button>
+							@if (!string.IsNullOrEmpty(activeQuery))
+							{
+								<a href="/Catalog/Index?cat=tpcn" class="btn btn-outline-secondary rounded-pill d-flex align-items-center justify-content-center px-3" style="height: 42px;" title="Xóa tìm kiếm">
+									<i class="bi bi-x-lg"></i>
+								</a>
+							}
+						</div>
+					</form>
+				</div>
+
+				<div class="d-flex justify-content-between align-items-center mb-3">
 					<div>
-						<h2 class="fw-bold text-dark mb-1">@ViewData["CategoryTitle"]</h2>
-						<p class="text-muted small mb-0">@ViewData["CategoryDescription"]</p>
+						<h4 class="fw-bold text-dark mb-0">Thực phẩm bổ trợ sức khỏe</h4>
+						<p class="text-muted small mb-0" id="tpcnResultCount">Hiển thị @(Model?.Count() ?? 0) sản phẩm phù hợp</p>
 					</div>
-					<a href="#" class="text-teal fw-semibold text-decoration-none">Xem tất cả <i class="bi bi-arrow-right"></i></a>
+					@if (!string.IsNullOrEmpty(activeQuery))
+					{
+						<span class="badge bg-light text-dark border px-3 py-2 rounded-pill">Tìm kiếm: "@activeQuery"</span>
+					}
 				</div>
 
 				@if (Model != null && Model.Any()) {
-					<div class="row g-3">
+					<div class="row g-3" id="tpcnProductGrid">
 						@foreach(var p in Model) {
-							<div class="col-6 col-md-4 col-lg-3">
+							<div class="col-6 col-md-4 col-lg-3 product-item-card" data-category="@(p.LoaiThuoc?.TenLoai ?? "")" data-treatment="@(p.NhomDieuTri ?? "")">
 								@await Html.PartialAsync("~/Views/Shared/_ProductCard.cshtml", p)
 							</div>
 						}
 					</div>
 				}
 				else {
-					<div class="alert alert-secondary">Không có sản phẩm cho danh mục này.</div>
+					<div class="row">
+						<div class="col-12 text-center py-5 bg-white rounded-4 border shadow-sm">
+							<div class="text-muted mb-3">
+								<i class="bi bi-search fs-1 text-success" style="opacity: 0.6;"></i>
+							</div>
+							<h5 class="fw-bold text-dark">Không tìm thấy sản phẩm nào</h5>
+							<p class="text-muted small">Chúng tôi chưa có sẵn sản phẩm bổ sung sức khỏe phù hợp với từ khóa này trong kho hàng.</p>
+							<a href="/Catalog/Index?cat=tpcn" class="btn btn-wellness-btn px-4 py-2 rounded-pill mt-2">Xem tất cả TPCN</a>
+						</div>
+					</div>
+				}
+			</div>
+		</div>
+
+		@await Html.PartialAsync("~/Views/Shared/_ProductScripts.cshtml")
+	</div>
+
+	<script>
+		let activeWellnessGoal = 'All';
+
+		function filterByWellness(goal, element) {
+			activeWellnessGoal = goal;
+			
+			// Highlight selected card
+			document.querySelectorAll('.wellness-goal-card').forEach(card => {
+				card.classList.remove('active');
+			});
+			if (element) {
+				element.classList.add('active');
+			} else {
+				let targetId = 'goal_All';
+				if (goal === 'Tăng đề kháng & Miễn dịch') targetId = 'goal_dekhang';
+				else if (goal === 'Bổ não & Giảm căng thẳng') targetId = 'goal_naobo';
+				else if (goal === 'Bổ mắt & Tim mạch') targetId = 'goal_mat';
+				else if (goal === 'Xương khớp chắc khỏe') targetId = 'goal_xuongkhop';
+				else if (goal === 'Hỗ trợ tiêu hóa') targetId = 'goal_tieuhoa';
+				else if (goal === 'Đẹp da & Chống lão hóa') targetId = 'goal_lamdep';
+				
+				const el = document.getElementById(targetId);
+				if (el) el.classList.add('active');
+			}
+
+			// Filter products grid
+			const items = document.querySelectorAll('#tpcnProductGrid .product-item-card');
+			let visibleCount = 0;
+
+			items.forEach(function(item) {
+				const treatmentGroup = item.dataset.treatment || '';
+				const matchGoal = (activeWellnessGoal === 'All' || treatmentGroup === activeWellnessGoal);
+
+				if (matchGoal) {
+					item.style.display = 'block';
+					visibleCount++;
+				} else {
+					item.style.display = 'none';
+				}
+			});
+
+			// Update result text
+			const countTextEl = document.getElementById('tpcnResultCount');
+			if (countTextEl) {
+				countTextEl.innerText = `Hiển thị ${visibleCount} sản phẩm phù hợp`;
+			}
+
+			// Handle empty message
+			const existingEmptyMsg = document.getElementById('noTpcnFilteredProductsMessage');
+			if (visibleCount === 0) {
+				if (!existingEmptyMsg) {
+					const grid = document.getElementById('tpcnProductGrid');
+					const msgHtml = `
+						<div id="noTpcnFilteredProductsMessage" class="col-12 text-center py-5 bg-white rounded-4 border w-100 shadow-3xs mt-3">
+							<div class="text-muted mb-3"><i class="bi bi-search fs-2 text-success"></i></div>
+							<h6 class="fw-bold text-dark">Chưa có sản phẩm bổ trợ cho nhu cầu này</h6>
+							<p class="text-muted small">Hãy liên hệ với Dược sĩ của chúng tôi để nhận tư vấn phù hợp nhất.</p>
+						</div>
+					`;
+					grid.insertAdjacentHTML('beforeend', msgHtml);
+				} else {
+					existingEmptyMsg.style.display = 'block';
+				}
+			} else {
+				if (existingEmptyMsg) existingEmptyMsg.style.display = 'none';
+			}
+		}
+
+		function resetWellnessFilter() {
+			filterByWellness('All', document.getElementById('goal_All'));
+			const problemSelect = document.getElementById('assistantProblemSelect');
+			if (problemSelect) problemSelect.value = 'All';
+		}
+
+		function runAssistantSelection() {
+			const selectEl = document.getElementById('assistantProblemSelect');
+			if (!selectEl) return;
+			const problem = selectEl.value;
+
+			if (problem === 'All') {
+				resetWellnessFilter();
+				return;
+			}
+
+			let mapping = 'All';
+			if (problem === 'dekhang') mapping = 'Tăng đề kháng & Miễn dịch';
+			else if (problem === 'naobo') mapping = 'Bổ não & Giảm căng thẳng';
+			else if (problem === 'mat') mapping = 'Bổ mắt & Tim mạch';
+			else if (problem === 'xuongkhop') mapping = 'Xương khớp chắc khỏe';
+			else if (problem === 'tieuhoa') mapping = 'Hỗ trợ tiêu hóa';
+			else if (problem === 'lamdep') mapping = 'Đẹp da & Chống lão hóa';
+
+			filterByWellness(mapping, null);
+		}
+	</script>
+}
+else if (isMeBe)
+{
+	var activeQuery = Context.Request.Query["query"].ToString();
+	var allCats = ViewData["AllCategories"] as IEnumerable<Web_Quản_Lí_Nhà_Thuốc.Models.LoaiThuoc>;
+
+	<style>
+		.mebe-hero {
+			background: linear-gradient(135deg, #f472b6 0%, #fb7185 50%, #f43f5e 100%);
+			box-shadow: 0 10px 30px rgba(244, 63, 94, 0.15) !important;
+			border-radius: 20px;
+		}
+		.mebe-card {
+			cursor: pointer;
+			transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+			border: 1px solid #fce7f3;
+			border-radius: 16px;
+			background-color: #ffffff;
+		}
+		.mebe-card:hover {
+			transform: translateY(-5px);
+			box-shadow: 0 10px 20px rgba(244, 63, 94, 0.05);
+			border-color: #f43f5e;
+		}
+		.mebe-card.active {
+			border-color: #f43f5e;
+			background-color: #fff1f2;
+			box-shadow: 0 10px 20px rgba(244, 63, 94, 0.1);
+		}
+		.mebe-icon-box {
+			width: 48px;
+			height: 48px;
+			border-radius: 12px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-size: 1.5rem;
+			transition: all 0.2s ease;
+		}
+		.mebe-card:hover .mebe-icon-box {
+			transform: scale(1.1);
+		}
+		.mebe-card.active .mebe-icon-box {
+			background-color: #f43f5e !important;
+			color: #ffffff !important;
+		}
+		.mebe-search-toolbar-wrapper .input-group-focus {
+			border-color: rgba(244, 63, 94, 0.4) !important;
+			box-shadow: 0 0 0 4px rgba(244, 63, 94, 0.1) !important;
+		}
+		.btn-mebe-btn {
+			background-color: #f43f5e !important;
+			color: white !important;
+			border: none !important;
+			transition: background-color 0.2s;
+		}
+		.btn-mebe-btn:hover {
+			background-color: #e11d48 !important;
+			color: white !important;
+		}
+		.icon-pink-light { background-color: #fff1f2; color: #f43f5e; }
+		.icon-rose-light { background-color: #ffe4e6; color: #e11d48; }
+		.icon-violet-light { background-color: #f5f3ff; color: #7c3aed; }
+		
+		.mebe-guide-box {
+			background: linear-gradient(135deg, #fff1f2 0%, #ffe4e6 100%);
+			border: 1px dashed #fecdd3;
+			border-radius: 16px;
+			padding: 24px;
+		}
+	</style>
+
+	<div class="container mt-4">
+		<!-- Hero Section -->
+		<div class="mebe-hero text-white rounded-4 p-5 mb-4 shadow-sm overflow-hidden position-relative">
+			<div class="hero-content position-relative" style="z-index: 2; max-width: 750px;">
+				<span class="badge text-white rounded-pill px-3 py-2 mb-3 fw-semibold text-uppercase tracking-wider" style="font-size: 0.8rem; backdrop-filter: blur(5px); background-color: rgba(255, 255, 255, 0.25);">
+					Mẹ Khỏe Bé Ngoan • Trọn Vẹn Yêu Thương
+				</span>
+				<h1 class="display-5 fw-bold mb-3">Sản Phẩm Chăm Sóc Mẹ &amp; Bé</h1>
+				<p class="lead text-white text-opacity-95 mb-0">Cung cấp sữa bột, tã dán, thực phẩm bổ sung thai kỳ và đồ dùng chăm sóc dịu nhẹ, an toàn tuyệt đối cho làn da của trẻ nhỏ.</p>
+				
+				<div class="d-flex gap-4 mt-4 text-white text-opacity-90 small">
+					<div class="d-flex align-items-center"><i class="bi bi-shield-lock-fill text-warning me-2 fs-5"></i> Tuyệt Đối An Toàn</div>
+					<div class="d-flex align-items-center"><i class="bi bi-balloon-fill text-warning me-2 fs-5"></i> Dinh Dưỡng Khoa Học</div>
+					<div class="d-flex align-items-center"><i class="bi bi-chat-heart text-warning me-2 fs-5"></i> Dược Sĩ Đồng Hành</div>
+				</div>
+			</div>
+			<div style="position: absolute; top: 0; right: 0; bottom: 0; left: 0; background-image: radial-gradient(circle at 85% 30%, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0) 50%); pointer-events: none;"></div>
+		</div>
+
+		<!-- Interactive Milestone Selection -->
+		<div class="row mb-4">
+			<div class="col-12">
+				<div class="card border-0 shadow-sm p-4 bg-white" style="border-radius: 16px;">
+					<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+						<div>
+							<h5 class="fw-bold text-dark mb-1 d-flex align-items-center">
+								<i class="bi bi-heart-fill text-danger me-2"></i>
+								Lọc sản phẩm theo giai đoạn phát triển
+							</h5>
+							<p class="text-muted small mb-0">Xem nhanh các sản phẩm dinh dưỡng và chăm sóc phù hợp với từng thời kỳ của mẹ và bé.</p>
+						</div>
+						<button class="btn btn-outline-secondary btn-sm rounded-pill px-3" onclick="resetMeBeFilter()">Hiển thị tất cả</button>
+					</div>
+
+					<div class="row g-2 justify-content-center">
+						<div class="col-6 col-md-4">
+							<div class="mebe-card p-3 h-100 text-center d-flex flex-column align-items-center active" id="mebe_All" onclick="filterByMeBe('All', this)">
+								<div class="mebe-icon-box icon-pink-light mb-3">
+									<i class="bi bi-balloon-heart-fill"></i>
+								</div>
+								<h6 class="fw-bold small mb-1 text-dark">Tất cả sản phẩm</h6>
+								<span class="text-muted" style="font-size: 0.7rem;">Hiển thị trọn bộ dinh dưỡng &amp; tã bỉm</span>
+							</div>
+						</div>
+						<div class="col-6 col-md-4">
+							<div class="mebe-card p-3 h-100 text-center d-flex flex-column align-items-center" id="mebe_sosinhi" onclick="filterByMeBe('Trẻ sơ sinh (0 - 6 tháng)', this)">
+								<div class="mebe-icon-box icon-rose-light mb-3">
+									<i class="bi bi-baby-carriage-fill"></i>
+								</div>
+								<h6 class="fw-bold small mb-1 text-dark">Bé sơ sinh (0 - 6 tháng)</h6>
+								<span class="text-muted" style="font-size: 0.7rem;">Sữa bột công thức sơ sinh, tã dán dịu nhẹ</span>
+							</div>
+						</div>
+						<div class="col-6 col-md-4">
+							<div class="mebe-card p-3 h-100 text-center d-flex flex-column align-items-center" id="mebe_mebau" onclick="filterByMeBe('Dành cho Mẹ bầu', this)">
+								<div class="mebe-icon-box icon-violet-light mb-3">
+									<i class="bi bi-heart-pulse-fill"></i>
+								</div>
+								<h6 class="fw-bold small mb-1 text-dark">Dành cho Mẹ bầu</h6>
+								<span class="text-muted" style="font-size: 0.7rem;">Sữa bầu, Vitamin tổng hợp thai kỳ</span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="row">
+			<!-- Sidebar -->
+			<div class="col-lg-3 mb-4">
+				<div class="mebe-guide-box shadow-3xs text-center mb-4">
+					<div class="text-danger fs-3 mb-2"><i class="bi bi-journal-check"></i></div>
+					<h6 class="fw-bold text-dark mb-1">Cẩm Nang Làm Mẹ</h6>
+					<p class="text-muted small mb-3">Bí quyết chọn sữa và bảo vệ làn da nhạy cảm của bé sơ sinh:</p>
+					<div class="text-start bg-white p-2.5 rounded-3 border mb-3">
+						<span class="text-danger fw-bold small" style="font-size: 0.75rem;"><i class="bi bi-info-circle me-1"></i>Mẹo nhỏ:</span>
+						<p class="text-muted mb-0 mt-1" style="font-size: 0.7rem; line-height: 1.4;">Đối với trẻ sơ sinh dưới 6 tháng tuổi, sữa mẹ là tốt nhất. Khi bổ sung sữa ngoài, hãy pha đúng tỷ lệ nhiệt độ để bảo đảm vi chất.</p>
+					</div>
+					<a href="/Home/PrescriptionUpload?mode=consult" class="btn btn-mebe-btn btn-sm w-100 rounded-pill py-2 text-white small fw-semibold">Kết nối Dược sĩ tư vấn</a>
+				</div>
+			</div>
+
+			<!-- Grid -->
+			<div class="col-lg-9">
+				<!-- Search -->
+				<div class="card border-0 shadow-sm p-3 bg-white mb-4 mebe-search-toolbar-wrapper" style="border-radius: 16px;">
+					<form method="get" action="/Catalog/Index" class="row g-2 align-items-center">
+						<input type="hidden" name="cat" value="me-be" />
+						<div class="col-md-8 col-12">
+							<div class="input-group border rounded-pill overflow-hidden bg-light">
+								<span class="input-group-text bg-transparent border-0"><i class="bi bi-search text-muted"></i></span>
+								<input type="text" name="query" class="form-control border-0 bg-transparent" placeholder="Tìm kiếm sữa, tã, vitamin mẹ và bé..." value="@activeQuery" style="box-shadow: none; height: 42px;">
+							</div>
+						</div>
+						<div class="col-md-4 col-12 d-flex gap-2 justify-content-md-end">
+							<button class="btn btn-mebe-btn rounded-pill px-4 flex-grow-1" type="submit" style="height: 42px;">Tìm kiếm</button>
+							@if (!string.IsNullOrEmpty(activeQuery))
+							{
+								<a href="/Catalog/Index?cat=me-be" class="btn btn-outline-secondary rounded-pill d-flex align-items-center justify-content-center px-3" style="height: 42px;" title="Xóa tìm kiếm">
+									<i class="bi bi-x-lg"></i>
+								</a>
+							}
+						</div>
+					</form>
+				</div>
+
+				<div class="d-flex justify-content-between align-items-center mb-3">
+					<div>
+						<h4 class="fw-bold text-dark mb-0">Sản phẩm cho Mẹ &amp; Bé</h4>
+						<p class="text-muted small mb-0" id="mebeResultCount">Hiển thị @(Model?.Count() ?? 0) sản phẩm phù hợp</p>
+					</div>
+					@if (!string.IsNullOrEmpty(activeQuery))
+					{
+						<span class="badge bg-light text-dark border px-3 py-2 rounded-pill">Tìm kiếm: "@activeQuery"</span>
+					}
+				</div>
+
+				@if (Model != null && Model.Any()) {
+					<div class="row g-3" id="mebeProductGrid">
+						@foreach(var p in Model) {
+							<div class="col-6 col-md-4 col-lg-3 product-item-card" data-category="@(p.LoaiThuoc?.TenLoai ?? "")" data-treatment="@(p.NhomDieuTri ?? "")">
+								@await Html.PartialAsync("~/Views/Shared/_ProductCard.cshtml", p)
+							</div>
+						}
+					</div>
+				}
+				else {
+					<div class="row">
+						<div class="col-12 text-center py-5 bg-white rounded-4 border shadow-sm">
+							<div class="text-muted mb-3">
+								<i class="bi bi-search fs-1 text-danger" style="opacity: 0.6;"></i>
+							</div>
+							<h5 class="fw-bold text-dark">Không tìm thấy sản phẩm nào</h5>
+							<p class="text-muted small">Chúng tôi chưa có sẵn sản phẩm phù hợp với từ khóa này trong kho hàng.</p>
+							<a href="/Catalog/Index?cat=me-be" class="btn btn-mebe-btn px-4 py-2 rounded-pill mt-2">Xem tất cả sản phẩm</a>
+						</div>
+					</div>
+				}
+			</div>
+		</div>
+
+		@await Html.PartialAsync("~/Views/Shared/_ProductScripts.cshtml")
+	</div>
+
+	<script>
+		let activeMeBeGoal = 'All';
+
+		function filterByMeBe(goal, element) {
+			activeMeBeGoal = goal;
+			
+			// Highlight selected card
+			document.querySelectorAll('.mebe-card').forEach(card => {
+				card.classList.remove('active');
+			});
+			if (element) {
+				element.classList.add('active');
+			} else {
+				let targetId = 'mebe_All';
+				if (goal === 'Trẻ sơ sinh (0 - 6 tháng)') targetId = 'mebe_sosinhi';
+				else if (goal === 'Dành cho Mẹ bầu') targetId = 'mebe_mebau';
+				
+				const el = document.getElementById(targetId);
+				if (el) el.classList.add('active');
+			}
+
+			// Filter grid
+			const items = document.querySelectorAll('#mebeProductGrid .product-item-card');
+			let visibleCount = 0;
+
+			items.forEach(function(item) {
+				const treatmentGroup = item.dataset.treatment || '';
+				const matchGoal = (activeMeBeGoal === 'All' || treatmentGroup === activeMeBeGoal);
+
+				if (matchGoal) {
+					item.style.display = 'block';
+					visibleCount++;
+				} else {
+					item.style.display = 'none';
+				}
+			});
+
+			const countTextEl = document.getElementById('mebeResultCount');
+			if (countTextEl) {
+				countTextEl.innerText = `Hiển thị ${visibleCount} sản phẩm phù hợp`;
+			}
+
+			const existingEmptyMsg = document.getElementById('noMebeFilteredProductsMessage');
+			if (visibleCount === 0) {
+				if (!existingEmptyMsg) {
+					const grid = document.getElementById('mebeProductGrid');
+					const msgHtml = `
+						<div id="noMebeFilteredProductsMessage" class="col-12 text-center py-5 bg-white rounded-4 border w-100 shadow-3xs mt-3">
+							<div class="text-muted mb-3"><i class="bi bi-search fs-2 text-danger"></i></div>
+							<h6 class="fw-bold text-dark">Chưa có sản phẩm cho cột mốc này</h6>
+							<p class="text-muted small">Vui lòng liên hệ Dược sĩ để nhận hỗ trợ chọn sản phẩm thay thế.</p>
+						</div>
+					`;
+					grid.insertAdjacentHTML('beforeend', msgHtml);
+				} else {
+					existingEmptyMsg.style.display = 'block';
+				}
+			} else {
+				if (existingEmptyMsg) existingEmptyMsg.style.display = 'none';
+			}
+		}
+
+		function resetMeBeFilter() {
+			filterByMeBe('All', document.getElementById('mebe_All'));
+		}
+	</script>
+}
+else if (isThietBiYTe)
+{
+	var activeQuery = Context.Request.Query["query"].ToString();
+	var allCats = ViewData["AllCategories"] as IEnumerable<Web_Quản_Lí_Nhà_Thuốc.Models.LoaiThuoc>;
+
+	<style>
+		.tbyt-hero {
+			background: linear-gradient(135deg, #0284c7 0%, #0369a1 50%, #075985 100%);
+			box-shadow: 0 10px 30px rgba(3, 105, 161, 0.15) !important;
+			border-radius: 20px;
+		}
+		.tbyt-card {
+			cursor: pointer;
+			transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+			border: 1px solid #e0f2fe;
+			border-radius: 16px;
+			background-color: #ffffff;
+		}
+		.tbyt-card:hover {
+			transform: translateY(-5px);
+			box-shadow: 0 10px 20px rgba(3, 105, 161, 0.05);
+			border-color: #0284c7;
+		}
+		.tbyt-card.active {
+			border-color: #0284c7;
+			background-color: #f0f9ff;
+			box-shadow: 0 10px 20px rgba(3, 105, 161, 0.1);
+		}
+		.tbyt-icon-box {
+			width: 48px;
+			height: 48px;
+			border-radius: 12px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-size: 1.5rem;
+			transition: all 0.2s ease;
+		}
+		.tbyt-card:hover .tbyt-icon-box {
+			transform: scale(1.1);
+		}
+		.tbyt-card.active .tbyt-icon-box {
+			background-color: #0284c7 !important;
+			color: #ffffff !important;
+		}
+		.tbyt-search-toolbar-wrapper .input-group-focus {
+			border-color: rgba(3, 105, 161, 0.4) !important;
+			box-shadow: 0 0 0 4px rgba(3, 105, 161, 0.1) !important;
+		}
+		.btn-tbyt-btn {
+			background-color: #0284c7 !important;
+			color: white !important;
+			border: none !important;
+			transition: background-color 0.2s;
+		}
+		.btn-tbyt-btn:hover {
+			background-color: #0369a1 !important;
+			color: white !important;
+		}
+		.icon-blue-light { background-color: #f0f9ff; color: #0284c7; }
+		.icon-sky-light { background-color: #e0f2fe; color: #0369a1; }
+		.icon-cyan-light { background-color: #ecfeff; color: #0891b2; }
+		
+		.tbyt-reference-table {
+			font-size: 0.75rem;
+		}
+		.tbyt-reference-table th {
+			background-color: #f1f5f9;
+			color: #334155;
+			font-weight: 600;
+		}
+	</style>
+
+	<div class="container mt-4">
+		<!-- Hero Section -->
+		<div class="tbyt-hero text-white rounded-4 p-5 mb-4 shadow-sm overflow-hidden position-relative">
+			<div class="hero-content position-relative" style="z-index: 2; max-width: 750px;">
+				<span class="badge text-white rounded-pill px-3 py-2 mb-3 fw-semibold text-uppercase tracking-wider" style="font-size: 0.8rem; backdrop-filter: blur(5px); background-color: rgba(255, 255, 255, 0.25);">
+					Thiết Bị Y Tế Gia Đình Chuẩn Y Khoa
+				</span>
+				<h1 class="display-5 fw-bold mb-3">Thiết Bị &amp; Dụng Cụ Y Tế</h1>
+				<p class="lead text-white text-opacity-95 mb-0">Theo dõi chủ động huyết áp, nhiệt độ, chỉ số SpO2 cơ thể tại nhà với thiết bị y tế tự động nhập khẩu chính hãng, bảo hành dài hạn.</p>
+				
+				<div class="d-flex gap-4 mt-4 text-white text-opacity-90 small">
+					<div class="d-flex align-items-center"><i class="bi bi-clock-history text-warning me-2 fs-5"></i> Bảo Hành 1 Đổi 1</div>
+					<div class="d-flex align-items-center"><i class="bi bi-check-circle-fill text-warning me-2 fs-5"></i> Đạt Chuẩn ISO</div>
+					<div class="d-flex align-items-center"><i class="bi bi-clipboard-pulse text-warning me-2 fs-5"></i> Kết Quả Chính Xác</div>
+				</div>
+			</div>
+			<div style="position: absolute; top: 0; right: 0; bottom: 0; left: 0; background-image: radial-gradient(circle at 85% 30%, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0) 50%); pointer-events: none;"></div>
+		</div>
+
+		<!-- Interactive Device Category Selection -->
+		<div class="row mb-4">
+			<div class="col-12">
+				<div class="card border-0 shadow-sm p-4 bg-white" style="border-radius: 16px;">
+					<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+						<div>
+							<h5 class="fw-bold text-dark mb-1 d-flex align-items-center">
+								<i class="bi bi-heart-pulse-fill text-primary me-2"></i>
+								Chọn loại thiết bị y tế theo nhu cầu
+							</h5>
+							<p class="text-muted small mb-0">Lọc nhanh các loại máy đo tự động và dụng cụ y khoa chuyên sâu.</p>
+						</div>
+						<button class="btn btn-outline-secondary btn-sm rounded-pill px-3" onclick="resetTbytFilter()">Hiển thị tất cả</button>
+					</div>
+
+					<div class="row g-2 justify-content-center">
+						<div class="col-6 col-md-3">
+							<div class="tbyt-card p-3 h-100 text-center d-flex flex-column align-items-center active" id="tbyt_All" onclick="filterByTbyt('All', this)">
+								<div class="tbyt-icon-box icon-blue-light mb-3">
+									<i class="bi bi-activity"></i>
+								</div>
+								<h6 class="fw-bold small mb-1 text-dark">Tất cả thiết bị</h6>
+								<span class="text-muted" style="font-size: 0.7rem;">Toàn bộ dụng cụ &amp; máy đo</span>
+							</div>
+						</div>
+						<div class="col-6 col-md-3">
+							<div class="tbyt-card p-3 h-100 text-center d-flex flex-column align-items-center" id="tbyt_huyetap" onclick="filterByTbyt('Máy đo huyết áp', this)">
+								<div class="tbyt-icon-box icon-sky-light mb-3">
+									<i class="bi bi-heart-pulse-fill"></i>
+								</div>
+								<h6 class="fw-bold small mb-1 text-dark">Máy đo huyết áp</h6>
+								<span class="text-muted" style="font-size: 0.7rem;">Máy đo bắp tay, cổ tay tự động</span>
+							</div>
+						</div>
+						<div class="col-6 col-md-3">
+							<div class="tbyt-card p-3 h-100 text-center d-flex flex-column align-items-center" id="tbyt_nhietke" onclick="filterByTbyt('Nhiệt kế', this)">
+								<div class="tbyt-icon-box icon-cyan-light mb-3">
+									<i class="bi bi-thermometer-half"></i>
+								</div>
+								<h6 class="fw-bold small mb-1 text-dark">Nhiệt kế điện tử</h6>
+								<span class="text-muted" style="font-size: 0.7rem;">Nhiệt kế hồng ngoại đo trán, tai</span>
+							</div>
+						</div>
+						<div class="col-6 col-md-3">
+							<div class="tbyt-card p-3 h-100 text-center d-flex flex-column align-items-center" id="tbyt_spo2" onclick="filterByTbyt('Máy đo SpO2', this)">
+								<div class="tbyt-icon-box icon-blue-light mb-3" style="background-color: #f1f5f9; color: #475569;">
+									<i class="bi bi-fingerprint"></i>
+								</div>
+								<h6 class="fw-bold small mb-1 text-dark">Thiết bị đo SpO2</h6>
+								<span class="text-muted" style="font-size: 0.7rem;">Kẹp đầu ngón tay đo nhịp tim &amp; Oxy</span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="row">
+			<!-- Sidebar -->
+			<div class="col-lg-3 mb-4">
+				<div class="card border-0 shadow-sm p-3 bg-white mb-4" style="border-radius: 16px;">
+					<h6 class="fw-bold mb-2 text-dark d-flex align-items-center">
+						<i class="bi bi-info-circle-fill text-primary me-2"></i>
+						Chỉ số sức khỏe tiêu chuẩn
+					</h6>
+					<p class="text-muted small mb-3">Tra cứu nhanh giới hạn an toàn của các chỉ số sinh tồn cơ bản:</p>
+					
+					<table class="table table-bordered tbyt-reference-table mb-0">
+						<thead>
+							<tr>
+								<th>Chỉ số</th>
+								<th>Bình thường</th>
+								<th>Cảnh báo</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td class="fw-semibold">Huyết áp</td>
+								<td>&lt; 120/80</td>
+								<td class="text-danger">&ge; 140/90</td>
+							</tr>
+							<tr>
+								<td class="fw-semibold">SpO2</td>
+								<td>96% - 100%</td>
+								<td class="text-danger">&lt; 94%</td>
+							</tr>
+							<tr>
+								<td class="fw-semibold">Thân nhiệt</td>
+								<td>36.5°C - 37.2°C</td>
+								<td class="text-danger">&ge; 38.0°C</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+
+			<!-- Grid -->
+			<div class="col-lg-9">
+				<!-- Search -->
+				<div class="card border-0 shadow-sm p-3 bg-white mb-4 tbyt-search-toolbar-wrapper" style="border-radius: 16px;">
+					<form method="get" action="/Catalog/Index" class="row g-2 align-items-center">
+						<input type="hidden" name="cat" value="thietbiyte" />
+						<div class="col-md-8 col-12">
+							<div class="input-group border rounded-pill overflow-hidden bg-light">
+								<span class="input-group-text bg-transparent border-0"><i class="bi bi-search text-muted"></i></span>
+								<input type="text" name="query" class="form-control border-0 bg-transparent" placeholder="Tìm kiếm máy đo huyết áp, nhiệt kế..." value="@activeQuery" style="box-shadow: none; height: 42px;">
+							</div>
+						</div>
+						<div class="col-md-4 col-12 d-flex gap-2 justify-content-md-end">
+							<button class="btn btn-tbyt-btn rounded-pill px-4 flex-grow-1" type="submit" style="height: 42px;">Tìm kiếm</button>
+							@if (!string.IsNullOrEmpty(activeQuery))
+							{
+								<a href="/Catalog/Index?cat=thietbiyte" class="btn btn-outline-secondary rounded-pill d-flex align-items-center justify-content-center px-3" style="height: 42px;" title="Xóa tìm kiếm">
+									<i class="bi bi-x-lg"></i>
+								</a>
+							}
+						</div>
+					</form>
+				</div>
+
+				<div class="d-flex justify-content-between align-items-center mb-3">
+					<div>
+						<h4 class="fw-bold text-dark mb-0">Thiết bị y tế gia đình</h4>
+						<p class="text-muted small mb-0" id="tbytResultCount">Hiển thị @(Model?.Count() ?? 0) sản phẩm phù hợp</p>
+					</div>
+					@if (!string.IsNullOrEmpty(activeQuery))
+					{
+						<span class="badge bg-light text-dark border px-3 py-2 rounded-pill">Tìm kiếm: "@activeQuery"</span>
+					}
+				</div>
+
+				@if (Model != null && Model.Any()) {
+					<div class="row g-3" id="tbytProductGrid">
+						@foreach(var p in Model) {
+							<div class="col-6 col-md-4 col-lg-3 product-item-card" data-category="@(p.LoaiThuoc?.TenLoai ?? "")" data-treatment="@(p.NhomDieuTri ?? "")">
+								@await Html.PartialAsync("~/Views/Shared/_ProductCard.cshtml", p)
+							</div>
+						}
+					</div>
+				}
+				else {
+					<div class="row">
+						<div class="col-12 text-center py-5 bg-white rounded-4 border shadow-sm">
+							<div class="text-muted mb-3">
+								<i class="bi bi-search fs-1 text-primary" style="opacity: 0.6;"></i>
+							</div>
+							<h5 class="fw-bold text-dark">Không tìm thấy sản phẩm nào</h5>
+							<p class="text-muted small">Chúng tôi chưa có sẵn thiết bị phù hợp với từ khóa này trong kho hàng.</p>
+							<a href="/Catalog/Index?cat=thietbiyte" class="btn btn-tbyt-btn px-4 py-2 rounded-pill mt-2">Xem tất cả thiết bị</a>
+						</div>
+					</div>
+				}
+			</div>
+		</div>
+
+		@await Html.PartialAsync("~/Views/Shared/_ProductScripts.cshtml")
+	</div>
+
+	<script>
+		let activeTbytGoal = 'All';
+
+		function filterByTbyt(goal, element) {
+			activeTbytGoal = goal;
+			
+			// Highlight card
+			document.querySelectorAll('.tbyt-card').forEach(card => {
+				card.classList.remove('active');
+			});
+			if (element) {
+				element.classList.add('active');
+			} else {
+				let targetId = 'tbyt_All';
+				if (goal === 'Máy đo huyết áp') targetId = 'tbyt_huyetap';
+				else if (goal === 'Nhiệt kế') targetId = 'tbyt_nhietke';
+				else if (goal === 'Máy đo SpO2') targetId = 'tbyt_spo2';
+				
+				const el = document.getElementById(targetId);
+				if (el) el.classList.add('active');
+			}
+
+			// Filter grid
+			const items = document.querySelectorAll('#tbytProductGrid .product-item-card');
+			let visibleCount = 0;
+
+			items.forEach(function(item) {
+				const treatmentGroup = item.dataset.treatment || '';
+				const matchGoal = (activeTbytGoal === 'All' || treatmentGroup === activeTbytGoal);
+
+				if (matchGoal) {
+					item.style.display = 'block';
+					visibleCount++;
+				} else {
+					item.style.display = 'none';
+				}
+			});
+
+			const countTextEl = document.getElementById('tbytResultCount');
+			if (countTextEl) {
+				countTextEl.innerText = `Hiển thị ${visibleCount} sản phẩm phù hợp`;
+			}
+
+			const existingEmptyMsg = document.getElementById('noTbytFilteredProductsMessage');
+			if (visibleCount === 0) {
+				if (!existingEmptyMsg) {
+					const grid = document.getElementById('tbytProductGrid');
+					const msgHtml = `
+						<div id="noTbytFilteredProductsMessage" class="col-12 text-center py-5 bg-white rounded-4 border w-100 shadow-3xs mt-3">
+							<div class="text-muted mb-3"><i class="bi bi-search fs-2 text-primary"></i></div>
+							<h6 class="fw-bold text-dark">Chưa có thiết bị cho nhu cầu này</h6>
+							<p class="text-muted small">Hãy liên hệ với Dược sĩ để nhận tư vấn mua hàng riêng.</p>
+						</div>
+					`;
+					grid.insertAdjacentHTML('beforeend', msgHtml);
+				} else {
+					existingEmptyMsg.style.display = 'block';
+				}
+			} else {
+				if (existingEmptyMsg) existingEmptyMsg.style.display = 'none';
+			}
+		}
+
+		function resetTbytFilter() {
+			filterByTbyt('All', document.getElementById('tbyt_All'));
+		}
+	</script>
+}
+else if (isTienLoi)
+{
+	var activeQuery = Context.Request.Query["query"].ToString();
+	var allCats = ViewData["AllCategories"] as IEnumerable<Web_Quản_Lí_Nhà_Thuốc.Models.LoaiThuoc>;
+
+	<style>
+		.tienloi-hero {
+			background: linear-gradient(135deg, #f97316 0%, #ea580c 50%, #c2410c 100%);
+			box-shadow: 0 10px 30px rgba(234, 88, 12, 0.15) !important;
+			border-radius: 20px;
+		}
+		.tienloi-card {
+			cursor: pointer;
+			transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+			border: 1px solid #ffedd5;
+			border-radius: 16px;
+			background-color: #ffffff;
+		}
+		.tienloi-card:hover {
+			transform: translateY(-5px);
+			box-shadow: 0 10px 20px rgba(234, 88, 12, 0.05);
+			border-color: #ea580c;
+		}
+		.tienloi-card.active {
+			border-color: #ea580c;
+			background-color: #fff7ed;
+			box-shadow: 0 10px 20px rgba(234, 88, 12, 0.1);
+		}
+		.tienloi-icon-box {
+			width: 48px;
+			height: 48px;
+			border-radius: 12px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-size: 1.5rem;
+			transition: all 0.2s ease;
+		}
+		.tienloi-card:hover .tienloi-icon-box {
+			transform: scale(1.1);
+		}
+		.tienloi-card.active .tienloi-icon-box {
+			background-color: #ea580c !important;
+			color: #ffffff !important;
+		}
+		.tienloi-search-toolbar-wrapper .input-group-focus {
+			border-color: rgba(234, 88, 12, 0.4) !important;
+			box-shadow: 0 0 0 4px rgba(234, 88, 12, 0.1) !important;
+		}
+		.btn-tienloi-btn {
+			background-color: #ea580c !important;
+			color: white !important;
+			border: none !important;
+			transition: background-color 0.2s;
+		}
+		.btn-tienloi-btn:hover {
+			background-color: #c2410c !important;
+			color: white !important;
+		}
+		.icon-orange-light { background-color: #fff7ed; color: #ea580c; }
+		.icon-amber-light { background-color: #fef3c7; color: #d97706; }
+		
+		.tienloi-bundle-box {
+			background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+			border: 1px dashed #fed7aa;
+			border-radius: 16px;
+			padding: 24px;
+		}
+	</style>
+
+	<div class="container mt-4">
+		<!-- Hero Section -->
+		<div class="tienloi-hero text-white rounded-4 p-5 mb-4 shadow-sm overflow-hidden position-relative">
+			<div class="hero-content position-relative" style="z-index: 2; max-width: 750px;">
+				<span class="badge text-white rounded-pill px-3 py-2 mb-3 fw-semibold text-uppercase tracking-wider" style="font-size: 0.8rem; backdrop-filter: blur(5px); background-color: rgba(255, 255, 255, 0.25);">
+					Tiện Lợi Mỗi Ngày • Chăm Sóc Gia Đình
+				</span>
+				<h1 class="display-5 fw-bold mb-3">Sản Phẩm Tiện Lợi</h1>
+				<p class="lead text-white text-opacity-95 mb-0">Khẩu trang y tế kháng khuẩn, nước rửa tay diệt trùng, kẹo ngậm ho thảo dược và đồ dùng cá nhân tiện dụng luôn sẵn có phục vụ bạn.</p>
+				
+				<div class="d-flex gap-4 mt-4 text-white text-opacity-90 small">
+					<div class="d-flex align-items-center"><i class="bi bi-cart-check-fill text-warning me-2 fs-5"></i> Mua Lẻ Giá Sỉ</div>
+					<div class="d-flex align-items-center"><i class="bi bi-lightning-fill text-warning me-2 fs-5"></i> Giao Hàng Siêu Tốc</div>
+					<div class="d-flex align-items-center"><i class="bi bi-shield-fill-plus text-warning me-2 fs-5"></i> Bảo Vệ 24/7</div>
+				</div>
+			</div>
+			<div style="position: absolute; top: 0; right: 0; bottom: 0; left: 0; background-image: radial-gradient(circle at 85% 30%, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0) 50%); pointer-events: none;"></div>
+		</div>
+
+		<!-- Interactive Convenience Filters -->
+		<div class="row mb-4">
+			<div class="col-12">
+				<div class="card border-0 shadow-sm p-4 bg-white" style="border-radius: 16px;">
+					<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+						<div>
+							<h5 class="fw-bold text-dark mb-1 d-flex align-items-center">
+								<i class="bi bi-cart4 text-warning me-2"></i>
+								Chọn nhu cầu tiện ích hàng ngày
+							</h5>
+							<p class="text-muted small mb-0">Lọc nhanh các vật phẩm vệ sinh phòng dịch và đồ dùng gia đình tiện lợi.</p>
+						</div>
+						<button class="btn btn-outline-secondary btn-sm rounded-pill px-3" onclick="resetTienloiFilter()">Hiển thị tất cả</button>
+					</div>
+
+					<div class="row g-2 justify-content-center">
+						<div class="col-6 col-md-4">
+							<div class="tienloi-card p-3 h-100 text-center d-flex flex-column align-items-center active" id="tienloi_All" onclick="filterByTienloi('All', this)">
+								<div class="tienloi-icon-box icon-orange-light mb-3">
+									<i class="bi bi-grid-3x3-gap-fill"></i>
+								</div>
+								<h6 class="fw-bold small mb-1 text-dark">Tất cả sản phẩm</h6>
+								<span class="text-muted" style="font-size: 0.7rem;">Hiển thị trọn bộ tiện lợi</span>
+							</div>
+						</div>
+						<div class="col-6 col-md-4">
+							<div class="tienloi-card p-3 h-100 text-center d-flex flex-column align-items-center" id="tienloi_khautrang" onclick="filterByTienloi('Khẩu trang & Sát khuẩn', this)">
+								<div class="tienloi-icon-box icon-amber-light mb-3">
+									<i class="bi bi-shield-plus"></i>
+								</div>
+								<h6 class="fw-bold small mb-1 text-dark">Khẩu trang &amp; Sát khuẩn</h6>
+								<span class="text-muted" style="font-size: 0.7rem;">Khẩu trang 4 lớp, rửa tay diệt khuẩn</span>
+							</div>
+						</div>
+						<div class="col-6 col-md-4">
+							<div class="tienloi-card p-3 h-100 text-center d-flex flex-column align-items-center" id="tienloi_keongam" onclick="filterByTienloi('Kẹo ngậm & Đồ uống', this)">
+								<div class="tienloi-icon-box icon-orange-light mb-3" style="background-color: #f1f5f9; color: #475569;">
+									<i class="bi bi-cup-hot"></i>
+								</div>
+								<h6 class="fw-bold small mb-1 text-dark">Kẹo ngậm &amp; Đồ uống</h6>
+								<span class="text-muted" style="font-size: 0.7rem;">Kẹo ho Strepsils, nước điện giải</span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="row">
+			<!-- Sidebar -->
+			<div class="col-lg-3 mb-4">
+				<div class="tienloi-bundle-box shadow-3xs text-center mb-4">
+					<div class="text-warning fs-3 mb-2"><i class="bi bi-gift-fill"></i></div>
+					<h6 class="fw-bold text-dark mb-1">Combo Gia Đình Khỏe</h6>
+					<p class="text-muted small mb-3">Tiết kiệm hơn khi đặt mua trọn bộ combo vệ sinh phòng dịch tại nhà:</p>
+					
+					<div class="text-start bg-white p-2.5 rounded-3 border mb-3">
+						<span class="badge bg-warning text-dark mb-1 small" style="font-size: 0.65rem;">Combo Best-Seller</span>
+						<div class="fw-bold text-dark small">1 Hộp Khẩu trang + 1 Lifebuoy</div>
+						<div class="text-muted small mt-1" style="font-size: 0.7rem;">Bảo vệ gia đình suốt cả tháng chỉ với <span class="fw-bold text-danger">119.000₫</span>.</div>
+					</div>
+					<a href="/Catalog/Index?cat=sanpham-tien-loi" class="btn btn-tienloi-btn btn-sm w-100 rounded-pill py-2 text-white small fw-semibold">Khám phá ngay</a>
+				</div>
+			</div>
+
+			<!-- Grid -->
+			<div class="col-lg-9">
+				<!-- Search -->
+				<div class="card border-0 shadow-sm p-3 bg-white mb-4 tienloi-search-toolbar-wrapper" style="border-radius: 16px;">
+					<form method="get" action="/Catalog/Index" class="row g-2 align-items-center">
+						<input type="hidden" name="cat" value="sanpham-tien-loi" />
+						<div class="col-md-8 col-12">
+							<div class="input-group border rounded-pill overflow-hidden bg-light">
+								<span class="input-group-text bg-transparent border-0"><i class="bi bi-search text-muted"></i></span>
+								<input type="text" name="query" class="form-control border-0 bg-transparent" placeholder="Tìm kiếm khẩu trang, rửa tay, kẹo ngậm..." value="@activeQuery" style="box-shadow: none; height: 42px;">
+							</div>
+						</div>
+						<div class="col-md-4 col-12 d-flex gap-2 justify-content-md-end">
+							<button class="btn btn-tienloi-btn rounded-pill px-4 flex-grow-1" type="submit" style="height: 42px;">Tìm kiếm</button>
+							@if (!string.IsNullOrEmpty(activeQuery))
+							{
+								<a href="/Catalog/Index?cat=sanpham-tien-loi" class="btn btn-outline-secondary rounded-pill d-flex align-items-center justify-content-center px-3" style="height: 42px;" title="Xóa tìm kiếm">
+									<i class="bi bi-x-lg"></i>
+								</a>
+							}
+						</div>
+					</form>
+				</div>
+
+				<div class="d-flex justify-content-between align-items-center mb-3">
+					<div>
+						<h4 class="fw-bold text-dark mb-0">Sản phẩm tiện lợi cho gia đình</h4>
+						<p class="text-muted small mb-0" id="tienloiResultCount">Hiển thị @(Model?.Count() ?? 0) sản phẩm phù hợp</p>
+					</div>
+					@if (!string.IsNullOrEmpty(activeQuery))
+					{
+						<span class="badge bg-light text-dark border px-3 py-2 rounded-pill">Tìm kiếm: "@activeQuery"</span>
+					}
+				</div>
+
+				@if (Model != null && Model.Any()) {
+					<div class="row g-3" id="tienloiProductGrid">
+						@foreach(var p in Model) {
+							<div class="col-6 col-md-4 col-lg-3 product-item-card" data-category="@(p.LoaiThuoc?.TenLoai ?? "")" data-treatment="@(p.NhomDieuTri ?? "")">
+								@await Html.PartialAsync("~/Views/Shared/_ProductCard.cshtml", p)
+							</div>
+						}
+					</div>
+				}
+				else {
+					<div class="row">
+						<div class="col-12 text-center py-5 bg-white rounded-4 border shadow-sm">
+							<div class="text-muted mb-3">
+								<i class="bi bi-search fs-1 text-warning" style="opacity: 0.6;"></i>
+							</div>
+							<h5 class="fw-bold text-dark">Không tìm thấy sản phẩm nào</h5>
+							<p class="text-muted small">Chúng tôi chưa có sẵn sản phẩm phù hợp với từ khóa này trong kho hàng.</p>
+							<a href="/Catalog/Index?cat=sanpham-tien-loi" class="btn btn-tienloi-btn px-4 py-2 rounded-pill mt-2">Xem tất cả sản phẩm</a>
+						</div>
+					</div>
+				}
+			</div>
+		</div>
+
+		@await Html.PartialAsync("~/Views/Shared/_ProductScripts.cshtml")
+	</div>
+
+	<script>
+		let activeTienloiGoal = 'All';
+
+		function filterByTienloi(goal, element) {
+			activeTienloiGoal = goal;
+			
+			// Highlight card
+			document.querySelectorAll('.tienloi-card').forEach(card => {
+				card.classList.remove('active');
+			});
+			if (element) {
+				element.classList.add('active');
+			} else {
+				let targetId = 'tienloi_All';
+				if (goal === 'Khẩu trang & Sát khuẩn') targetId = 'tienloi_khautrang';
+				else if (goal === 'Kẹo ngậm & Đồ uống') targetId = 'tienloi_keongam';
+				
+				const el = document.getElementById(targetId);
+				if (el) el.classList.add('active');
+			}
+
+			// Filter grid
+			const items = document.querySelectorAll('#tienloiProductGrid .product-item-card');
+			let visibleCount = 0;
+
+			items.forEach(function(item) {
+				const treatmentGroup = item.dataset.treatment || '';
+				const matchGoal = (activeTienloiGoal === 'All' || treatmentGroup === activeTienloiGoal);
+
+				if (matchGoal) {
+					item.style.display = 'block';
+					visibleCount++;
+				} else {
+					item.style.display = 'none';
+				}
+			});
+
+			const countTextEl = document.getElementById('tienloiResultCount');
+			if (countTextEl) {
+				countTextEl.innerText = `Hiển thị ${visibleCount} sản phẩm phù hợp`;
+			}
+
+			const existingEmptyMsg = document.getElementById('noTienloiFilteredProductsMessage');
+			if (visibleCount === 0) {
+				if (!existingEmptyMsg) {
+					const grid = document.getElementById('tienloiProductGrid');
+					const msgHtml = `
+						<div id="noTienloiFilteredProductsMessage" class="col-12 text-center py-5 bg-white rounded-4 border w-100 shadow-3xs mt-3">
+							<div class="text-muted mb-3"><i class="bi bi-search fs-2 text-warning"></i></div>
+							<h6 class="fw-bold text-dark">Chưa có sản phẩm cho nhóm này</h6>
+							<p class="text-muted small">Hãy liên hệ với Dược sĩ để nhận hỗ trợ tìm kiếm sản phẩm.</p>
+						</div>
+					`;
+					grid.insertAdjacentHTML('beforeend', msgHtml);
+				} else {
+					existingEmptyMsg.style.display = 'block';
+				}
+			} else {
+				if (existingEmptyMsg) existingEmptyMsg.style.display = 'none';
+			}
+		}
+
+		function resetTienloiFilter() {
+			filterByTienloi('All', document.getElementById('tienloi_All'));
+		}
+	</script>
+}
+else
+{
+	var activeLoaiId = Context.Request.Query["loaiId"].ToString();
+	var activeQuery = Context.Request.Query["query"].ToString();
+	var allCats = ViewData["AllCategories"] as IEnumerable<Web_Quản_Lí_Nhà_Thuốc.Models.LoaiThuoc>;
+	var activeCategoryName = allCats?.FirstOrDefault(c => c.Id.ToString() == activeLoaiId)?.TenLoai ?? "Tất cả dược phẩm";
+
+
+	<style>
+		.category-sidebar-link {
+			color: #475569;
+			font-size: 0.9rem;
+			font-weight: 500;
+			transition: all 0.2s ease;
+		}
+		.category-sidebar-link:hover {
+			background-color: #f8fafc;
+			color: #0d9488;
+			transform: translateX(3px);
+		}
+		.category-sidebar-link.active {
+			background-color: #0d9488 !important;
+			color: white !important;
+			font-weight: 600;
+			box-shadow: 0 4px 12px rgba(13, 148, 136, 0.15);
+		}
+		.category-sidebar-link.active i {
+			color: white !important;
+		}
+		.catalog-hero {
+			background: linear-gradient(135deg, #0d9488 0%, #3b82f6 100%);
+			box-shadow: 0 10px 30px rgba(13, 148, 136, 0.1) !important;
+		}
+		.search-toolbar-wrapper .input-group-focus {
+			border-color: rgba(13, 148, 136, 0.4) !important;
+			box-shadow: 0 0 0 4px rgba(13, 148, 136, 0.1) !important;
+		}
+		.product-item-card {
+			transition: transform 0.3s ease, box-shadow 0.3s ease;
+		}
+		.product-item-card:hover {
+			transform: translateY(-5px);
+		}
+	</style>
+
+	<div class="container mt-4">
+		<!-- Hero section for Thuốc -->
+		<div class="catalog-hero text-white rounded-4 p-5 mb-4 shadow-sm overflow-hidden position-relative">
+			<div class="hero-content position-relative" style="z-index: 2; max-width: 700px;">
+				<span class="badge text-white rounded-pill px-3 py-2 mb-3 fw-semibold text-uppercase tracking-wider" style="font-size: 0.8rem; backdrop-filter: blur(5px); background-color: rgba(255, 255, 255, 0.25);">
+					Nhà Thuốc Chính Hãng GPP
+				</span>
+				<h1 class="display-5 fw-bold mb-3">Danh Mục Thuốc & Dược Phẩm</h1>
+				<p class="lead text-white text-opacity-90 mb-0">Cam kết 100% thuốc chính hãng, được bảo quản trong điều kiện chuẩn nhiệt độ và độ ẩm, phục vụ tư vấn tận tâm bởi đội ngũ Dược sĩ giàu kinh nghiệm.</p>
+			</div>
+			<div style="position: absolute; top: 0; right: 0; bottom: 0; left: 0; background-image: radial-gradient(circle at 85% 30%, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0) 50%); pointer-events: none;"></div>
+		</div>
+
+		<div class="row">
+			<!-- Sidebar: Categories -->
+			<div class="col-lg-3 mb-4">
+				<div class="card border-0 shadow-sm mb-4" style="border-radius: 16px; overflow: hidden;">
+					<div class="card-header bg-white border-0 pt-4 px-4 pb-2">
+						<h6 class="fw-bold mb-0 text-dark d-flex align-items-center">
+							<i class="bi bi-grid-fill text-teal me-2"></i>
+							Phân loại dược phẩm
+						</h6>
+					</div>
+					<div class="card-body px-3 py-2">
+						<ul class="list-unstyled mb-0">
+							<li class="mb-1">
+								<a class="category-sidebar-link d-flex align-items-center justify-content-between p-2.5 rounded-3 text-decoration-none @(string.IsNullOrEmpty(activeLoaiId) ? "active" : "")" href="/Catalog/Index?cat=thuoc">
+									<span class="d-flex align-items-center">
+										<i class="bi bi-grid-3x3-gap-fill me-2 fs-6 text-teal"></i>
+										Tất cả sản phẩm
+									</span>
+									<i class="bi bi-chevron-right fs-7 opacity-50"></i>
+								</a>
+							</li>
+							@if (allCats != null)
+							{
+								foreach(var c in allCats) {
+									var isCurrent = c.Id.ToString() == activeLoaiId;
+									<li class="mb-1">
+										<a class="category-sidebar-link d-flex align-items-center justify-content-between p-2.5 rounded-3 text-decoration-none @(isCurrent ? "active" : "")" href="/Catalog/Index?cat=thuoc&loaiId=@c.Id">
+											<span class="d-flex align-items-center">
+												<i class="bi bi-capsule-pill me-2 fs-6 text-teal"></i>
+												@c.TenLoai
+											</span>
+											<i class="bi bi-chevron-right fs-7 opacity-50"></i>
+										</a>
+									</li>
+								}
+							}
+						</ul>
+					</div>
+				</div>
+
+				<div class="card border-0 shadow-sm p-4 text-center bg-white" style="border-radius: 16px; background: linear-gradient(180deg, #f0fdfa 0%, #ffffff 100%) !important;">
+					<div class="text-teal fs-3 mb-2"><i class="bi bi-file-earmark-medical"></i></div>
+					<h6 class="fw-bold mb-1">Có đơn thuốc của bác sĩ?</h6>
+					<p class="text-muted small mb-3">Tải đơn thuốc lên để Dược sĩ liên hệ chuẩn bị thuốc và giao tận nơi.</p>
+					<a href="/Home/PrescriptionUpload" class="btn btn-teal-btn btn-sm rounded-pill w-100 py-2">Gửi đơn thuốc</a>
+				</div>
+			</div>
+
+			<!-- Main product grid -->
+			<div class="col-lg-9">
+				<!-- Search and filter toolbar -->
+				<div class="card border-0 shadow-sm p-3 bg-white mb-4 search-toolbar-wrapper" style="border-radius: 16px;">
+					<form method="get" action="/Catalog/Index" class="row g-2 align-items-center">
+						<input type="hidden" name="cat" value="thuoc" />
+						<input type="hidden" name="loaiId" value="@activeLoaiId" />
+						<div class="col-md-8 col-12">
+							<div class="input-group border rounded-pill overflow-hidden bg-light">
+								<span class="input-group-text bg-transparent border-0"><i class="bi bi-search text-muted"></i></span>
+								<input type="text" name="query" class="form-control border-0 bg-transparent" placeholder="Tìm kiếm thuốc trong danh mục..." value="@activeQuery" style="box-shadow: none; height: 42px;">
+							</div>
+						</div>
+						<div class="col-md-4 col-12 d-flex gap-2 justify-content-md-end">
+							<button class="btn btn-teal-btn rounded-pill px-4 flex-grow-1" type="submit" style="height: 42px;">Tìm kiếm</button>
+							@if (!string.IsNullOrEmpty(activeQuery) || !string.IsNullOrEmpty(activeLoaiId))
+							{
+								<a href="/Catalog/Index?cat=thuoc" class="btn btn-outline-secondary rounded-pill d-flex align-items-center justify-content-center px-3" style="height: 42px;" title="Xóa bộ lọc">
+									<i class="bi bi-x-lg"></i>
+								</a>
+							}
+						</div>
+					</form>
+				</div>
+
+				<div class="d-flex justify-content-between align-items-center mb-3">
+					<div>
+						<h4 class="fw-bold text-dark mb-0">@activeCategoryName</h4>
+						<p class="text-muted small mb-0">Hiển thị @(Model?.Count() ?? 0) sản phẩm phù hợp</p>
+					</div>
+					@if (!string.IsNullOrEmpty(activeQuery))
+					{
+						<span class="badge bg-light text-dark border px-3 py-2 rounded-pill">Từ khóa: "@activeQuery"</span>
+					}
+				</div>
+
+				@if (Model != null && Model.Any()) {
+					<div class="row g-3" id="productGrid">
+						@foreach(var p in Model) {
+							<div class="col-6 col-md-4 col-lg-3 product-item-card">
+								@await Html.PartialAsync("~/Views/Shared/_ProductCard.cshtml", p)
+							</div>
+						}
+					</div>
+				}
+				else {
+					<div class="row">
+						<div class="col-12 text-center py-5 bg-white rounded-4 border shadow-sm">
+							<div class="text-muted mb-3">
+								<i class="bi bi-search fs-1 text-teal" style="opacity: 0.6;"></i>
+							</div>
+							<h5 class="fw-bold text-dark">Không tìm thấy sản phẩm nào</h5>
+							<p class="text-muted small">Chúng tôi chưa có sẵn sản phẩm trong phân loại này hoặc khớp với từ khóa tìm kiếm của bạn.</p>
+							<a href="/Catalog/Index?cat=thuoc" class="btn btn-teal-btn px-4 py-2 rounded-pill mt-2">Xem tất cả thuốc</a>
+						</div>
+					</div>
 				}
 			</div>
 		</div>
@@ -549,3 +1924,4 @@ else
 		@await Html.PartialAsync("~/Views/Shared/_ProductScripts.cshtml")
 	</div>
 }
+

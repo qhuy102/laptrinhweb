@@ -1,50 +1,844 @@
 @model IEnumerable<Web_Quản_Lí_Nhà_Thuốc.Models.Thuoc>
 
 @{
-    ViewData["Title"] = "Quản lý Thuốc";
+    ViewData["Title"] = "Quản lý Kho Thuốc";
+    
+    // Calculate dashboard statistics from Model
+    var totalUnique = Model.Count();
+    var totalStock = Model.Sum(m => m.SoLuong);
+    var lowStockCount = Model.Count(m => m.SoLuong < 20);
+    var nearExpiryCount = Model.Count(m => (m.HanSuDung - DateTime.Today).TotalDays < 90 && (m.HanSuDung - DateTime.Today).TotalDays >= 0);
+    var expiredCount = Model.Count(m => m.HanSuDung < DateTime.Today);
 }
 
-<div class="container-fluid mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h2>Quản lý danh mục thuốc</h2>
-        <a asp-action="Create" class="btn btn-primary">Thêm thuốc mới</a>
+<style>
+    :root {
+        --teal-primary: #0d9488;
+        --teal-hover: #0f766e;
+        --teal-light: #f0fdfa;
+        --indigo-primary: #6366f1;
+        --indigo-light: #e0e7ff;
+        --emerald-primary: #10b981;
+        --emerald-light: #d1fae5;
+        --amber-primary: #f59e0b;
+        --amber-light: #fef3c7;
+        --rose-primary: #f43f5e;
+        --rose-light: #ffe4e6;
+    }
+
+    .med-dashboard {
+        font-family: 'Inter', sans-serif;
+    }
+
+    .med-stat-card {
+        border: none;
+        border-radius: 16px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        background: #ffffff;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+        overflow: hidden;
+        position: relative;
+    }
+
+    .med-stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 20px -8px rgba(0, 0, 0, 0.08);
+    }
+
+    .med-stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+    }
+
+    .med-stat-card.stat-total::before { background-color: var(--indigo-primary); }
+    .med-stat-card.stat-stock::before { background-color: var(--emerald-primary); }
+    .med-stat-card.stat-low::before { background-color: var(--amber-primary); }
+    .med-stat-card.stat-expiry::before { background-color: var(--rose-primary); }
+
+    .icon-shape {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+    }
+
+    .icon-indigo { background-color: var(--indigo-light); color: var(--indigo-primary); }
+    .icon-emerald { background-color: var(--emerald-light); color: var(--emerald-primary); }
+    .icon-amber { background-color: var(--amber-light); color: var(--amber-primary); }
+    .icon-rose { background-color: var(--rose-light); color: var(--rose-primary); }
+
+    .med-search-bar {
+        border-radius: 12px;
+        padding-left: 45px;
+        height: 46px;
+        border: 1px solid #e2e8f0;
+        transition: all 0.2s ease;
+    }
+
+    .med-search-bar:focus {
+        border-color: var(--teal-primary);
+        box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.15);
+    }
+
+    .med-search-wrapper i {
+        position: absolute;
+        left: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94a3b8;
+    }
+
+    .med-select-filter {
+        border-radius: 12px;
+        height: 46px;
+        border: 1px solid #e2e8f0;
+    }
+
+    .med-select-filter:focus {
+        border-color: var(--teal-primary);
+        box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.15);
+    }
+
+    .med-table-card {
+        border: none;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+        background: #ffffff;
+        overflow: hidden;
+    }
+
+    .med-table {
+        margin: 0;
+    }
+
+    .med-table th {
+        background-color: #f8fafc;
+        border-bottom: 2px solid #f1f5f9;
+        color: #475569;
+        font-weight: 600;
+        font-size: 0.82rem;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        padding: 1.1rem 1.25rem;
+    }
+
+    .med-table td {
+        padding: 1.1rem 1.25rem;
+        border-bottom: 1px solid #f1f5f9;
+        vertical-align: middle;
+        font-size: 0.9rem;
+    }
+
+    .med-table tbody tr {
+        transition: background-color 0.2s ease;
+    }
+
+    .med-table tbody tr:hover {
+        background-color: #fafbfd;
+    }
+
+    .med-thumbnail {
+        width: 44px;
+        height: 44px;
+        border-radius: 10px;
+        background-color: #f1f5f9;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--teal-primary);
+        font-size: 1.2rem;
+        border: 1px solid #e2e8f0;
+        object-fit: contain;
+    }
+
+    .med-badge {
+        padding: 0.4rem 0.75rem;
+        border-radius: 30px;
+        font-weight: 500;
+        font-size: 0.78rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .med-badge-stock-in { background-color: var(--emerald-light); color: var(--emerald-primary); }
+    .med-badge-stock-low { background-color: var(--amber-light); color: var(--amber-primary); }
+    .med-badge-stock-empty { background-color: var(--rose-light); color: var(--rose-primary); }
+
+    .med-badge-expiry-good { background-color: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; }
+    .med-badge-expiry-warn { background-color: #fffbeb; color: #b45309; border: 1px solid #fef3c7; }
+    .med-badge-expiry-danger { background-color: #fff1f2; color: #be123c; border: 1px solid #ffe4e6; }
+
+    .btn-med-action {
+        width: 34px;
+        height: 34px;
+        border-radius: 8px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        transition: all 0.2s ease;
+        text-decoration: none;
+    }
+
+    .btn-med-edit { background-color: #fef3c7; color: #d97706; }
+    .btn-med-edit:hover { background-color: #fde68a; color: #b45309; transform: scale(1.05); }
+
+    .btn-med-delete { background-color: #ffe4e6; color: #e11d48; }
+    .btn-med-delete:hover { background-color: #fecdd3; color: #be123c; transform: scale(1.05); }
+
+    .btn-med-primary {
+        background-color: var(--teal-primary);
+        color: #ffffff;
+        border: none;
+        padding: 0.6rem 1.25rem;
+        border-radius: 12px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        box-shadow: 0 4px 10px rgba(13, 148, 136, 0.15);
+    }
+
+    .btn-med-primary:hover {
+        background-color: var(--teal-hover);
+        color: #ffffff;
+        box-shadow: 0 6px 14px rgba(13, 148, 136, 0.25);
+        transform: translateY(-1px);
+    }
+
+    .tab-filter-btn {
+        border: none;
+        background: transparent;
+        padding: 0.6rem 1.2rem;
+        font-weight: 500;
+        color: #64748b;
+        border-radius: 10px;
+        transition: all 0.2s ease;
+    }
+
+    .tab-filter-btn:hover {
+        background-color: #f1f5f9;
+        color: #334155;
+    }
+
+    .tab-filter-btn.active {
+        background-color: var(--teal-light);
+        color: var(--teal-primary);
+    }
+
+    .cat-tab-btn {
+        border: 1px solid #e2e8f0;
+        background: #ffffff;
+        padding: 0.5rem 1rem;
+        font-weight: 500;
+        color: #475569;
+        border-radius: 10px;
+        transition: all 0.2s ease;
+        font-size: 0.82rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .cat-tab-btn:hover {
+        background-color: #f1f5f9;
+        border-color: #cbd5e1;
+        color: #1e293b;
+    }
+
+    .cat-tab-btn.active {
+        background-color: var(--teal-primary);
+        border-color: var(--teal-primary);
+        color: #ffffff;
+        box-shadow: 0 4px 10px rgba(13, 148, 136, 0.15);
+    }
+
+    .subcat-tab-btn {
+        border: 1px solid #cbd5e1;
+        background: #ffffff;
+        padding: 0.35rem 0.8rem;
+        font-weight: 500;
+        color: #475569;
+        border-radius: 20px;
+        transition: all 0.2s ease;
+        font-size: 0.76rem;
+    }
+
+    .subcat-tab-btn:hover {
+        background-color: #f8fafc;
+        border-color: #94a3b8;
+        color: #0f172a;
+    }
+
+    .subcat-tab-btn.active {
+        background-color: var(--teal-light);
+        border-color: var(--teal-primary);
+        color: var(--teal-primary);
+        font-weight: 600;
+    }
+
+    .med-empty-state {
+        padding: 3.5rem 2rem;
+        text-align: center;
+        background: #ffffff;
+    }
+</style>
+
+<div class="container-fluid py-4 med-dashboard">
+    <!-- Breadcrumb and header -->
+    <div class="row align-items-center mb-4">
+        <div class="col-md-6 col-12 mb-3 mb-md-0">
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <span class="badge bg-teal text-white py-1.5 px-2.5 rounded-pill" style="font-size: 0.75rem;">ADMIN PANEL</span>
+                <span class="text-muted"><i class="bi bi-chevron-right fs-7"></i></span>
+                <span class="text-muted small">Quản lý kho</span>
+            </div>
+            <h2 class="fw-bold mb-0 text-dark">Quản lý Kho Thuốc</h2>
+            <p class="text-muted small mb-0">Theo dõi, kiểm tra hạn sử dụng và số lượng thuốc tồn kho tiện lợi.</p>
+        </div>
+        <div class="col-md-6 col-12 d-flex justify-content-md-end justify-content-start">
+            <a asp-action="Create" class="btn btn-med-primary d-flex align-items-center gap-2">
+                <i class="bi bi-plus-circle-fill"></i>
+                Thêm thuốc mới
+            </a>
+        </div>
     </div>
 
-    <table class="table table-bordered table-striped table-hover">
-        <thead class="table-dark">
-            <tr>
-                <th>Tên Thuốc</th>
-                <th>Phân loại</th>
-                <th>Giá</th>
-                <th>Số lượng</th>
-                <th>HSD</th>
-                <th>Hoạt chất</th>
-                <th>Vị trí kệ</th>
-                <th>Thao tác</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model) {
-                <tr>
-                    <td>@item.TenThuoc</td>
-                    <td>@(item.LoaiThuoc?.TenLoai ?? "Chưa phân loại")</td>
-                    <td>@item.DonGia.ToString("N0") ₫</td>
-                    <td>
-                        @if (item.SoLuong < 20) {
-                            <span class="badge bg-danger">@item.SoLuong</span>
-                        } else {
-                            <span class="badge bg-success">@item.SoLuong</span>
+    <!-- Stats summary grid -->
+    <div class="row g-3 mb-4">
+        <div class="col-xl-3 col-sm-6 col-12">
+            <div class="card med-stat-card stat-total">
+                <div class="card-body p-4 d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="text-muted fw-medium small d-block mb-1">Tổng loại thuốc</span>
+                        <h3 class="fw-bold mb-0 text-dark">@totalUnique</h3>
+                    </div>
+                    <div class="icon-shape icon-indigo">
+                        <i class="bi bi-database"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-sm-6 col-12">
+            <div class="card med-stat-card stat-stock">
+                <div class="card-body p-4 d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="text-muted fw-medium small d-block mb-1">Tổng sản phẩm tồn</span>
+                        <h3 class="fw-bold mb-0 text-dark">@totalStock.ToString("N0")</h3>
+                    </div>
+                    <div class="icon-shape icon-emerald">
+                        <i class="bi bi-box-seam"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-sm-6 col-12">
+            <div class="card med-stat-card stat-low" style="cursor: pointer;" onclick="activateTabFilter('low-stock')">
+                <div class="card-body p-4 d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="text-muted fw-medium small d-block mb-1">Sắp hết hàng (<20)</span>
+                        <h3 class="fw-bold mb-0 text-dark">@lowStockCount</h3>
+                    </div>
+                    <div class="icon-shape icon-amber">
+                        <i class="bi bi-exclamation-triangle"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-sm-6 col-12">
+            <div class="card med-stat-card stat-expiry" style="cursor: pointer;" onclick="activateTabFilter('near-expiry')">
+                <div class="card-body p-4 d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="text-muted fw-medium small d-block mb-1">Sắp hết hạn / Hết hạn</span>
+                        <h3 class="fw-bold mb-0 text-dark">@(nearExpiryCount + expiredCount)</h3>
+                    </div>
+                    <div class="icon-shape icon-rose">
+                        <i class="bi bi-calendar-x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters and Tabs -->
+    <div class="card med-table-card mb-4">
+        <div class="card-header bg-white border-0 pt-4 px-4 pb-3">
+            <div class="row align-items-center g-3">
+                <!-- Tab buttons -->
+                <div class="col-lg-6 col-12 d-flex flex-wrap gap-1">
+                    <button class="tab-filter-btn active" id="tab-all" onclick="filterByTab('all')">Tất cả</button>
+                    <button class="tab-filter-btn" id="tab-low-stock" onclick="filterByTab('low-stock')">Sắp hết hàng</button>
+                    <button class="tab-filter-btn" id="tab-near-expiry" onclick="filterByTab('near-expiry')">Sắp hết hạn</button>
+                    <button class="tab-filter-btn text-danger" id="tab-expired" onclick="filterByTab('expired')">Đã hết hạn (@expiredCount)</button>
+                </div>
+                <!-- Filters and Search -->
+                <div class="col-lg-6 col-12">
+                    <div class="row g-2">
+                        <div class="col-sm-7 col-12 med-search-wrapper position-relative">
+                            <i class="bi bi-search"></i>
+                            <input type="text" id="medSearch" class="form-control med-search-bar" placeholder="Tìm tên thuốc, hoạt chất..." onkeyup="performSearchFilter()">
+                        </div>
+                        <div class="col-sm-5 col-12">
+                            <select id="medCategoryFilter" class="form-select med-select-filter" onchange="handleSelectCategoryChange()">
+                                <option value="">Tất cả phân loại</option>
+                                @foreach (var cat in Model.Select(m => m.LoaiThuoc?.TenLoai).Where(t => t != null).Distinct())
+                                {
+                                    <option value="@cat">@cat</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Phân loại danh mục chính tương tự Client Catalog -->
+        <div class="px-4 pb-3 border-bottom d-flex flex-wrap gap-2 align-items-center" style="background-color: #fafbfc;">
+            <span class="text-muted small fw-bold me-2"><i class="bi bi-funnel-fill text-teal"></i> DANH MỤC:</span>
+            <button class="cat-tab-btn active" id="cat-all" onclick="filterByCategory('all')">
+                <i class="bi bi-grid-3x3-gap-fill"></i> Tất cả danh mục
+            </button>
+            <button class="cat-tab-btn" id="cat-thuoc" onclick="filterByCategory('thuoc')">
+                <i class="bi bi-capsule-pill"></i> Thuốc (Kê đơn & Không kê đơn)
+            </button>
+            <button class="cat-tab-btn" id="cat-tpcn" onclick="filterByCategory('tpcn')">
+                <i class="bi bi-shield-heart"></i> Thực phẩm chức năng
+            </button>
+            <button class="cat-tab-btn" id="cat-duocmypham" onclick="filterByCategory('duocmypham')">
+                <i class="bi bi-heart"></i> Dược mỹ phẩm
+            </button>
+            <button class="cat-tab-btn" id="cat-mebe" onclick="filterByCategory('mebe')">
+                <i class="bi bi-baby-carriage"></i> Mẹ và bé
+            </button>
+            <button class="cat-tab-btn" id="cat-thietbiyte" onclick="filterByCategory('thietbiyte')">
+                <i class="bi bi-thermometer-half"></i> Thiết bị y tế
+            </button>
+            <button class="cat-tab-btn" id="cat-tienloi" onclick="filterByCategory('tienloi')">
+                <i class="bi bi-box-seam"></i> Sản phẩm tiện lợi
+            </button>
+        </div>
+
+        <!-- Nhóm chi tiết theo các danh mục đặc thù (Mẹ & Bé, Thiết bị y tế, Sản phẩm tiện lợi...) -->
+        <div id="subCatFilterRow" class="px-4 py-2 border-bottom flex-wrap gap-1 align-items-center" style="display: none; background-color: #f8fafc;">
+            <span class="text-muted small fw-semibold me-2" id="subCatTitle"><i class="bi bi-tag text-teal me-1"></i> NHÓM CHI TIẾT:</span>
+            <div id="subCatButtons" class="d-inline-flex flex-wrap gap-1">
+                <!-- Nút phân loại phụ sẽ được render tự động -->
+            </div>
+        </div>
+
+        <!-- Table Content -->
+        <div class="table-responsive">
+            <table class="table med-table" id="medicineTable">
+                <thead>
+                    <tr>
+                        <th style="width: 50px;">Ảnh</th>
+                        <th>Thông tin Thuốc</th>
+                        <th>Phân loại</th>
+                        <th class="text-end">Đơn Giá</th>
+                        <th class="text-center">Số lượng tồn</th>
+                        <th class="text-center">Hạn Sử Dụng</th>
+                        <th>Vị trí kệ</th>
+                        <th class="text-end" style="width: 110px;">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model) {
+                        var daysToExpiry = (item.HanSuDung - DateTime.Today).TotalDays;
+                        string stockStatusClass = "med-badge-stock-in";
+                        string stockStatusText = "Còn hàng";
+                        if (item.SoLuong == 0) {
+                            stockStatusClass = "med-badge-stock-empty";
+                            stockStatusText = "Hết hàng";
+                        } else if (item.SoLuong < 20) {
+                            stockStatusClass = "med-badge-stock-low";
+                            stockStatusText = "Sắp hết";
                         }
-                    </td>
-                    <td>@item.HanSuDung.ToString("dd/MM/yyyy")</td>
-                    <td>@item.HoatChat</td>
-                    <td>@item.ViTriKe</td>
-                    <td>
-                        <a asp-action="Edit" asp-route-id="@item.MaThuoc" class="btn btn-sm btn-warning">Sửa</a>
-                        <a asp-action="Delete" asp-route-id="@item.MaThuoc" class="btn btn-sm btn-danger">Xóa</a>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+
+                        string expiryClass = "med-badge-expiry-good";
+                        string expiryText = "Còn hạn";
+                        if (daysToExpiry < 0) {
+                            expiryClass = "med-badge-expiry-danger";
+                            expiryText = "Hết hạn";
+                        } else if (daysToExpiry < 90) {
+                            expiryClass = "med-badge-expiry-warn";
+                            expiryText = $"Hạn dưới {Math.Ceiling(daysToExpiry/30)} tháng";
+                        }
+
+                        var lowerName = item.TenThuoc.ToLower();
+                        string fallbackImgUrl = "https://via.placeholder.com/100/e2e8f0/0d9488?text=" + Uri.EscapeDataString(item.TenThuoc.Substring(0, Math.Min(item.TenThuoc.Length, 2)));
+                        if (lowerName.Contains("panadol") || lowerName.Contains("paracetamol")) {
+                            fallbackImgUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Tylenol_Extra_Strength.jpg/120px-Tylenol_Extra_Strength.jpg";
+                        } else if (lowerName.Contains("cetaphil")) {
+                            fallbackImgUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Cetaphil_Daily_Facial_Cleanser.png/120px-Cetaphil_Daily_Facial_Cleanser.png";
+                        } else if (lowerName.Contains("amoxicillin")) {
+                            fallbackImgUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Amoxicillin_500_mg_capsule.JPG/120px-Amoxicillin_500_mg_capsule.JPG";
+                        } else if (lowerName.Contains("vitamin")) {
+                            fallbackImgUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Ascorbic_acid_crystals.jpg/120px-Ascorbic_acid_crystals.jpg";
+                        }
+
+                        <tr class="medicine-row" 
+                            data-name="@item.TenThuoc.ToLower()" 
+                            data-active-ingredient="@(item.HoatChat?.ToLower() ?? "")"
+                            data-category="@(item.LoaiThuoc?.TenLoai ?? "Chưa phân loại")"
+                            data-treatment="@(item.NhomDieuTri ?? "")"
+                            data-is-low-stock="@(item.SoLuong < 20 ? "true" : "false")"
+                            data-is-near-expiry="@(daysToExpiry >= 0 && daysToExpiry < 90 ? "true" : "false")"
+                            data-is-expired="@(daysToExpiry < 0 ? "true" : "false")">
+                            
+                            <td>
+                                <img src="@(string.IsNullOrEmpty(item.HinhAnh) ? fallbackImgUrl : item.HinhAnh)" 
+                                     alt="@item.TenThuoc" 
+                                     class="med-thumbnail"
+                                     onerror="this.src='https://via.placeholder.com/60x60?text=Thuoc'"/>
+                            </td>
+                            <td>
+                                <div class="fw-bold text-dark mb-0 fs-6">@item.TenThuoc</div>
+                                <div class="text-muted small">
+                                    @if (!string.IsNullOrEmpty(item.HoatChat)) {
+                                        <span>Hoạt chất: <span class="fw-semibold">@item.HoatChat</span></span>
+                                    } else {
+                                        <span>Không có hoạt chất đăng ký</span>
+                                    }
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge bg-light text-secondary border px-2.5 py-1.5 rounded" style="font-size: 0.8rem;">
+                                    <i class="bi bi-tag me-1"></i>
+                                    @(item.LoaiThuoc?.TenLoai ?? "Chưa phân loại")
+                                </span>
+                            </td>
+                            <td class="text-end fw-bold text-teal">
+                                @item.DonGia.ToString("N0") ₫
+                                <div class="text-muted text-end fw-normal" style="font-size: 0.72rem;">mỗi @(item.DonViCoBan ?? "Viên")</div>
+                            </td>
+                            <td class="text-center">
+                                <div class="fw-semibold">@item.SoLuong @(item.DonViCoBan ?? "Viên")</div>
+                                <span class="med-badge @stockStatusClass mt-1">
+                                    @stockStatusText
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <div class="fw-semibold">@item.HanSuDung.ToString("dd/MM/yyyy")</div>
+                                <span class="med-badge @expiryClass mt-1">
+                                    @expiryText
+                                </span>
+                            </td>
+                            <td>
+                                @if (!string.IsNullOrEmpty(item.ViTriKe)) {
+                                    <span class="small text-dark fw-medium"><i class="bi bi-geo-alt me-1 text-teal"></i>@item.ViTriKe</span>
+                                } else {
+                                    <span class="text-muted small">Chưa xếp kệ</span>
+                                }
+                            </td>
+                            <td class="text-end">
+                                <div class="d-inline-flex gap-1.5">
+                                    <a asp-action="Edit" asp-route-id="@item.MaThuoc" class="btn-med-action btn-med-edit" title="Chỉnh sửa thông tin">
+                                        <i class="bi bi-pencil-fill"></i>
+                                    </a>
+                                    <a asp-action="Delete" asp-route-id="@item.MaThuoc" class="btn-med-action btn-med-delete" title="Xóa thuốc">
+                                        <i class="bi bi-trash-fill"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Empty state -->
+        <div id="emptyState" class="med-empty-state" style="display: none;">
+            <div class="mb-3">
+                <i class="bi bi-search fs-1 text-muted"></i>
+            </div>
+            <h5 class="fw-bold text-dark">Không tìm thấy kết quả phù hợp</h5>
+            <p class="text-muted small">Thử thay đổi từ khóa tìm kiếm hoặc phân loại lọc.</p>
+        </div>
+    </div>
 </div>
+
+<script>
+    let currentTab = 'all';
+    let currentCategory = 'all';
+    let currentSubCategory = 'all';
+
+    const subCategories = {
+        'all': [],
+        'thuoc': [
+            { label: 'Tất cả nhóm', value: 'all' },
+            { label: 'Hạ sốt - Giảm đau', value: 'Hạ sốt - Giảm đau' },
+            { label: 'Hô hấp - Cảm cúm', value: 'Hô hấp - Cảm cúm' },
+            { label: 'Kháng sinh - Kháng viêm', value: 'Kháng sinh - Kháng viêm' }
+        ],
+        'tpcn': [
+            { label: 'Tất cả mục tiêu', value: 'all' },
+            { label: 'Tăng đề kháng & Miễn dịch', value: 'Tăng đề kháng & Miễn dịch' },
+            { label: 'Bổ não & Giảm căng thẳng', value: 'Bổ não & Giảm căng thẳng' },
+            { label: 'Bổ mắt & Tim mạch', value: 'Bổ mắt & Tim mạch' },
+            { label: 'Xương khớp chắc khỏe', value: 'Xương khớp chắc khỏe' },
+            { label: 'Hỗ trợ tiêu hóa', value: 'Hỗ trợ tiêu hóa' },
+            { label: 'Đẹp da & Chống lão hóa', value: 'Đẹp da & Chống lão hóa' }
+        ],
+        'duocmypham': [
+            { label: 'Tất cả', value: 'all' },
+            { label: 'Chăm sóc da - Dược mỹ phẩm', value: 'Chăm sóc da - Dược mỹ phẩm' }
+        ],
+        'mebe': [
+            { label: 'Tất cả giai đoạn', value: 'all' },
+            { label: 'Trẻ sơ sinh (0 - 6 tháng)', value: 'Trẻ sơ sinh (0 - 6 tháng)' },
+            { label: 'Dành cho Mẹ bầu', value: 'Dành cho Mẹ bầu' }
+        ],
+        'thietbiyte': [
+            { label: 'Tất cả thiết bị', value: 'all' },
+            { label: 'Máy đo huyết áp', value: 'Máy đo huyết áp' },
+            { label: 'Nhiệt kế', value: 'Nhiệt kế' },
+            { label: 'Máy đo SpO2', value: 'Máy đo SpO2' }
+        ],
+        'tienloi': [
+            { label: 'Tất cả sản phẩm', value: 'all' },
+            { label: 'Khẩu trang & Sát khuẩn', value: 'Khẩu trang & Sát khuẩn' },
+            { label: 'Kẹo ngậm & Đồ uống', value: 'Kẹo ngậm & Đồ uống' }
+        ]
+    };
+
+    function filterByTab(tab) {
+        currentTab = tab;
+        
+        // Remove active class from all tabs
+        document.querySelectorAll('.tab-filter-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        
+        // Add active class to selected tab
+        const activeBtn = document.getElementById('tab-' + tab);
+        if (activeBtn) {
+            activeBtn.classList.add('active');
+        }
+
+        performSearchFilter();
+    }
+
+    function activateTabFilter(tab) {
+        filterByTab(tab);
+    }
+
+    function renderSubCategories(cat) {
+        const row = document.getElementById('subCatFilterRow');
+        const container = document.getElementById('subCatButtons');
+        const titleEl = document.getElementById('subCatTitle');
+        if (!row || !container) return;
+
+        const subs = subCategories[cat] || [];
+        if (subs.length === 0) {
+            row.style.display = 'none';
+            container.innerHTML = '';
+            currentSubCategory = 'all';
+            return;
+        }
+
+        // Customize title label based on category
+        let titleText = 'NHÓM CHI TIẾT:';
+        if (cat === 'mebe') titleText = 'ĐỘ TUỔI / MẸ BẦU:';
+        else if (cat === 'thietbiyte') titleText = 'CHỦ ĐỀ Y TẾ:';
+        else if (cat === 'tienloi') titleText = 'PHÂN LOẠI TIỆN LỢI:';
+        else if (cat === 'tpcn') titleText = 'MỤC TIÊU SỨC KHỎE:';
+        
+        if (titleEl) titleEl.innerHTML = `<i class="bi bi-tag text-teal me-1"></i> ${titleText}`;
+
+        container.innerHTML = '';
+        subs.forEach(sub => {
+            const isActive = sub.value === 'all' ? 'active' : '';
+            const btnHtml = `<button class="subcat-tab-btn ${isActive} me-1 mb-1" data-subval="${sub.value}" onclick="filterBySubCategory('${sub.value}', this)">${sub.label}</button>`;
+            container.innerHTML += btnHtml;
+        });
+
+        row.style.display = 'flex';
+        currentSubCategory = 'all';
+    }
+
+    function filterBySubCategory(sub, btn) {
+        currentSubCategory = sub;
+        document.querySelectorAll('.subcat-tab-btn').forEach(b => b.classList.remove('active'));
+        if (btn) {
+            btn.classList.add('active');
+        }
+        performSearchFilter();
+    }
+
+    function filterByCategory(cat) {
+        currentCategory = cat;
+
+        // Remove active class from all category tab buttons
+        document.querySelectorAll('.cat-tab-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+
+        // Add active class to selected category tab button
+        const activeBtn = document.getElementById('cat-' + cat);
+        if (activeBtn) {
+            activeBtn.classList.add('active');
+        }
+
+        // Sync dropdown filter
+        const selectFilter = document.getElementById('medCategoryFilter');
+        if (selectFilter) {
+            if (cat === 'all' || cat === 'thuoc') {
+                selectFilter.value = '';
+            } else if (cat === 'tpcn') {
+                selectFilter.value = 'Thực phẩm chức năng';
+            } else if (cat === 'duocmypham') {
+                selectFilter.value = 'Dược mỹ phẩm';
+            } else if (cat === 'mebe') {
+                selectFilter.value = 'Mẹ và bé';
+            } else if (cat === 'thietbiyte') {
+                selectFilter.value = 'Thiết bị y tế';
+            } else if (cat === 'tienloi') {
+                selectFilter.value = 'Sản phẩm tiện lợi';
+            }
+        }
+
+        renderSubCategories(cat);
+        performSearchFilter();
+    }
+
+    function handleSelectCategoryChange() {
+        const val = document.getElementById('medCategoryFilter').value;
+        // Reset category tab highlights first
+        document.querySelectorAll('.cat-tab-btn').forEach(btn => btn.classList.remove('active'));
+
+        if (val === '') {
+            currentCategory = 'all';
+            document.getElementById('cat-all').classList.add('active');
+        } else if (val === 'Thuốc kê đơn' || val === 'Thuốc không kê đơn') {
+            currentCategory = 'thuoc';
+            document.getElementById('cat-thuoc').classList.add('active');
+        } else if (val === 'Thực phẩm chức năng') {
+            currentCategory = 'tpcn';
+            document.getElementById('cat-tpcn').classList.add('active');
+        } else if (val === 'Dược mỹ phẩm') {
+            currentCategory = 'duocmypham';
+            document.getElementById('cat-duocmypham').classList.add('active');
+        } else if (val === 'Mẹ và bé') {
+            currentCategory = 'mebe';
+            document.getElementById('cat-mebe').classList.add('active');
+        } else if (val === 'Thiết bị y tế') {
+            currentCategory = 'thietbiyte';
+            document.getElementById('cat-thietbiyte').classList.add('active');
+        } else if (val === 'Sản phẩm tiện lợi') {
+            currentCategory = 'tienloi';
+            document.getElementById('cat-tienloi').classList.add('active');
+        } else {
+            currentCategory = 'all';
+            document.getElementById('cat-all').classList.add('active');
+        }
+
+        renderSubCategories(currentCategory);
+        performSearchFilter();
+    }
+
+    function performSearchFilter() {
+        const query = document.getElementById('medSearch').value.toLowerCase().trim();
+        const category = document.getElementById('medCategoryFilter').value;
+        const rows = document.querySelectorAll('.medicine-row');
+        let visibleCount = 0;
+
+        rows.forEach(row => {
+            const name = row.getAttribute('data-name');
+            const ingredient = row.getAttribute('data-active-ingredient');
+            const rowCategory = row.getAttribute('data-category');
+            const treatment = row.getAttribute('data-treatment');
+            const isLowStock = row.getAttribute('data-is-low-stock') === 'true';
+            const isNearExpiry = row.getAttribute('data-is-near-expiry') === 'true';
+            const isExpired = row.getAttribute('data-is-expired') === 'true';
+
+            // Text search match
+            const matchesQuery = name.includes(query) || ingredient.includes(query);
+            
+            // Category filter match
+            let matchesCategory = true;
+            if (currentCategory === 'all') {
+                matchesCategory = category === '' || rowCategory === category;
+            } else if (currentCategory === 'thuoc') {
+                if (category !== '') {
+                    matchesCategory = rowCategory === category;
+                } else {
+                    matchesCategory = rowCategory === 'Thuốc kê đơn' || rowCategory === 'Thuốc không kê đơn';
+                }
+            } else if (currentCategory === 'tpcn') {
+                matchesCategory = rowCategory === 'Thực phẩm chức năng';
+            } else if (currentCategory === 'duocmypham') {
+                matchesCategory = rowCategory === 'Dược mỹ phẩm';
+            } else if (currentCategory === 'mebe') {
+                matchesCategory = rowCategory === 'Mẹ và bé';
+            } else if (currentCategory === 'thietbiyte') {
+                matchesCategory = rowCategory === 'Thiết bị y tế';
+            } else if (currentCategory === 'tienloi') {
+                matchesCategory = rowCategory === 'Sản phẩm tiện lợi';
+            }
+
+            // Subcategory filter match
+            let matchesSubCategory = true;
+            if (currentSubCategory !== 'all') {
+                matchesSubCategory = treatment === currentSubCategory;
+            }
+
+            // Tab filter match
+            let matchesTab = true;
+            if (currentTab === 'low-stock') {
+                matchesTab = isLowStock;
+            } else if (currentTab === 'near-expiry') {
+                matchesTab = isNearExpiry;
+            } else if (currentTab === 'expired') {
+                matchesTab = isExpired;
+            }
+
+            // Combine all filters
+            if (matchesQuery && matchesCategory && matchesSubCategory && matchesTab) {
+                row.style.display = '';
+                visibleCount++;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+
+        // Toggle empty state
+        const emptyState = document.getElementById('emptyState');
+        const table = document.getElementById('medicineTable');
+        
+        if (visibleCount === 0) {
+            emptyState.style.display = 'block';
+            table.querySelector('thead').style.display = 'none';
+        } else {
+            emptyState.style.display = 'none';
+            table.querySelector('thead').style.display = '';
+        }
+    }
+
+    // Handle category query parameter on load
+    document.addEventListener("DOMContentLoaded", function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const catParam = urlParams.get('cat');
+        if (catParam) {
+            let cat = catParam.toLowerCase();
+            if (cat === 'me-be' || cat === 'mebe') {
+                filterByCategory('mebe');
+            } else if (cat === 'thiet-bi-y-te' || cat === 'thietbiyte') {
+                filterByCategory('thietbiyte');
+            } else if (cat === 'san-pham-tien-loi' || cat === 'sanpham-tien-loi' || cat === 'tienloi') {
+                filterByCategory('tienloi');
+            } else if (cat === 'thuoc') {
+                filterByCategory('thuoc');
+            } else if (cat === 'tpcn') {
+                filterByCategory('tpcn');
+            } else if (cat === 'duocmypham') {
+                filterByCategory('duocmypham');
+            }
+        }
+    });
+</script>

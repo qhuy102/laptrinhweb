@@ -68,8 +68,8 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Controllers
             var categories = await _context.LoaiThuocs.OrderBy(l => l.TenLoai).ToListAsync();
             ViewData["AllCategories"] = categories;
 
-            // If category is 'thuoc' show medicines from DB; otherwise show empty list (could filter by LoaiThuoc)
-            if (key == "thuoc")
+            // If category is a supported product key, show matching items from DB; otherwise show empty list
+            if (key == "thuoc" || key == "tpcn" || key == "me-be" || key == "thietbiyte" || key == "sanpham-tien-loi")
             {
                 // check for LoaiThuoc filter id
                 int? loaiId = null;
@@ -78,13 +78,35 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Controllers
                 string searchTerm = Request.Query["query"].FirstOrDefault() ?? "";
 
                 var query = _context.Thuocs.Include(t => t.LoaiThuoc).Where(t => t.SoLuong > 0).AsQueryable();
-                if (loaiId.HasValue) query = query.Where(t => t.LoaiThuocId == loaiId.Value);
+                
+                if (key == "tpcn")
+                {
+                    query = query.Where(t => t.LoaiThuoc.TenLoai == "Thực phẩm chức năng");
+                }
+                else if (key == "me-be")
+                {
+                    query = query.Where(t => t.LoaiThuoc.TenLoai == "Mẹ và bé");
+                }
+                else if (key == "thietbiyte")
+                {
+                    query = query.Where(t => t.LoaiThuoc.TenLoai == "Thiết bị y tế");
+                }
+                else if (key == "sanpham-tien-loi")
+                {
+                    query = query.Where(t => t.LoaiThuoc.TenLoai == "Sản phẩm tiện lợi");
+                }
+                else if (loaiId.HasValue)
+                {
+                    query = query.Where(t => t.LoaiThuocId == loaiId.Value);
+                }
 
                 if (!string.IsNullOrWhiteSpace(searchTerm))
                 {
                     var normalizedSearch = searchTerm.Trim().ToLower();
                     query = query.Where(t => t.TenThuoc.ToLower().Contains(normalizedSearch) || 
-                                             (t.HoatChat != null && t.HoatChat.ToLower().Contains(normalizedSearch)));
+                                             (t.HoatChat != null && t.HoatChat.ToLower().Contains(normalizedSearch)) ||
+                                             (t.CongDung != null && t.CongDung.ToLower().Contains(normalizedSearch)) ||
+                                             (t.NhomDieuTri != null && t.NhomDieuTri.ToLower().Contains(normalizedSearch)));
                 }
 
                 var items = await query.OrderBy(t => t.TenThuoc).ToListAsync();

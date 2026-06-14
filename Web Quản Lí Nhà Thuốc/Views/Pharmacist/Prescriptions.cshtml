@@ -1,88 +1,448 @@
 @model List<Web_Quản_Lí_Nhà_Thuốc.Models.DonThuoc>
 @{
-    ViewData["Title"] = "Xử Lý Đơn Thuốc Bằng Công Nghệ OCR";
+    ViewData["Title"] = "Tiếp Nhận & Quản Lý Tư Vấn";
+
+    // Calculate stats
+    var totalCount = Model.Count;
+    var pendingCount = Model.Count(d => d.TrangThai == "ChoDuyet");
+    var approvedCount = Model.Count(d => d.TrangThai == "DaDuyet");
+    var completedCount = Model.Count(d => d.TrangThai == "DaBan");
+    var cancelledCount = Model.Count(d => d.TrangThai == "DaHuy");
 }
 
-<div class="row mb-4">
-    <div class="col-md-7">
-        <h1 class="page-title mb-1">Nhận diện & Quản lý Đơn Thuốc</h1>
-        <p class="text-muted mb-0">Tải đơn thuốc của bác sĩ lên (dạng hình ảnh), hệ thống sử dụng thuật toán giả lập OCR quét từ khóa để tự động kê đơn bán thuốc nhanh.</p>
+<style>
+    :root {
+        --teal-primary: #0d9488;
+        --teal-hover: #0f766e;
+        --teal-light: #f0fdfa;
+        --indigo-primary: #6366f1;
+        --indigo-light: #e0e7ff;
+        --emerald-primary: #10b981;
+        --emerald-light: #d1fae5;
+        --amber-primary: #f59e0b;
+        --amber-light: #fef3c7;
+        --rose-primary: #f43f5e;
+        --rose-light: #ffe4e6;
+    }
+
+    .pres-dashboard {
+        font-family: 'Inter', sans-serif;
+    }
+
+    .pres-stat-card {
+        border: none;
+        border-radius: 16px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        background: #ffffff;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
+        overflow: hidden;
+        position: relative;
+    }
+
+    .pres-stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 20px -8px rgba(0, 0, 0, 0.08);
+    }
+
+    .pres-stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+    }
+
+    .pres-stat-card.stat-total::before { background-color: var(--indigo-primary); }
+    .pres-stat-card.stat-pending::before { background-color: var(--amber-primary); }
+    .pres-stat-card.stat-approved::before { background-color: var(--teal-primary); }
+    .pres-stat-card.stat-completed::before { background-color: var(--emerald-primary); }
+
+    .icon-shape {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+    }
+
+    .icon-indigo { background-color: var(--indigo-light); color: var(--indigo-primary); }
+    .icon-amber { background-color: var(--amber-light); color: var(--amber-primary); }
+    .icon-teal { background-color: var(--teal-light); color: var(--teal-primary); }
+    .icon-emerald { background-color: var(--emerald-light); color: var(--emerald-primary); }
+
+    .pres-table-card {
+        border: none;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+        background: #ffffff;
+        overflow: hidden;
+    }
+
+    .pres-table {
+        margin: 0;
+    }
+
+    .pres-table th {
+        background-color: #f8fafc;
+        border-bottom: 2px solid #f1f5f9;
+        color: #475569;
+        font-weight: 600;
+        font-size: 0.82rem;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        padding: 1.1rem 1.25rem;
+    }
+
+    .pres-table td {
+        padding: 1.1rem 1.25rem;
+        border-bottom: 1px solid #f1f5f9;
+        vertical-align: middle;
+        font-size: 0.9rem;
+    }
+
+    .pres-table tbody tr {
+        transition: background-color 0.2s ease;
+    }
+
+    .pres-table tbody tr:hover {
+        background-color: #fafbfd;
+    }
+
+    .pres-img-thumb {
+        width: 50px;
+        height: 50px;
+        border-radius: 8px;
+        border: 1px solid #cbd5e1;
+        object-fit: cover;
+        cursor: pointer;
+        transition: transform 0.2s;
+    }
+
+    .pres-img-thumb:hover {
+        transform: scale(1.1);
+    }
+
+    .pres-no-img {
+        width: 50px;
+        height: 50px;
+        border-radius: 8px;
+        background-color: #f1f5f9;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #94a3b8;
+        font-size: 1.25rem;
+        border: 1px dashed #cbd5e1;
+    }
+
+    .tab-filter-btn {
+        border: none;
+        background: transparent;
+        padding: 0.6rem 1.2rem;
+        font-weight: 500;
+        color: #64748b;
+        border-radius: 10px;
+        transition: all 0.2s ease;
+    }
+
+    .tab-filter-btn:hover {
+        background-color: #f1f5f9;
+        color: #334155;
+    }
+
+    .tab-filter-btn.active {
+        background-color: var(--teal-light);
+        color: var(--teal-primary);
+    }
+
+    .btn-action-pill {
+        border-radius: 30px;
+        padding: 0.35rem 0.85rem;
+        font-size: 0.8rem;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        transition: all 0.2s;
+    }
+
+    .badge-status {
+        padding: 0.4rem 0.75rem;
+        border-radius: 30px;
+        font-weight: 600;
+        font-size: 0.76rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .status-choduyet { background-color: var(--amber-light); color: var(--amber-primary); }
+    .status-daduyet { background-color: var(--teal-light); color: var(--teal-primary); }
+    .status-daban { background-color: var(--emerald-light); color: var(--emerald-primary); }
+    .status-dahuy { background-color: var(--rose-light); color: var(--rose-primary); }
+
+    .border-dashed {
+        border-style: dashed !important;
+        border-width: 2px !important;
+        border-color: #cbd5e1 !important;
+        transition: all 0.3s;
+    }
+    .border-dashed:hover {
+        border-color: var(--teal-primary) !important;
+        background-color: rgba(13, 148, 136, 0.03) !important;
+    }
+    .animate-pulse {
+        animation: pulse-text 2s infinite;
+    }
+    @@keyframes pulse-text {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+    }
+</style>
+
+<div class="container-fluid py-4 pres-dashboard">
+    <!-- Header -->
+    <div class="row align-items-center mb-4">
+        <div class="col-md-7 col-12 mb-3 mb-md-0">
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <span class="badge bg-teal text-white py-1.5 px-2.5 rounded-pill" style="font-size: 0.75rem;">TIẾP NHẬN TƯ VẤN</span>
+                <span class="text-muted"><i class="bi bi-chevron-right fs-7"></i></span>
+                <span class="text-muted small">Quy trình bán thuốc theo toa & tư vấn</span>
+            </div>
+            <h2 class="fw-bold mb-0 text-dark">Nhận Diện & Quản Lý Tư Vấn</h2>
+            <p class="text-muted small mb-0">Tiếp nhận đơn thuốc hoặc yêu cầu tư vấn do khách hàng tải lên để lên hóa đơn POS và gọi điện tư vấn nhanh chóng.</p>
+        </div>
+        <div class="col-md-5 col-12 d-flex justify-content-md-end justify-content-start">
+            <button class="btn btn-teal-btn d-flex align-items-center gap-2 py-2 px-3 rounded-3" style="background-color: var(--teal-primary); color:white; border:none;" onclick="showScanModal()">
+                <i class="bi bi-camera-fill"></i>
+                Quét đơn / yêu cầu tư vấn mới (AI)
+            </button>
+        </div>
     </div>
-    <div class="col-md-5 text-md-end">
-        <button class="btn btn-primary" onclick="showScanModal()"><i class="bi bi-camera-fill me-1"></i> Quét Đơn Thuốc Mới</button>
+
+    <!-- Stats Widgets -->
+    <div class="row g-3 mb-4">
+        <div class="col-xl-3 col-sm-6 col-12">
+            <div class="card pres-stat-card stat-total">
+                <div class="card-body p-4 d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="text-muted fw-medium small d-block mb-1">Tổng yêu cầu tư vấn</span>
+                        <h3 class="fw-bold mb-0 text-dark">@totalCount</h3>
+                    </div>
+                    <div class="icon-shape icon-indigo">
+                        <i class="bi bi-file-earmark-medical"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-sm-6 col-12">
+            <div class="card pres-stat-card stat-pending" style="cursor: pointer;" onclick="filterByTab('ChoDuyet')">
+                <div class="card-body p-4 d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="text-muted fw-medium small d-block mb-1">Chờ tư vấn (Khách gửi)</span>
+                        <h3 class="fw-bold mb-0 text-dark">@pendingCount</h3>
+                    </div>
+                    <div class="icon-shape icon-amber">
+                        <i class="bi bi-clock-history"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-sm-6 col-12">
+            <div class="card pres-stat-card stat-approved" style="cursor: pointer;" onclick="filterByTab('DaDuyet')">
+                <div class="card-body p-4 d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="text-muted fw-medium small d-block mb-1">Đã tư vấn (Chờ POS)</span>
+                        <h3 class="fw-bold mb-0 text-dark">@approvedCount</h3>
+                    </div>
+                    <div class="icon-shape icon-teal">
+                        <i class="bi bi-check2-circle"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-sm-6 col-12">
+            <div class="card pres-stat-card stat-completed" style="cursor: pointer;" onclick="filterByTab('DaBan')">
+                <div class="card-body p-4 d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="text-muted fw-medium small d-block mb-1">Đã hoàn thành</span>
+                        <h3 class="fw-bold mb-0 text-dark">@completedCount</h3>
+                    </div>
+                    <div class="icon-shape icon-emerald">
+                        <i class="bi bi-bag-check"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Prescriptions Card Table -->
+    <div class="card pres-table-card">
+        <div class="card-header bg-white border-0 pt-4 px-4 pb-2">
+            <div class="row align-items-center g-3">
+                <!-- Tabs -->
+                <div class="col-lg-6 col-12 d-flex flex-wrap gap-1">
+                    <button class="tab-filter-btn active" id="tab-all" onclick="filterByTab('all')">Tất cả yêu cầu</button>
+                    <button class="tab-filter-btn" id="tab-ChoDuyet" onclick="filterByTab('ChoDuyet')">Chờ tư vấn (@pendingCount)</button>
+                    <button class="tab-filter-btn" id="tab-DaDuyet" onclick="filterByTab('DaDuyet')">Đã tư vấn (@approvedCount)</button>
+                    <button class="tab-filter-btn" id="tab-DaBan" onclick="filterByTab('DaBan')">Đã bán (@completedCount)</button>
+                    <button class="tab-filter-btn" id="tab-DaHuy" onclick="filterByTab('DaHuy')">Đã hủy (@cancelledCount)</button>
+                </div>
+                <!-- Search bar -->
+                <div class="col-lg-6 col-12 d-flex justify-content-lg-end">
+                    <div class="input-group rounded-pill overflow-hidden border bg-light style-search" style="max-width: 380px;">
+                        <span class="input-group-text bg-transparent border-0"><i class="bi bi-search text-muted"></i></span>
+                        <input type="text" id="presSearchInput" class="form-control border-0 bg-transparent" placeholder="Tìm tên bệnh nhân, mã yêu cầu..." onkeyup="performSearchFilter()" style="box-shadow: none; height: 38px;">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table pres-table" id="prescriptionTable">
+                <thead>
+                    <tr>
+                        <th style="width: 80px;">Ảnh Đơn / Ghi chú</th>
+                        <th>Mã Yêu Cầu</th>
+                        <th>Thời Gian Gửi</th>
+                        <th>Khách Hàng</th>
+                        <th>Chẩn Đoán / Bác sĩ</th>
+                        <th>Thuốc Đề Xuất / Đơn Thuốc</th>
+                        <th>Trạng Thái</th>
+                        <th class="text-end" style="width: 250px;">Thao tác xử lý tư vấn</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var pres in Model)
+                    {
+                        var hasImage = !string.IsNullOrEmpty(pres.HinhAnhDonThuoc);
+                        <tr class="prescription-row" 
+                            data-patient="@pres.TenBenhNhan.ToLower()" 
+                            data-id="@pres.Id" 
+                            data-status="@pres.TrangThai">
+                            <td>
+                                @if (hasImage)
+                                {
+                                    <img src="@pres.HinhAnhDonThuoc" alt="Prescription" class="pres-img-thumb" onclick="openImageModal('@pres.HinhAnhDonThuoc', '#TV-@pres.Id')">
+                                }
+                                else
+                                {
+                                    <div class="pres-no-img" title="Chỉ gửi yêu cầu tư vấn (Không kèm đơn)"><i class="bi bi-chat-left-text"></i></div>
+                                }
+                            </td>
+                            <td class="fw-bold text-dark text-nowrap">
+                                #TV-@pres.Id
+                            </td>
+                            <td class="small text-muted text-nowrap">
+                                @pres.NgayKeDon.ToString("dd/MM/yyyy")
+                                <div style="font-size:0.75rem;">@pres.NgayKeDon.ToString("HH:mm")</div>
+                            </td>
+                            <td>
+                                <div class="fw-semibold text-dark">@pres.TenBenhNhan</div>
+                                @if (pres.TenBenhNhan.Contains("SĐT:")) {
+                                    <!-- Extracted telephone formatting if needed -->
+                                }
+                            </td>
+                            <td>
+                                <span class="small text-dark fw-semibold d-block">@pres.ChanDoan</span>
+                                <span class="text-muted small" style="font-size: 0.78rem;"><i class="bi bi-person-workspace me-1"></i>@pres.BacSiKeDon</span>
+                            </td>
+                            <td>
+                                <ul class="list-unstyled mb-0 ps-0">
+                                    @foreach (var det in pres.ChiTietDonThuocs ?? new List<ChiTietDonThuoc>())
+                                    {
+                                        <li class="small text-dark mb-0.5"><i class="bi bi-dot text-teal fs-5 align-middle"></i> @det.Thuoc?.TenThuoc <span class="fw-semibold">x@det.SoLuong</span> (@det.Thuoc?.DonViCoBan)</li>
+                                    }
+                                    @if (pres.ChiTietDonThuocs == null || !pres.ChiTietDonThuocs.Any())
+                                    {
+                                        <span class="text-muted small italic">Chưa kê thuốc cụ thể</span>
+                                    }
+                                </ul>
+                            </td>
+                            <td>
+                                @{
+                                    string badgeClass = pres.TrangThai switch {
+                                        "ChoDuyet" => "status-choduyet",
+                                        "DaDuyet" => "status-daduyet",
+                                        "DaBan" => "status-daban",
+                                        "DaHuy" => "status-dahuy",
+                                        _ => "bg-secondary text-white"
+                                    };
+                                    string statusText = pres.TrangThai switch {
+                                        "ChoDuyet" => "Chờ tư vấn",
+                                        "DaDuyet" => "Đã tư vấn (Chờ POS)",
+                                        "DaBan" => "Đã bán thuốc",
+                                        "DaHuy" => "Đã hủy bỏ",
+                                        _ => pres.TrangThai
+                                    };
+                                }
+                                <span class="badge-status @badgeClass text-nowrap">
+                                    <i class="bi bi-circle-fill" style="font-size: 0.45rem;"></i>
+                                    @statusText
+                                </span>
+                            </td>
+                            <td class="text-end">
+                                <div class="d-inline-flex gap-1">
+                                    @if (pres.TrangThai == "ChoDuyet")
+                                    {
+                                        <button class="btn btn-action-pill btn-success text-white" onclick="updateStatus(@pres.Id, 'DaDuyet')">
+                                            <i class="bi bi-check-lg"></i> Duyệt tư vấn
+                                        </button>
+                                        <button class="btn btn-action-pill btn-outline-danger" onclick="updateStatus(@pres.Id, 'DaHuy')">
+                                            <i class="bi bi-x-circle"></i> Từ chối
+                                        </button>
+                                    }
+                                    @if (pres.TrangThai == "ChoDuyet" || pres.TrangThai == "DaDuyet")
+                                    {
+                                        <a href="/Pharmacist/Sell?prescriptionId=@pres.Id" class="btn btn-action-pill btn-primary text-white" style="background-color: var(--teal-primary); border-color: var(--teal-primary);">
+                                            <i class="bi bi-cart-check-fill"></i> POS Bán
+                                        </a>
+                                    }
+                                    @if (pres.TrangThai == "DaBan" || pres.TrangThai == "DaHuy")
+                                    {
+                                        <button class="btn btn-action-pill btn-light text-muted" disabled>
+                                            <i class="bi bi-lock-fill"></i> Lưu trữ
+                                        </button>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="8" class="text-center py-5 text-muted">
+                                <i class="bi bi-inbox fs-1 d-block mb-3"></i>
+                                Không có dữ liệu yêu cầu tư vấn nào trên hệ thống.
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Empty Filter State -->
+        <div id="emptyState" class="text-center py-5 bg-white rounded-bottom" style="display: none;">
+            <div class="text-muted mb-3"><i class="bi bi-search fs-1"></i></div>
+            <h5 class="fw-bold text-dark">Không tìm thấy yêu cầu tư vấn nào</h5>
+            <p class="text-muted small">Thử thay đổi từ khóa tìm kiếm hoặc bộ lọc trạng thái khác.</p>
+        </div>
     </div>
 </div>
 
-<div class="row g-4">
-    <!-- Prescriptions List -->
-    <div class="col-12">
-        <div class="custom-table-container">
-            <div class="custom-table-header">
-                <h5 class="fw-bold mb-0">Vòng Đời Đơn Thuốc Toàn Hệ Thống</h5>
+<!-- Modal: View Full Size Prescription Image -->
+<div class="modal fade" id="imageModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0" style="border-radius: 20px; overflow: hidden;">
+            <div class="modal-header bg-dark text-white p-3 border-0">
+                <h6 class="modal-title fw-bold" id="imageModalLabel">Ảnh chụp đơn thuốc / yêu cầu tư vấn</h6>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            
-            <div class="table-responsive">
-                <table class="table align-middle">
-                    <thead>
-                        <tr>
-                            <th>Mã Đơn</th>
-                            <th>Ngày Kê</th>
-                            <th>Bệnh Nhân</th>
-                            <th>Bác Sĩ Kê Đơn</th>
-                            <th>Chẩn Đoán</th>
-                            <th>Thuốc Kê Trong Đơn</th>
-                            <th>Trạng Thái</th>
-                            <th>Hành Động</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var pres in Model)
-                        {
-                            <tr>
-                                <td class="fw-bold text-nowrap">#DT-@pres.Id</td>
-                                <td class="small text-muted">@pres.NgayKeDon.ToString("dd/MM/yyyy HH:mm")</td>
-                                <td class="fw-semibold">@pres.TenBenhNhan</td>
-                                <td>@pres.BacSiKeDon</td>
-                                <td><span class="text-secondary small fw-semibold">@pres.ChanDoan</span></td>
-                                <td>
-                                    <ul class="list-unstyled mb-0 pl-0">
-                                        @foreach (var det in pres.ChiTietDonThuocs ?? new List<ChiTietDonThuoc>())
-                                        {
-                                            <li class="small text-dark"><i class="bi bi-dot text-primary"></i> @det.Thuoc?.TenThuoc x @det.SoLuong (@det.Thuoc?.DonViCoBan)</li>
-                                        }
-                                    </ul>
-                                </td>
-                                <td>
-                                    <span class="badge @(pres.TrangThai switch {
-                                        "ChoDuyet" => "bg-warning text-dark",
-                                        "DaDuyet" => "bg-info text-white",
-                                        "DaBan" => "bg-success text-white",
-                                        "DaHuy" => "bg-danger text-white",
-                                        _ => "bg-secondary text-white"
-                                    }) px-2.5 py-1.5" style="border-radius: 6px;">
-                                        @(pres.TrangThai switch {
-                                            "ChoDuyet" => "Chờ duyệt",
-                                            "DaDuyet" => "Đã duyệt (Chờ bán)",
-                                            "DaBan" => "Đã bán thuốc",
-                                            "DaHuy" => "Đã hủy bỏ",
-                                            _ => pres.TrangThai
-                                        })
-                                    </span>
-                                </td>
-                                <td>
-                                    @if (pres.TrangThai == "ChoDuyet" || pres.TrangThai == "DaDuyet")
-                                    {
-                                        <a href="/Pharmacist/Sell?prescriptionId=@pres.Id" class="btn btn-sm btn-outline-success"><i class="bi bi-cart-check-fill me-1"></i> Xuất Bán</a>
-                                    }
-                                    else
-                                    {
-                                        <button class="btn btn-sm btn-light" disabled><i class="bi bi-check-lg"></i> Hoàn tất</button>
-                                    }
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
+            <div class="modal-body p-0 bg-black text-center" style="min-height: 400px; display: flex; align-items: center; justify-content: center;">
+                <img id="modalFullImage" src="" class="img-fluid" style="max-height: 80vh; object-fit: contain;" alt="Toàn cảnh đơn thuốc / yêu cầu tư vấn">
             </div>
         </div>
     </div>
@@ -93,13 +453,13 @@
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content" style="border-radius: 16px; border: none;">
             <div class="modal-header">
-                <h5 class="modal-title fw-bold"><i class="bi bi-camera-fill me-2 text-primary"></i>Trình Quét Đơn Thuốc AI</h5>
+                <h5 class="modal-title fw-bold"><i class="bi bi-camera-fill me-2 text-primary"></i>Trình Quét Yêu Cầu Tư Vấn AI</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div id="ocrUploadArea" class="p-5 border-2 border-dashed rounded text-center bg-light" style="cursor: pointer;" onclick="document.getElementById('ocrFile').click()">
-                    <i class="bi bi-cloud-arrow-up text-primary mb-3" style="font-size: 3.5rem;"></i>
-                    <h5 class="fw-bold">Kéo thả hoặc Click để tải ảnh đơn thuốc</h5>
+                    <i class="bi bi-cloud-arrow-up text-primary mb-3" style="font-size: 3.5rem; display: block;"></i>
+                    <h5 class="fw-bold text-dark">Kéo thả hoặc Click để tải ảnh đơn thuốc / yêu cầu tư vấn</h5>
                     <p class="text-muted small">Hỗ trợ các file hình ảnh dạng JPG, PNG. Đặt tên file chứa "Panadol", "Amox" hoặc "Decolgen" để demo bóc tách OCR.</p>
                     <input type="file" id="ocrFile" style="display: none;" accept="image/*" onchange="startOcrProcess()" />
                 </div>
@@ -109,15 +469,15 @@
                     <div class="spinner-border text-primary mb-3" style="width: 3rem; height: 3rem;" role="status">
                         <span class="visually-hidden">Loading...</span>
                     </div>
-                    <h5 class="fw-bold animate-pulse">Đang định hình ảnh & chạy giải thuật OCR AI...</h5>
+                    <h5 class="fw-bold animate-pulse text-dark">Đang định hình ảnh & chạy giải thuật OCR AI...</h5>
                     <p class="text-muted small">Hệ thống đang trích xuất văn bản và bóc tách tên thuốc trong đơn.</p>
                 </div>
 
                 <!-- Results Output -->
                 <div id="ocrResult" style="display: none;">
                     <div class="alert alert-success d-flex align-items-center mb-4">
-                        <i class="bi bi-check-circle-fill me-2 fs-5"></i>
-                        <div>Nhận diện thành công đơn thuốc bằng OCR!</div>
+                        <i class="bi bi-check-circle-fill me-2 fs-5 text-white"></i>
+                        <div>Nhận diện thành công đơn thuốc / yêu cầu tư vấn bằng OCR!</div>
                     </div>
                     <div class="row g-3 mb-4">
                         <div class="col-md-4">
@@ -140,7 +500,7 @@
                         </div>
                     </div>
                     
-                    <h6 class="fw-bold mb-3 border-bottom pb-2">Danh Sách Thuốc Trích Xuất Được</h6>
+                    <h6 class="fw-bold mb-3 border-bottom pb-2 text-dark">Danh Sách Thuốc Trích Xuất Được</h6>
                     <div class="table-responsive">
                         <table class="table align-middle">
                             <thead>
@@ -167,29 +527,94 @@
 </div>
 
 @section Scripts {
-    <style>
-        .border-dashed {
-            border-style: dashed !important;
-            border-width: 2px !important;
-            border-color: #cbd5e1 !important;
-            transition: all 0.3s;
-        }
-        .border-dashed:hover {
-            border-color: var(--primary-color) !important;
-            background-color: rgba(13, 148, 136, 0.03) !important;
-        }
-        .animate-pulse {
-            animation: pulse-text 2s infinite;
-        }
-        @@keyframes pulse-text {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-    </style>
     <script>
         var scanModal;
         var detectedPrescriptionId = null;
+        let currentTabFilter = 'all';
 
+        function filterByTab(tab) {
+            currentTabFilter = tab;
+            
+            // Highlight active tab
+            document.querySelectorAll('.tab-filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            const selectedBtn = document.getElementById('tab-' + tab);
+            if (selectedBtn) selectedBtn.classList.add('active');
+
+            performSearchFilter();
+        }
+
+        function performSearchFilter() {
+            const query = document.getElementById('presSearchInput').value.toLowerCase().trim();
+            const rows = document.querySelectorAll('.prescription-row');
+            let visibleCount = 0;
+
+            rows.forEach(row => {
+                const patient = row.getAttribute('data-patient');
+                const id = row.getAttribute('data-id');
+                const status = row.getAttribute('data-status');
+
+                const matchesQuery = patient.includes(query) || id.includes(query);
+                const matchesTab = (currentTabFilter === 'all' || status === currentTabFilter);
+
+                if (matchesQuery && matchesTab) {
+                    row.style.display = '';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            // Toggle table header & empty state
+            const table = document.getElementById('prescriptionTable');
+            const emptyState = document.getElementById('emptyState');
+            
+            if (visibleCount === 0) {
+                table.querySelector('thead').style.display = 'none';
+                emptyState.style.display = 'block';
+            } else {
+                table.querySelector('thead').style.display = '';
+                emptyState.style.display = 'none';
+            }
+        }
+
+        function openImageModal(imgUrl, title) {
+            document.getElementById("modalFullImage").src = imgUrl;
+            document.getElementById("imageModalLabel").innerText = "Ảnh chụp đơn gốc: " + title;
+            const myModal = new bootstrap.Modal(document.getElementById('imageModal'));
+            myModal.show();
+        }
+
+        function updateStatus(id, newStatus) {
+            if (confirm(`Bạn có chắc chắn muốn cập nhật trạng thái yêu cầu tư vấn này không?`)) {
+                // Call AJAX to update
+                const formData = new FormData();
+                formData.append("id", id);
+                formData.append("status", newStatus);
+
+                fetch('/Pharmacist/UpdatePrescriptionStatus', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        alert("Cập nhật trạng thái yêu cầu tư vấn thành công!");
+                        // Reload page to reflect changes
+                        window.location.reload();
+                    } else {
+                        alert("Không thể cập nhật trạng thái.");
+                    }
+                })
+                .catch(err => {
+                    alert("Lỗi kết nối máy chủ.");
+                    console.error(err);
+                });
+            }
+        }
+
+        // ================= OCR Scanning simulation logic ================
         function showScanModal() {
             detectedPrescriptionId = null;
             document.getElementById("ocrUploadArea").style.display = "block";
@@ -263,3 +688,4 @@
         }
     </script>
 }
+

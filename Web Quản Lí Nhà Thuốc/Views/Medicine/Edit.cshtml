@@ -4,64 +4,262 @@
     ViewData["Title"] = "Chỉnh sửa Thuốc";
 }
 
-<div class="container mt-4">
-    <h2>Chỉnh sửa thông tin Thuốc</h2>
-    <hr />
-    <form asp-action="Edit">
-        <input type="hidden" asp-for="MaThuoc" />
-        <div class="row">
-            <div class="col-md-6">
-                <div class="form-group mb-3">
-                    <label asp-for="TenThuoc" class="control-label">Tên thuốc</label>
-                    <input asp-for="TenThuoc" class="form-control" />
-                    <span asp-validation-for="TenThuoc" class="text-danger"></span>
+<style>
+    .med-form-card {
+        border: none;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+        background: #ffffff;
+    }
+
+    .form-section-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #0d9488;
+        margin-bottom: 1.25rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #f0fdfa;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .form-control, .form-select {
+        border-radius: 10px;
+        padding: 0.6rem 1rem;
+        border: 1px solid #cbd5e1;
+        transition: all 0.2s ease;
+        font-size: 0.92rem;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #0d9488;
+        box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.15);
+    }
+
+    .input-group-text {
+        border-radius: 10px 0 0 10px;
+        background-color: #f8fafc;
+        border-color: #cbd5e1;
+        color: #64748b;
+    }
+
+    .input-group .form-control {
+        border-radius: 0 10px 10px 0;
+    }
+
+    .form-label {
+        font-weight: 500;
+        color: #334155;
+        font-size: 0.88rem;
+        margin-bottom: 0.4rem;
+    }
+
+    .btn-med-save {
+        background-color: #0d9488;
+        color: #ffffff;
+        border: none;
+        padding: 0.7rem 1.8rem;
+        border-radius: 12px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        box-shadow: 0 4px 10px rgba(13, 148, 136, 0.15);
+    }
+
+    .btn-med-save:hover {
+        background-color: #0f766e;
+        color: #ffffff;
+        box-shadow: 0 6px 14px rgba(13, 148, 136, 0.25);
+        transform: translateY(-1px);
+    }
+
+    .btn-med-back {
+        background-color: #f1f5f9;
+        color: #475569;
+        border: none;
+        padding: 0.7rem 1.5rem;
+        border-radius: 12px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+    }
+
+    .btn-med-back:hover {
+        background-color: #e2e8f0;
+        color: #334155;
+    }
+</style>
+
+<div class="container py-4">
+    <!-- Header -->
+    <div class="d-flex align-items-center gap-2 mb-1">
+        <a asp-action="Index" class="text-teal text-decoration-none small fw-semibold">Quản lý kho</a>
+        <span class="text-muted"><i class="bi bi-chevron-right fs-7"></i></span>
+        <span class="text-muted small">Chỉnh sửa thuốc</span>
+    </div>
+    <h3 class="fw-bold text-dark mb-4">Chỉnh sửa thông tin Thuốc</h3>
+
+    <div class="card med-form-card p-4">
+        <form asp-action="Edit">
+            <input type="hidden" asp-for="MaThuoc" />
+            <div class="row">
+                <!-- Left Side: Basic & Stock Info -->
+                <div class="col-lg-6 col-12 pe-lg-4 border-end border-light">
+                    <div class="form-section-title">
+                        <i class="bi bi-info-circle-fill"></i>
+                        Thông tin cơ bản thuốc
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="TenThuoc" class="form-label">Tên thuốc <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-capsule"></i></span>
+                            <input asp-for="TenThuoc" class="form-control" placeholder="Nhập tên thuốc..." />
+                        </div>
+                        <span asp-validation-for="TenThuoc" class="text-danger small"></span>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-6 col-12 mb-3">
+                            <label asp-for="LoaiThuocId" class="form-label">Phân loại <span class="text-danger">*</span></label>
+                            <select asp-for="LoaiThuocId" class="form-select" asp-items="ViewBag.LoaiThuocId">
+                                <option value="">-- Chọn phân loại --</option>
+                            </select>
+                            <span asp-validation-for="LoaiThuocId" class="text-danger small"></span>
+                        </div>
+                        <div class="col-sm-6 col-12 mb-3">
+                            <label asp-for="DonViCoBan" class="form-label">Đơn vị cơ bản <span class="text-danger">*</span></label>
+                            <input asp-for="DonViCoBan" class="form-control" placeholder="Viên, Hộp, Vỉ..." />
+                            <span asp-validation-for="DonViCoBan" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-6 col-12 mb-3">
+                            <label asp-for="DonGia" class="form-label">Đơn giá bán (VNĐ) <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <input asp-for="DonGia" type="number" min="0" class="form-control" />
+                                <span class="input-group-text">₫</span>
+                            </div>
+                            <span asp-validation-for="DonGia" class="text-danger small"></span>
+                        </div>
+                        <div class="col-sm-6 col-12 mb-3">
+                            <label asp-for="SoLuong" class="form-label">Số lượng hiện tại <span class="text-danger">*</span></label>
+                            <input asp-for="SoLuong" type="number" min="0" class="form-control" />
+                            <span asp-validation-for="SoLuong" class="text-danger small"></span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-6 col-12 mb-3">
+                            <label asp-for="HanSuDung" class="form-label">Hạn sử dụng <span class="text-danger">*</span></label>
+                            <input asp-for="HanSuDung" type="date" class="form-control" />
+                            <span asp-validation-for="HanSuDung" class="text-danger small"></span>
+                        </div>
+                        <div class="col-sm-6 col-12 mb-3">
+                            <label asp-for="ViTriKe" class="form-label">Vị trí kệ</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
+                                <input asp-for="ViTriKe" class="form-control" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="HinhAnh" class="form-label">Đường dẫn hình ảnh (URL)</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-image"></i></span>
+                            <input asp-for="HinhAnh" class="form-control" placeholder="https://link-anh-san-pham.jpg..." />
+                        </div>
+                    </div>
                 </div>
-                <div class="form-group mb-3">
-                    <label asp-for="DonGia" class="control-label">Đơn giá (VNĐ)</label>
-                    <input asp-for="DonGia" type="number" class="form-control" />
-                    <span asp-validation-for="DonGia" class="text-danger"></span>
-                </div>
-                <div class="form-group mb-3">
-                    <label asp-for="SoLuong" class="control-label">Số lượng</label>
-                    <input asp-for="SoLuong" type="number" class="form-control" />
-                    <span asp-validation-for="SoLuong" class="text-danger"></span>
-                </div>
-                <div class="form-group mb-3">
-                    <label asp-for="LoaiThuocId" class="control-label">Loại thuốc</label>
-                    <select asp-for="LoaiThuocId" class="form-control" asp-items="ViewBag.LoaiThuocId"></select>
-                </div>
-                <div class="form-group mb-3">
-                    <label asp-for="HanSuDung" class="control-label">Hạn sử dụng</label>
-                    <input asp-for="HanSuDung" type="date" class="form-control" />
-                    <span asp-validation-for="HanSuDung" class="text-danger"></span>
+
+                <!-- Right Side: Medical & Clinical Info -->
+                <div class="col-lg-6 col-12 ps-lg-4 mt-lg-0 mt-4">
+                    <div class="form-section-title">
+                        <i class="bi bi-heart-pulse-fill"></i>
+                        Thông tin y học & Chỉ định
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-6 col-12 mb-3">
+                            <label asp-for="HoatChat" class="form-label">Hoạt chất chính</label>
+                            <input asp-for="HoatChat" class="form-control" />
+                        </div>
+                        <div class="col-sm-6 col-12 mb-3">
+                            <label asp-for="NhomDieuTri" class="form-label">Nhóm điều trị / Nhóm sản phẩm</label>
+                            <input asp-for="NhomDieuTri" class="form-control" list="nhomDieuTriSuggestions" />
+                            <datalist id="nhomDieuTriSuggestions"></datalist>
+                        </div>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="CongDung" class="form-label">Công dụng / Chỉ định</label>
+                        <textarea asp-for="CongDung" rows="2" class="form-control"></textarea>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="ChongChiDinh" class="form-label">Chống chỉ định</label>
+                        <textarea asp-for="ChongChiDinh" rows="2" class="form-control"></textarea>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="LieuLuong" class="form-label">Liều lượng & Cách dùng</label>
+                        <textarea asp-for="LieuLuong" rows="2" class="form-control"></textarea>
+                    </div>
                 </div>
             </div>
-            <div class="col-md-6">
-                <div class="form-group mb-3">
-                    <label asp-for="DonViCoBan" class="control-label">Đơn vị cơ bản</label>
-                    <input asp-for="DonViCoBan" class="form-control" />
-                </div>
-                <div class="form-group mb-3">
-                    <label asp-for="HoatChat" class="control-label">Hoạt chất chính</label>
-                    <input asp-for="HoatChat" class="form-control" />
-                </div>
-                <div class="form-group mb-3">
-                    <label asp-for="ViTriKe" class="control-label">Vị trí kệ</label>
-                    <input asp-for="ViTriKe" class="form-control" />
-                </div>
-                <div class="form-group mb-3">
-                    <label asp-for="CongDung" class="control-label">Công dụng</label>
-                    <textarea asp-for="CongDung" class="form-control"></textarea>
-                </div>
+
+            <hr class="my-4 text-muted" />
+
+            <!-- Action Buttons -->
+            <div class="d-flex justify-content-end gap-2">
+                <a asp-action="Index" class="btn btn-med-back d-flex align-items-center gap-1">
+                    <i class="bi bi-x-circle"></i> Hủy bỏ
+                </a>
+                <button type="submit" class="btn btn-med-save d-flex align-items-center gap-1">
+                    <i class="bi bi-check-circle"></i> Lưu thay đổi
+                </button>
             </div>
-        </div>
-        <div class="form-group mt-3">
-            <input type="submit" value="Lưu thay đổi" class="btn btn-primary" />
-            <a asp-action="Index" class="btn btn-secondary">Quay lại danh sách</a>
-        </div>
-    </form>
+        </form>
+    </div>
 </div>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        const categoryMap = {
+            "Thuốc kê đơn": ["Hạ sốt - Giảm đau", "Hô hấp - Cảm cúm", "Kháng sinh - Kháng viêm"],
+            "Thuốc không kê đơn": ["Hạ sốt - Giảm đau", "Hô hấp - Cảm cúm", "Kháng sinh - Kháng viêm"],
+            "Thực phẩm chức năng": ["Tăng đề kháng & Miễn dịch", "Bổ não & Giảm căng thẳng", "Bổ mắt & Tim mạch", "Xương khớp chắc khỏe", "Hỗ trợ tiêu hóa", "Đẹp da & Chống lão hóa"],
+            "Dược mỹ phẩm": ["Chăm sóc da - Dược mỹ phẩm"],
+            "Mẹ và bé": ["Trẻ sơ sinh (0 - 6 tháng)", "Dành cho Mẹ bầu"],
+            "Thiết bị y tế": ["Máy đo huyết áp", "Nhiệt kế", "Máy đo SpO2"],
+            "Sản phẩm tiện lợi": ["Khẩu trang & Sát khuẩn", "Kẹo ngậm & Đồ uống"]
+        };
+
+        function updateNhomDieuTriSuggestions() {
+            const select = document.getElementById("LoaiThuocId");
+            if (!select) return;
+            const selectedText = select.options[select.selectedIndex]?.text.trim();
+            const datalist = document.getElementById("nhomDieuTriSuggestions");
+            if (!datalist) return;
+            
+            datalist.innerHTML = "";
+            const suggestions = categoryMap[selectedText] || [];
+            suggestions.forEach(function(sug) {
+                const option = document.createElement("option");
+                option.value = sug;
+                datalist.appendChild(option);
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            const selectEl = document.getElementById("LoaiThuocId");
+            if (selectEl) {
+                selectEl.addEventListener("change", updateNhomDieuTriSuggestions);
+                updateNhomDieuTriSuggestions();
+            }
+        });
+    </script>
 }
+
