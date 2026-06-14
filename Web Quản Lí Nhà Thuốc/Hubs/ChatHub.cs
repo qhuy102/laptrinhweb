@@ -75,6 +75,16 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Hubs
                 
                 bool hasHeadache = messageLower.Contains("đau đầu") || messageLower.Contains("dau dau") || messageLower.Contains("nhức đầu") || messageLower.Contains("nhuc dau") || messageLower.Contains("đau nửa đầu") || messageLower.Contains("nhức đầu");
 
+                bool hasJointPain = messageLower.Contains("xương khớp") || messageLower.Contains("đau khớp") || messageLower.Contains("mỏi khớp") || messageLower.Contains("khô khớp") || messageLower.Contains("thoái hóa khớp") || messageLower.Contains("glucosamine") || messageLower.Contains("xương");
+
+                bool hasDigestive = messageLower.Contains("tiêu hóa") || messageLower.Contains("đau bụng") || messageLower.Contains("táo bón") || messageLower.Contains("đầy hơi") || messageLower.Contains("tiêu chảy") || messageLower.Contains("đường ruột") || messageLower.Contains("dạ dày") || messageLower.Contains("men vi sinh") || messageLower.Contains("optibac");
+
+                bool hasSkinCare = messageLower.Contains("dưỡng da") || messageLower.Contains("chăm sóc da") || messageLower.Contains("làm đẹp") || messageLower.Contains("mụn") || messageLower.Contains("lão hóa") || messageLower.Contains("collagen") || messageLower.Contains("cetaphil") || messageLower.Contains("sữa rửa mặt");
+
+                bool hasMotherBaby = messageLower.Contains("mẹ bầu") || messageLower.Contains("em bé") || messageLower.Contains("trẻ sơ sinh") || messageLower.Contains("sơ sinh") || messageLower.Contains("mang thai") || messageLower.Contains("bầu bì") || messageLower.Contains("tã") || messageLower.Contains("bỉm") || messageLower.Contains("sữa bột") || messageLower.Contains("prenatal") || messageLower.Contains("similac") || messageLower.Contains("bobby");
+
+                bool hasMedicalDevice = messageLower.Contains("thiết bị y tế") || messageLower.Contains("đo huyết áp") || messageLower.Contains("nhiệt kế") || messageLower.Contains("đo thân nhiệt") || messageLower.Contains("spo2") || messageLower.Contains("đo oxy") || messageLower.Contains("omron") || messageLower.Contains("microlife");
+
                 bool isPrescriptionQuery = messageLower.Contains("đơn thuốc") || messageLower.Contains("don thuoc") || messageLower.Contains("gợi ý đơn") || messageLower.Contains("goi y don") || messageLower.Contains("cho xin đơn") || messageLower.Contains("kê đơn") || messageLower.Contains("đơn thế nào") || messageLower.Contains("đơn cụ thể") || messageLower.Contains("cho đơn") || messageLower.Contains("đề xuất đơn");
 
                 bool isUsageQuery = messageLower.Contains("uống như nào") || messageLower.Contains("uống ra sao") || messageLower.Contains("uống thế nào") || messageLower.Contains("uống như thế nào") || messageLower.Contains("ngày uống sao") || messageLower.Contains("cách uống") || messageLower.Contains("liều lượng") || messageLower.Contains("cách dùng") || messageLower.Contains("uống sao") || messageLower.Contains("uống ngày") || messageLower.Contains("uống thế nào");
@@ -179,6 +189,67 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Hubs
                                 <span class='text-muted small d-block mt-2' style='font-size: 0.72rem;'>⚠️ *Thông tin chỉ mang tính tham khảo, hãy uống theo đúng chỉ định.*</span>
                             </div>";
                     }
+                    else if (hasJointPain || symptom == "xương khớp")
+                    {
+                        replyMessage = @"
+                            <div class='p-3 bg-white border-warning border-start border-4 rounded-3 shadow-sm'>
+                                <h6 class='fw-bold text-warning-emphasis mb-2'><i class='bi bi-clock-history me-1'></i> Liều dùng & Cách dùng hỗ trợ Xương khớp:</h6>
+                                <ul class='mb-0 ps-3 text-dark' style='font-size: 0.85rem;'>
+                                    <li><strong>Glucosamine Chondroitin 1500mg:</strong> Uống 1 viên mỗi ngày sau bữa ăn chính. Nên duy trì đều đặn từ 2-3 tháng để có hiệu quả tốt nhất.</li>
+                                    <li><strong>Dầu cá Omega-3:</strong> Uống 1 viên/lần, ngày 2 lần sau ăn vào buổi sáng và trưa.</li>
+                                </ul>
+                                <span class='text-muted small d-block mt-2' style='font-size: 0.72rem;'>⚠️ *Thông tin chỉ mang tính tham khảo, hãy uống theo đúng chỉ định.*</span>
+                            </div>";
+                    }
+                    else if (hasDigestive || symptom == "tiêu hóa")
+                    {
+                        replyMessage = @"
+                            <div class='p-3 bg-white border-success border-start border-4 rounded-3 shadow-sm'>
+                                <h6 class='fw-bold text-success mb-2'><i class='bi bi-clock-history me-1'></i> Liều dùng & Cách dùng hỗ trợ Tiêu hóa:</h6>
+                                <ul class='mb-0 ps-3 text-dark' style='font-size: 0.85rem;'>
+                                    <li><strong>Men vi sinh Optibac Probiotics:</strong> Hòa 1 gói với nước nguội uống mỗi buổi sáng trước hoặc cùng bữa ăn. Không pha với nước nóng.</li>
+                                </ul>
+                                <span class='text-muted small d-block mt-2' style='font-size: 0.72rem;'>⚠️ *Thông tin chỉ mang tính tham khảo, hãy uống theo đúng chỉ định.*</span>
+                            </div>";
+                    }
+                    else if (hasSkinCare || symptom == "dưỡng da")
+                    {
+                        replyMessage = @"
+                            <div class='p-3 bg-white border-start border-4 rounded-3 shadow-sm' style='border-color: #e21b79;'>
+                                <h6 class='fw-bold mb-2' style='color: #e21b79;'><i class='bi bi-clock-history me-1'></i> Hướng dẫn sử dụng Chăm sóc da & Làm đẹp:</h6>
+                                <ul class='mb-0 ps-3 text-dark' style='font-size: 0.85rem;'>
+                                    <li><strong>Viên uống Collagen Glow & White:</strong> Uống 2 viên mỗi ngày trước khi đi ngủ khoảng 30 phút - 1 tiếng để tăng hấp thu tối đa.</li>
+                                    <li><strong>Sữa rửa mặt Cetaphil Gentle 125ml:</strong> Dùng rửa mặt ngày 2 lần vào buổi Sáng và Tối, massage nhẹ nhàng rồi rửa lại với nước sạch.</li>
+                                </ul>
+                                <span class='text-muted small d-block mt-2' style='font-size: 0.72rem;'>⚠️ *Thông tin chỉ mang tính tham khảo.*</span>
+                            </div>";
+                    }
+                    else if (hasMotherBaby || symptom == "mẹ và bé")
+                    {
+                        replyMessage = @"
+                            <div class='p-3 bg-white border-info border-start border-4 rounded-3 shadow-sm'>
+                                <h6 class='fw-bold text-info mb-2'><i class='bi bi-clock-history me-1'></i> Hướng dẫn sử dụng cho Mẹ & Bé:</h6>
+                                <ul class='mb-0 ps-3 text-dark' style='font-size: 0.85rem;'>
+                                    <li><strong>Vitamin Prenatal DHA:</strong> Uống 1 viên mỗi ngày sau bữa ăn chính.</li>
+                                    <li><strong>Sữa bột Similac Newborn:</strong> Pha bằng nước ấm khoảng 37-40 độ C theo tỉ lệ chỉ dẫn trên hộp sữa.</li>
+                                    <li><strong>Tã dán Bobby:</strong> Thay tã sau mỗi 3-4 tiếng để giữ da bé khô thoáng, phòng ngừa hăm tã.</li>
+                                </ul>
+                                <span class='text-muted small d-block mt-2' style='font-size: 0.72rem;'>⚠️ *Thông tin chỉ mang tính tham khảo.*</span>
+                            </div>";
+                    }
+                    else if (hasMedicalDevice || symptom == "thiết bị y tế")
+                    {
+                        replyMessage = @"
+                            <div class='p-3 bg-white border-dark border-start border-4 rounded-3 shadow-sm'>
+                                <h6 class='fw-bold text-dark mb-2'><i class='bi bi-clock-history me-1'></i> Hướng dẫn sử dụng Thiết bị y tế:</h6>
+                                <ul class='mb-0 ps-3 text-dark' style='font-size: 0.85rem;'>
+                                    <li><strong>Máy đo huyết áp Omron:</strong> Đo ngày 1-2 lần vào buổi sáng trước khi ăn và tối trước khi đi ngủ. Ngồi thẳng lưng, đặt vòng bít bắp tay ngang tầm tim.</li>
+                                    <li><strong>Nhiệt kế hồng ngoại Microlife:</strong> Để đầu dò cách trán 1-3cm, bấm nút đo trong 1 giây để đọc kết quả.</li>
+                                    <li><strong>Máy đo SpO2:</strong> Kẹp vào ngón tay và giữ yên tay trong 10-15 giây để đọc kết quả đo.</li>
+                                </ul>
+                                <span class='text-muted small d-block mt-2' style='font-size: 0.72rem;'>⚠️ *Đọc kỹ hướng dẫn sử dụng đi kèm sản phẩm.*</span>
+                            </div>";
+                    }
                     else
                     {
                         // Check if specific drug is mentioned in the query
@@ -242,6 +313,62 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Hubs
                                 </ul>
                             </div>";
                     }
+                    else if (hasJointPain || symptom == "xương khớp")
+                    {
+                        replyMessage = @"
+                            <div class='p-3 bg-white border-warning border-start border-4 rounded-3 shadow-sm'>
+                                <h6 class='fw-bold text-warning-emphasis mb-2'><i class='bi bi-exclamation-triangle-fill me-1'></i> Chế độ chăm sóc & kiêng cữ Đau Xương Khớp:</h6>
+                                <ul class='mb-0 ps-3 text-dark' style='font-size: 0.85rem;'>
+                                    <li><strong>Kiêng ăn uống:</strong> Hạn chế các đồ ăn nhiều muối, nhiều dầu mỡ (thức ăn nhanh, đồ chiên rán) có thể làm tăng phản ứng viêm trong khớp. Tránh bia rượu và các chất kích thích.</li>
+                                    <li><strong>Hạn chế sinh hoạt:</strong> Tránh các vận động mạnh đột ngột, bê vác các đồ vật quá nặng gây áp lực trực tiếp lên các khớp đang tổn thương. Hạn chế ngồi một chỗ quá lâu mà không thay đổi tư thế.</li>
+                                    <li><strong>Nên làm:</strong> Tập thể dục nhẹ nhàng như đi bộ, bơi lội hoặc tập yoga để duy trì sự dẻo dai và bôi trơn khớp xương.</li>
+                                </ul>
+                            </div>";
+                    }
+                    else if (hasDigestive || symptom == "tiêu hóa")
+                    {
+                        replyMessage = @"
+                            <div class='p-3 bg-white border-warning border-start border-4 rounded-3 shadow-sm'>
+                                <h6 class='fw-bold text-warning-emphasis mb-2'><i class='bi bi-exclamation-triangle-fill me-1'></i> Chế độ kiêng cữ khi bị Rối Loạn Tiêu Hóa:</h6>
+                                <ul class='mb-0 ps-3 text-dark' style='font-size: 0.85rem;'>
+                                    <li><strong>Kiêng ăn uống:</strong> Tránh ăn các thực phẩm tanh sống (gỏi cá, tiết canh, hải sản sống), đồ ăn để qua đêm không được hâm nóng kỹ. Hạn chế sữa tươi, rượu bia, cà phê và nước ngọt có ga.</li>
+                                    <li><strong>Nên làm:</strong> Ăn các thức ăn dạng lỏng, mềm, dễ tiêu hóa như cháo, súp, thịt nạc ninh nhừ. Uống nhiều nước ấm hoặc Oresol để bù dịch nếu bị tiêu chảy.</li>
+                                </ul>
+                            </div>";
+                    }
+                    else if (hasSkinCare || symptom == "dưỡng da")
+                    {
+                        replyMessage = @"
+                            <div class='p-3 bg-white border-warning border-start border-4 rounded-3 shadow-sm'>
+                                <h6 class='fw-bold text-warning-emphasis mb-2'><i class='bi bi-exclamation-triangle-fill me-1'></i> Chăm sóc da & Kiêng cữ cho làn da khỏe đẹp:</h6>
+                                <ul class='mb-0 ps-3 text-dark' style='font-size: 0.85rem;'>
+                                    <li><strong>Kiêng cữ:</strong> Hạn chế đồ ăn cay nóng, đồ ăn nhiều dầu mỡ, đồ ăn chứa lượng đường cao (gây bùng phát mụn và lão hóa nhanh). Tránh thức khuya và tự ý nặn mụn bằng tay chưa vệ sinh.</li>
+                                    <li><strong>Nên làm:</strong> Uống đủ 2 lít nước mỗi ngày. Luôn thoa kem chống nắng bảo vệ da vào ban ngày khi ra đường. Rửa mặt sạch sâu dịu nhẹ vào cuối ngày.</li>
+                                </ul>
+                            </div>";
+                    }
+                    else if (hasMotherBaby || symptom == "mẹ và bé")
+                    {
+                        replyMessage = @"
+                            <div class='p-3 bg-white border-warning border-start border-4 rounded-3 shadow-sm'>
+                                <h6 class='fw-bold text-warning-emphasis mb-2'><i class='bi bi-exclamation-triangle-fill me-1'></i> Chế độ kiêng cữ An Toàn Cho Mẹ & Bé:</h6>
+                                <ul class='mb-0 ps-3 text-dark' style='font-size: 0.85rem;'>
+                                    <li><strong>Dành cho Mẹ bầu:</strong> Tuyệt đối không tự ý uống bất kỳ loại thuốc tây hay thảo dược nào khi chưa tham khảo ý kiến bác sĩ. Kiêng các chất kích thích (cafein, rượu bia). Tránh hoạt động mạnh, căng thẳng quá mức.</li>
+                                    <li><strong>Dành cho Em bé:</strong> Tránh sử dụng xà phòng có độ tẩy rửa mạnh lên da bé. Khi bé bị hăm tã, kiêng đóng tã bỉm quá chật hoặc để tã ẩm quá lâu.</li>
+                                </ul>
+                            </div>";
+                    }
+                    else if (hasMedicalDevice || symptom == "thiết bị y tế")
+                    {
+                        replyMessage = @"
+                            <div class='p-3 bg-white border-warning border-start border-4 rounded-3 shadow-sm'>
+                                <h6 class='fw-bold text-warning-emphasis mb-2'><i class='bi bi-exclamation-triangle-fill me-1'></i> Lưu ý quan trọng khi dùng thiết bị y tế tại nhà:</h6>
+                                <ul class='mb-0 ps-3 text-dark' style='font-size: 0.85rem;'>
+                                    <li><strong>Khi đo huyết áp:</strong> Không đo ngay sau khi ăn no, vừa đi bộ hay tập thể dục về, vừa hút thuốc hoặc uống cafe (hãy nghỉ ngơi tối thiểu 15 phút trước khi đo).</li>
+                                    <li><strong>Khi đo nhiệt độ & SpO2:</strong> Tránh đo nhiệt độ khi vừa đi ngoài nắng về. Không kẹp máy đo SpO2 lên ngón tay đang sơn móng tay quá dày hoặc ngón tay bị lạnh run.</li>
+                                </ul>
+                            </div>";
+                    }
                     else
                     {
                         replyMessage = "Bạn muốn biết chế độ kiêng cữ cho triệu chứng nào? Vui lòng gõ cụ thể như: 'Kiêng gì khi bị ho', 'Bị sốt kiêng gì'.";
@@ -250,13 +377,13 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Hubs
                 // ==========================================
                 // 4. INTENT: PRESCRIPTION & SYMPTOM AUTO-RESPONSE (Đơn thuốc ho, sốt, đau đầu)
                 // ==========================================
-                else if (hasCough || hasFever || hasHeadache || isPrescriptionQuery)
+                else if (hasCough || hasFever || hasHeadache || hasJointPain || hasDigestive || hasSkinCare || hasMotherBaby || hasMedicalDevice || isPrescriptionQuery)
                 {
                     // If a prescription is requested but no symptom is specified
-                    if (isPrescriptionQuery && !hasCough && !hasFever && !hasHeadache)
+                    if (isPrescriptionQuery && !hasCough && !hasFever && !hasHeadache && !hasJointPain && !hasDigestive && !hasSkinCare && !hasMotherBaby && !hasMedicalDevice)
                     {
                         replyMessage = @"
-                            🤖 <strong>Chọn triệu chứng của bạn để tôi gợi ý đơn thuốc phù hợp:</strong><br/><br/>
+                            🤖 <strong>Chọn triệu chứng hoặc nhu cầu của bạn để tôi gợi ý sản phẩm phù hợp:</strong><br/><br/>
                             <div class='d-flex flex-column gap-2'>
                                 <button class='btn btn-outline-primary text-start rounded-pill py-2 px-3 shadow-sm' onclick=""sendQuickMessage('Đơn thuốc ho')"">
                                     😷 <strong>Đơn thuốc Ho</strong> (Ho khan, ho có đờm)
@@ -266,6 +393,21 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Hubs
                                 </button>
                                 <button class='btn btn-outline-info text-start rounded-pill py-2 px-3 shadow-sm text-dark' onclick=""sendQuickMessage('Đơn thuốc đau đầu')"">
                                     🧠 <strong>Đơn thuốc Đau đầu</strong> (Đau nhức, chóng mặt)
+                                </button>
+                                <button class='btn btn-outline-warning text-start rounded-pill py-2 px-3 shadow-sm text-dark' onclick=""sendQuickMessage('Đơn thuốc xương khớp')"">
+                                    🦴 <strong>Sản phẩm Xương khớp</strong> (Đau mỏi khớp, khô khớp)
+                                </button>
+                                <button class='btn btn-outline-success text-start rounded-pill py-2 px-3 shadow-sm' onclick=""sendQuickMessage('Đơn thuốc tiêu hóa')"">
+                                    🥛 <strong>Sản phẩm Tiêu hóa</strong> (Men vi sinh, đầy bụng)
+                                </button>
+                                <button class='btn btn-outline-pink text-start rounded-pill py-2 px-3 shadow-sm text-dark' style='border-color: #e21b79; color: #e21b79;' onclick=""sendQuickMessage('Đơn thuốc dưỡng da')"">
+                                    ✨ <strong>Chăm sóc da & Làm đẹp</strong> (Collagen, Cetaphil)
+                                </button>
+                                <button class='btn btn-outline-secondary text-start rounded-pill py-2 px-3 shadow-sm' onclick=""sendQuickMessage('Đơn thuốc mẹ và bé')"">
+                                    👶 <strong>Sản phẩm Mẹ và Bé</strong> (Sữa bột, tã dán, vitamin bầu)
+                                </button>
+                                <button class='btn btn-outline-dark text-start rounded-pill py-2 px-3 shadow-sm' onclick=""sendQuickMessage('Đề xuất thiết bị y tế')"">
+                                    🩺 <strong>Thiết bị y tế</strong> (Đo huyết áp, nhiệt kế, SpO2)
                                 </button>
                             </div>";
                     }
@@ -436,6 +578,230 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Hubs
                                 </div>
 
                                 <span class='text-muted small d-block mt-2' style='font-size: 0.7rem; line-height: 1.2;'>⚠️ *Lưu ý: Không tự ý dùng Ginkgo cho người có hội chứng máu khó đông.*</span>
+                            </div>";
+                    }
+                    else if (hasJointPain)
+                    {
+                        session.Symptom = "xương khớp";
+                        session.State = "";
+
+                        var recommended = await _context.Thuocs
+                            .Where(t => t.TenThuoc.Contains("Glucosamine") || t.TenThuoc.Contains("Omega-3"))
+                            .Take(2)
+                            .ToListAsync();
+
+                        string drugCards = "";
+                        foreach (var drug in recommended)
+                        {
+                            drugCards += RenderDrugCard(drug);
+                        }
+
+                        replyMessage = $@"
+                            <div class='prescription-box border-warning border-start border-4 p-3 bg-white rounded-3 shadow-sm mb-2'>
+                                <h6 class='text-warning-emphasis fw-bold mb-1'><i class='bi bi-file-earmark-medical-fill me-1'></i> SẢN PHẨM KHUYÊN DÙNG: HỖ TRỢ XƯƠNG KHỚP</h6>
+                                <p class='text-muted mb-3' style='font-size: 0.75rem;'>Giúp tái tạo sụn khớp, giảm đau mỏi xương khớp và tăng chất nhờn bôi trơn khớp.</p>
+                                
+                                <div class='mb-3'>
+                                    <strong class='text-dark d-block mb-2' style='font-size: 0.8rem;'>💊 Sản phẩm khuyên dùng (lấy từ CSDL):</strong>
+                                    {drugCards}
+                                </div>
+
+                                <div class='bg-light p-2 rounded mb-2' style='font-size: 0.82rem;'>
+                                    <strong class='text-primary d-block mb-1'><i class='bi bi-clock-history me-1'></i> CÁCH DÙNG & LIỀU LƯỢNG:</strong>
+                                    <ul class='mb-0 ps-3 text-dark' style='font-size: 0.78rem;'>
+                                        <li><strong>Glucosamine Chondroitin 1500mg:</strong> Uống 1 viên mỗi ngày sau bữa ăn chính. Nên duy trì đều đặn từ 2-3 tháng.</li>
+                                        <li><strong>Dầu cá Omega-3:</strong> Uống 1 viên/lần, ngày 2 lần sau khi ăn (sáng/trưa).</li>
+                                    </ul>
+                                </div>
+
+                                <div class='p-2 rounded mb-1 border border-warning-subtle bg-warning-subtle text-warning-emphasis' style='font-size: 0.82rem;'>
+                                    <strong class='d-block mb-1'><i class='bi bi-exclamation-triangle-fill me-1'></i> CHẾ ĐỘ KIÊNG CỮ:</strong>
+                                    <ul class='mb-0 ps-3' style='font-size: 0.78rem;'>
+                                        <li>Hạn chế các đồ ăn nhiều muối, nhiều dầu mỡ (thức ăn nhanh, đồ chiên rán) có thể tăng phản ứng viêm. Tránh các vận động mạnh, mang vác nặng đè lên khớp bị đau.</li>
+                                        <li>Tập thể dục nhẹ nhàng như đi bộ hoặc bơi lội để bôi trơn các khớp xương. Cần kiên trì sử dụng thực phẩm bảo vệ sức khỏe khớp lâu dài.</li>
+                                    </ul>
+                                </div>
+
+                                <span class='text-muted small d-block mt-2' style='font-size: 0.7rem; line-height: 1.2;'>⚠️ *Lưu ý: Thực phẩm này không phải là thuốc, không thay thế thuốc chữa bệnh.*</span>
+                            </div>";
+                    }
+                    else if (hasDigestive)
+                    {
+                        session.Symptom = "tiêu hóa";
+                        session.State = "";
+
+                        var recommended = await _context.Thuocs
+                            .Where(t => t.TenThuoc.Contains("Optibac"))
+                            .Take(2)
+                            .ToListAsync();
+
+                        string drugCards = "";
+                        foreach (var drug in recommended)
+                        {
+                            drugCards += RenderDrugCard(drug);
+                        }
+
+                        replyMessage = $@"
+                            <div class='prescription-box border-success border-start border-4 p-3 bg-white rounded-3 shadow-sm mb-2'>
+                                <h6 class='text-success fw-bold mb-1'><i class='bi bi-file-earmark-medical-fill me-1'></i> SẢN PHẨM KHUYÊN DÙNG: HỖ TRỢ TIÊU HÓA</h6>
+                                <p class='text-muted mb-3' style='font-size: 0.75rem;'>Cung cấp lợi khuẩn probiotics giúp cân bằng hệ vi sinh đường ruột, giảm táo bón, đầy hơi.</p>
+                                
+                                <div class='mb-3'>
+                                    <strong class='text-dark d-block mb-2' style='font-size: 0.8rem;'>💊 Sản phẩm khuyên dùng (lấy từ CSDL):</strong>
+                                    {drugCards}
+                                </div>
+
+                                <div class='bg-light p-2 rounded mb-2' style='font-size: 0.82rem;'>
+                                    <strong class='text-primary d-block mb-1'><i class='bi bi-clock-history me-1'></i> CÁCH DÙNG & LIỀU LƯỢNG:</strong>
+                                    <ul class='mb-0 ps-3 text-dark' style='font-size: 0.78rem;'>
+                                        <li><strong>Men vi sinh Optibac Probiotics:</strong> Hòa 1 gói với nước nguội hoặc nước ấm nhẹ (dưới 40°C), uống mỗi buổi sáng trước hoặc trong khi ăn.</li>
+                                    </ul>
+                                </div>
+
+                                <div class='p-2 rounded mb-1 border border-warning-subtle bg-warning-subtle text-warning-emphasis' style='font-size: 0.82rem;'>
+                                    <strong class='d-block mb-1'><i class='bi bi-exclamation-triangle-fill me-1'></i> CHẾ ĐỘ KIÊNG CỮ:</strong>
+                                    <ul class='mb-0 ps-3' style='font-size: 0.78rem;'>
+                                        <li>Kiêng các đồ ăn tanh (hải sản sống, gỏi), thức ăn ôi thiu, thực phẩm không đảm bảo vệ sinh. Hạn chế sữa tươi và các đồ uống có cồn, nhiều ga khi đang bị rối loạn tiêu hóa.</li>
+                                        <li>Bổ sung nhiều nước ấm (nếu bị tiêu chảy), ăn đồ lỏng dễ tiêu như cháo, súp.</li>
+                                    </ul>
+                                </div>
+
+                                <span class='text-muted small d-block mt-2' style='font-size: 0.7rem; line-height: 1.2;'>⚠️ *Lưu ý: Thực phẩm này không phải là thuốc, không thay thế thuốc chữa bệnh.*</span>
+                            </div>";
+                    }
+                    else if (hasSkinCare)
+                    {
+                        session.Symptom = "dưỡng da";
+                        session.State = "";
+
+                        var recommended = await _context.Thuocs
+                            .Where(t => t.TenThuoc.Contains("Collagen") || t.TenThuoc.Contains("Cetaphil"))
+                            .Take(2)
+                            .ToListAsync();
+
+                        string drugCards = "";
+                        foreach (var drug in recommended)
+                        {
+                            drugCards += RenderDrugCard(drug);
+                        }
+
+                        replyMessage = $@"
+                            <div class='prescription-box border-start border-4 p-3 bg-white rounded-3 shadow-sm mb-2' style='border-color: #e21b79;'>
+                                <h6 class='fw-bold mb-1' style='color: #e21b79;'><i class='bi bi-file-earmark-medical-fill me-1'></i> SẢN PHẨM KHUYÊN DÙNG: CHĂM SÓC DA & LÀM ĐẸP</h6>
+                                <p class='text-muted mb-3' style='font-size: 0.75rem;'>Hỗ trợ chăm sóc da dịu nhẹ bên ngoài và bổ sung collagen ngừa lão hóa bên trong.</p>
+                                
+                                <div class='mb-3'>
+                                    <strong class='text-dark d-block mb-2' style='font-size: 0.8rem;'>💊 Sản phẩm khuyên dùng (lấy từ CSDL):</strong>
+                                    {drugCards}
+                                </div>
+
+                                <div class='bg-light p-2 rounded mb-2' style='font-size: 0.82rem;'>
+                                    <strong class='text-primary d-block mb-1'><i class='bi bi-clock-history me-1'></i> CÁCH DÙNG & LIỀU LƯỢNG:</strong>
+                                    <ul class='mb-0 ps-3 text-dark' style='font-size: 0.78rem;'>
+                                        <li><strong>Viên uống Collagen Glow & White:</strong> Uống 2 viên mỗi ngày trước khi đi ngủ khoảng 30 phút - 1 tiếng.</li>
+                                        <li><strong>Sữa rửa mặt Cetaphil Gentle 125ml:</strong> Dùng rửa mặt nhẹ nhàng 2 lần mỗi ngày (sáng và tối).</li>
+                                    </ul>
+                                </div>
+
+                                <div class='p-2 rounded mb-1 border border-warning-subtle bg-warning-subtle text-warning-emphasis' style='font-size: 0.82rem;'>
+                                    <strong class='d-block mb-1'><i class='bi bi-exclamation-triangle-fill me-1'></i> CHẾ ĐỘ KIÊNG CỮ:</strong>
+                                    <ul class='mb-0 ps-3' style='font-size: 0.78rem;'>
+                                        <li>Hạn chế thức khuya, ăn đồ ăn cay nóng, chứa nhiều đường (gây mụn). Không chạm tay chưa rửa sạch lên mặt.</li>
+                                        <li>Luôn bôi kem chống nắng khi ra đường vào ban ngày để bảo vệ làn da đang chăm sóc. Uống đủ 2 lít nước mỗi ngày.</li>
+                                    </ul>
+                                </div>
+
+                                <span class='text-muted small d-block mt-2' style='font-size: 0.7rem; line-height: 1.2;'>⚠️ *Lưu ý: Không bôi Cetaphil lên vết thương hở sâu.*</span>
+                            </div>";
+                    }
+                    else if (hasMotherBaby)
+                    {
+                        session.Symptom = "mẹ và bé";
+                        session.State = "";
+
+                        var recommended = await _context.Thuocs
+                            .Where(t => t.TenThuoc.Contains("Prenatal") || t.TenThuoc.Contains("Similac") || t.TenThuoc.Contains("Bobby"))
+                            .Take(3)
+                            .ToListAsync();
+
+                        string drugCards = "";
+                        foreach (var drug in recommended)
+                        {
+                            drugCards += RenderDrugCard(drug);
+                        }
+
+                        replyMessage = $@"
+                            <div class='prescription-box border-info border-start border-4 p-3 bg-white rounded-3 shadow-sm mb-2'>
+                                <h6 class='text-info fw-bold mb-1'><i class='bi bi-file-earmark-medical-fill me-1'></i> SẢN PHẨM KHUYÊN DÙNG: DÀNH CHO MẸ & BÉ</h6>
+                                <p class='text-muted mb-3' style='font-size: 0.75rem;'>Cung cấp dinh dưỡng toàn diện cho mẹ bầu và chăm sóc sức khỏe của trẻ sơ sinh.</p>
+                                
+                                <div class='mb-3'>
+                                    <strong class='text-dark d-block mb-2' style='font-size: 0.8rem;'>💊 Sản phẩm khuyên dùng (lấy từ CSDL):</strong>
+                                    {drugCards}
+                                </div>
+
+                                <div class='bg-light p-2 rounded mb-2' style='font-size: 0.82rem;'>
+                                    <strong class='text-primary d-block mb-1'><i class='bi bi-clock-history me-1'></i> CÁCH DÙNG & LIỀU LƯỢNG:</strong>
+                                    <ul class='mb-0 ps-3 text-dark' style='font-size: 0.78rem;'>
+                                        <li><strong>Vitamin Prenatal DHA:</strong> Uống 1 viên mỗi ngày sau bữa ăn chính.</li>
+                                        <li><strong>Sữa bột Similac Newborn:</strong> Pha theo hướng dẫn chi tiết trên vỏ hộp sữa bằng nước ấm khoảng 37-40 độ C.</li>
+                                        <li><strong>Tã dán Bobby:</strong> Thay tã sau mỗi 3-4 tiếng hoặc ngay sau khi bé đi tiêu để tránh hăm da.</li>
+                                    </ul>
+                                </div>
+
+                                <div class='p-2 rounded mb-1 border border-warning-subtle bg-warning-subtle text-warning-emphasis' style='font-size: 0.82rem;'>
+                                    <strong class='d-block mb-1'><i class='bi bi-exclamation-triangle-fill me-1'></i> CHẾ ĐỘ KIÊNG CỮ:</strong>
+                                    <ul class='mb-0 ps-3' style='font-size: 0.78rem;'>
+                                        <li>Mẹ bầu tuyệt đối tránh tự ý sử dụng bất kỳ loại thuốc tây nào mà không có chỉ định của bác sĩ. Không sử dụng chất kích thích, rượu bia, caffeine.</li>
+                                        <li>Giữ vùng mặc tã của bé luôn sạch sẽ, khô thoáng, bôi kem hăm tã mỏng trước khi đóng tã mới cho bé.</li>
+                                    </ul>
+                                </div>
+
+                                <span class='text-muted small d-block mt-2' style='font-size: 0.7rem; line-height: 1.2;'>⚠️ *Lưu ý: Sữa mẹ là thức ăn tốt nhất cho sức khỏe và sự phát triển toàn diện của trẻ nhỏ.*</span>
+                            </div>";
+                    }
+                    else if (hasMedicalDevice)
+                    {
+                        session.Symptom = "thiết bị y tế";
+                        session.State = "";
+
+                        var recommended = await _context.Thuocs
+                            .Where(t => t.TenThuoc.Contains("Omron") || t.TenThuoc.Contains("Microlife") || t.TenThuoc.Contains("SpO2"))
+                            .Take(3)
+                            .ToListAsync();
+
+                        string drugCards = "";
+                        foreach (var drug in recommended)
+                        {
+                            drugCards += RenderDrugCard(drug);
+                        }
+
+                        replyMessage = $@"
+                            <div class='prescription-box border-dark border-start border-4 p-3 bg-white rounded-3 shadow-sm mb-2'>
+                                <h6 class='text-dark fw-bold mb-1'><i class='bi bi-file-earmark-medical-fill me-1'></i> THIẾT BỊ Y TẾ KHUYÊN DÙNG TẠI NHÀ</h6>
+                                <p class='text-muted mb-3' style='font-size: 0.75rem;'>Các thiết bị theo dõi sức khỏe chủ động, đo chỉ số huyết áp, nhiệt độ và nồng độ oxy cơ thể.</p>
+                                
+                                <div class='mb-3'>
+                                    <strong class='text-dark d-block mb-2' style='font-size: 0.8rem;'>🩺 Thiết bị khuyên dùng (lấy từ CSDL):</strong>
+                                    {drugCards}
+                                </div>
+
+                                <div class='bg-light p-2 rounded mb-2' style='font-size: 0.82rem;'>
+                                    <strong class='text-primary d-block mb-1'><i class='bi bi-clock-history me-1'></i> HƯỚNG DẪN SỬ DỤNG:</strong>
+                                    <ul class='mb-0 ps-3 text-dark' style='font-size: 0.78rem;'>
+                                        <li><strong>Máy đo huyết áp Omron:</strong> Đo ngày 1-2 lần vào buổi sáng trước khi ăn và tối trước khi đi ngủ. Ngồi thẳng lưng, đặt vòng bít bắp tay ngang tầm tim.</li>
+                                        <li><strong>Nhiệt kế Microlife:</strong> Để đầu dò cách trán 1-3cm, nhấn nút đo để nhận kết quả sau 1 giây.</li>
+                                        <li><strong>Máy đo SpO2:</strong> Kẹp vào đầu ngón tay, giữ yên bàn tay trong 10-15 giây để nhận kết quả đo.</li>
+                                    </ul>
+                                </div>
+
+                                <div class='p-2 rounded mb-1 border border-warning-subtle bg-warning-subtle text-warning-emphasis' style='font-size: 0.82rem;'>
+                                    <strong class='d-block mb-1'><i class='bi bi-exclamation-triangle-fill me-1'></i> LƯU Ý KHI SỬ DỤNG:</strong>
+                                    <ul class='mb-0 ps-3' style='font-size: 0.78rem;'>
+                                        <li>Tránh đo huyết áp ngay sau khi tập thể dục, hút thuốc hoặc uống cafe. Không tự ý thay đổi liều lượng thuốc điều trị huyết áp dựa vào kết quả máy đo khi chưa hỏi ý kiến bác sĩ.</li>
+                                        <li>Bảo quản các thiết bị điện tử y tế nơi khô ráo, tránh va đập mạnh, tháo pin ra nếu lâu ngày không sử dụng.</li>
+                                    </ul>
+                                </div>
                             </div>";
                     }
                 }
