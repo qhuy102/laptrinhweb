@@ -17,243 +17,244 @@ build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.TargetFrameworkIdentifier = .NETCoreApp
 build_property.TargetFrameworkVersion = v8.0
+build_property.EntryPointFilePath = 
 build_property.RootNamespace = Web_Quản_Lí_Nhà_Thuốc
 build_property.RootNamespace = Web_Quản_Lí_Nhà_Thuốc
-build_property.ProjectDir = D:\laptrinhweb\Web Quản Lí Nhà Thuốc\
+build_property.ProjectDir = C:\Users\Windows 11\Desktop\New folder\laptrinhweb\Web Quản Lí Nhà Thuốc\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
 build_property.RazorLangVersion = 8.0
 build_property.SupportLocalizedComponentNames = 
 build_property.GenerateRazorMetadataSourceChecksumAttributes = 
-build_property.MSBuildProjectDirectory = D:\laptrinhweb\Web Quản Lí Nhà Thuốc
+build_property.MSBuildProjectDirectory = C:\Users\Windows 11\Desktop\New folder\laptrinhweb\Web Quản Lí Nhà Thuốc
 build_property._RazorSourceGeneratorDebug = 
 build_property.EffectiveAnalysisLevelStyle = 8.0
 build_property.EnableCodeStyleSeverity = 
 
-[D:/laptrinhweb/Web Quản Lí Nhà Thuốc/Areas/Identity/Pages/Account/Login.cshtml]
+[C:/Users/Windows 11/Desktop/New folder/laptrinhweb/Web Quản Lí Nhà Thuốc/Areas/Identity/Pages/Account/Login.cshtml]
 build_metadata.AdditionalFiles.TargetPath = QXJlYXNcSWRlbnRpdHlcUGFnZXNcQWNjb3VudFxMb2dpbi5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/laptrinhweb/Web Quản Lí Nhà Thuốc/Areas/Identity/Pages/Account/Logout.cshtml]
+[C:/Users/Windows 11/Desktop/New folder/laptrinhweb/Web Quản Lí Nhà Thuốc/Areas/Identity/Pages/Account/Logout.cshtml]
 build_metadata.AdditionalFiles.TargetPath = QXJlYXNcSWRlbnRpdHlcUGFnZXNcQWNjb3VudFxMb2dvdXQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/laptrinhweb/Web Quản Lí Nhà Thuốc/Areas/Identity/Pages/Account/Manage/Index.cshtml]
+[C:/Users/Windows 11/Desktop/New folder/laptrinhweb/Web Quản Lí Nhà Thuốc/Areas/Identity/Pages/Account/Manage/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = QXJlYXNcSWRlbnRpdHlcUGFnZXNcQWNjb3VudFxNYW5hZ2VcSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/laptrinhweb/Web Quản Lí Nhà Thuốc/Areas/Identity/Pages/Account/Manage/_ViewImports.cshtml]
+[C:/Users/Windows 11/Desktop/New folder/laptrinhweb/Web Quản Lí Nhà Thuốc/Areas/Identity/Pages/Account/Manage/_ViewImports.cshtml]
 build_metadata.AdditionalFiles.TargetPath = QXJlYXNcSWRlbnRpdHlcUGFnZXNcQWNjb3VudFxNYW5hZ2VcX1ZpZXdJbXBvcnRzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/laptrinhweb/Web Quản Lí Nhà Thuốc/Areas/Identity/Pages/Account/Register.cshtml]
+[C:/Users/Windows 11/Desktop/New folder/laptrinhweb/Web Quản Lí Nhà Thuốc/Areas/Identity/Pages/Account/Register.cshtml]
 build_metadata.AdditionalFiles.TargetPath = QXJlYXNcSWRlbnRpdHlcUGFnZXNcQWNjb3VudFxSZWdpc3Rlci5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/laptrinhweb/Web Quản Lí Nhà Thuốc/Areas/Identity/Pages/Account/_ViewImports.cshtml]
+[C:/Users/Windows 11/Desktop/New folder/laptrinhweb/Web Quản Lí Nhà Thuốc/Areas/Identity/Pages/Account/_ViewImports.cshtml]
 build_metadata.AdditionalFiles.TargetPath = QXJlYXNcSWRlbnRpdHlcUGFnZXNcQWNjb3VudFxfVmlld0ltcG9ydHMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/laptrinhweb/Web Quản Lí Nhà Thuốc/Areas/Identity/Pages/_ValidationScriptsPartial.cshtml]
+[C:/Users/Windows 11/Desktop/New folder/laptrinhweb/Web Quản Lí Nhà Thuốc/Areas/Identity/Pages/_ValidationScriptsPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = QXJlYXNcSWRlbnRpdHlcUGFnZXNcX1ZhbGlkYXRpb25TY3JpcHRzUGFydGlhbC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/laptrinhweb/Web Quản Lí Nhà Thuốc/Areas/Identity/Pages/_ViewImports.cshtml]
+[C:/Users/Windows 11/Desktop/New folder/laptrinhweb/Web Quản Lí Nhà Thuốc/Areas/Identity/Pages/_ViewImports.cshtml]
 build_metadata.AdditionalFiles.TargetPath = QXJlYXNcSWRlbnRpdHlcUGFnZXNcX1ZpZXdJbXBvcnRzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/laptrinhweb/Web Quản Lí Nhà Thuốc/Areas/Identity/Pages/_ViewStart.cshtml]
+[C:/Users/Windows 11/Desktop/New folder/laptrinhweb/Web Quản Lí Nhà Thuốc/Areas/Identity/Pages/_ViewStart.cshtml]
 build_metadata.AdditionalFiles.TargetPath = QXJlYXNcSWRlbnRpdHlcUGFnZXNcX1ZpZXdTdGFydC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/Admin/AuditLogs.cshtml]
+[C:/Users/Windows 11/Desktop/New folder/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/Admin/AuditLogs.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cQXVkaXRMb2dzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/Admin/CreatePharmacist.cshtml]
+[C:/Users/Windows 11/Desktop/New folder/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/Admin/CreatePharmacist.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cQ3JlYXRlUGhhcm1hY2lzdC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/Admin/Deals.cshtml]
+[C:/Users/Windows 11/Desktop/New folder/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/Admin/Deals.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cRGVhbHMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/Admin/EditUser.cshtml]
+[C:/Users/Windows 11/Desktop/New folder/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/Admin/EditUser.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cRWRpdFVzZXIuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/Admin/Users.cshtml]
+[C:/Users/Windows 11/Desktop/New folder/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/Admin/Users.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cVXNlcnMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/Benh/Create.cshtml]
+[C:/Users/Windows 11/Desktop/New folder/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/Benh/Create.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQmVuaFxDcmVhdGUuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/Benh/Delete.cshtml]
+[C:/Users/Windows 11/Desktop/New folder/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/Benh/Delete.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQmVuaFxEZWxldGUuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/Benh/Edit.cshtml]
+[C:/Users/Windows 11/Desktop/New folder/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/Benh/Edit.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQmVuaFxFZGl0LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/Benh/Index.cshtml]
+[C:/Users/Windows 11/Desktop/New folder/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/Benh/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQmVuaFxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/Cart/Index.cshtml]
+[C:/Users/Windows 11/Desktop/New folder/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/Cart/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2FydFxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/Catalog/Index.cshtml]
+[C:/Users/Windows 11/Desktop/New folder/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/Catalog/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2F0YWxvZ1xJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/Category/Create.cshtml]
+[C:/Users/Windows 11/Desktop/New folder/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/Category/Create.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2F0ZWdvcnlcQ3JlYXRlLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/Category/Delete.cshtml]
+[C:/Users/Windows 11/Desktop/New folder/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/Category/Delete.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2F0ZWdvcnlcRGVsZXRlLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/Category/Edit.cshtml]
+[C:/Users/Windows 11/Desktop/New folder/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/Category/Edit.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2F0ZWdvcnlcRWRpdC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/Category/Index.cshtml]
+[C:/Users/Windows 11/Desktop/New folder/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/Category/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2F0ZWdvcnlcSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/Home/AdminIndex.cshtml]
+[C:/Users/Windows 11/Desktop/New folder/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/Home/AdminIndex.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxBZG1pbkluZGV4LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/Home/CustomerIndex.cshtml]
+[C:/Users/Windows 11/Desktop/New folder/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/Home/CustomerIndex.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxDdXN0b21lckluZGV4LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/Home/Index.cshtml]
+[C:/Users/Windows 11/Desktop/New folder/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/Home/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/Home/Policies.cshtml]
+[C:/Users/Windows 11/Desktop/New folder/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/Home/Policies.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxQb2xpY2llcy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/Home/PrescriptionUpload.cshtml]
+[C:/Users/Windows 11/Desktop/New folder/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/Home/PrescriptionUpload.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxQcmVzY3JpcHRpb25VcGxvYWQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/Home/Privacy.cshtml]
+[C:/Users/Windows 11/Desktop/New folder/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/Home/Privacy.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxQcml2YWN5LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/Medicine/Create.cshtml]
+[C:/Users/Windows 11/Desktop/New folder/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/Medicine/Create.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWVkaWNpbmVcQ3JlYXRlLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/Medicine/Delete.cshtml]
+[C:/Users/Windows 11/Desktop/New folder/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/Medicine/Delete.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWVkaWNpbmVcRGVsZXRlLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/Medicine/Edit.cshtml]
+[C:/Users/Windows 11/Desktop/New folder/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/Medicine/Edit.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWVkaWNpbmVcRWRpdC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/Medicine/Index.cshtml]
+[C:/Users/Windows 11/Desktop/New folder/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/Medicine/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWVkaWNpbmVcSW5kZXguY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/OrderManagement/Details.cshtml]
+[C:/Users/Windows 11/Desktop/New folder/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/OrderManagement/Details.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcT3JkZXJNYW5hZ2VtZW50XERldGFpbHMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/OrderManagement/Index.cshtml]
+[C:/Users/Windows 11/Desktop/New folder/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/OrderManagement/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcT3JkZXJNYW5hZ2VtZW50XEluZGV4LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/OrderManagement/MapTracking.cshtml]
+[C:/Users/Windows 11/Desktop/New folder/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/OrderManagement/MapTracking.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcT3JkZXJNYW5hZ2VtZW50XE1hcFRyYWNraW5nLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/OrderManagement/ShipperTracking.cshtml]
+[C:/Users/Windows 11/Desktop/New folder/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/OrderManagement/ShipperTracking.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcT3JkZXJNYW5hZ2VtZW50XFNoaXBwZXJUcmFja2luZy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/Order/Checkout.cshtml]
+[C:/Users/Windows 11/Desktop/New folder/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/Order/Checkout.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcT3JkZXJcQ2hlY2tvdXQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/Order/MyOrders.cshtml]
+[C:/Users/Windows 11/Desktop/New folder/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/Order/MyOrders.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcT3JkZXJcTXlPcmRlcnMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/Pharmacist/Consult.cshtml]
+[C:/Users/Windows 11/Desktop/New folder/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/Pharmacist/Consult.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGhhcm1hY2lzdFxDb25zdWx0LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/Pharmacist/Dashboard.cshtml]
+[C:/Users/Windows 11/Desktop/New folder/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/Pharmacist/Dashboard.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGhhcm1hY2lzdFxEYXNoYm9hcmQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/Pharmacist/Prescriptions.cshtml]
+[C:/Users/Windows 11/Desktop/New folder/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/Pharmacist/Prescriptions.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGhhcm1hY2lzdFxQcmVzY3JpcHRpb25zLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/Pharmacist/Sell.cshtml]
+[C:/Users/Windows 11/Desktop/New folder/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/Pharmacist/Sell.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGhhcm1hY2lzdFxTZWxsLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/Shared/Error.cshtml]
+[C:/Users/Windows 11/Desktop/New folder/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/Shared/Error.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEVycm9yLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/Shared/_CategoryMegaMenu.cshtml]
+[C:/Users/Windows 11/Desktop/New folder/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/Shared/_CategoryMegaMenu.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9DYXRlZ29yeU1lZ2FNZW51LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/Shared/_LoginPartial.cshtml]
+[C:/Users/Windows 11/Desktop/New folder/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/Shared/_LoginPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9Mb2dpblBhcnRpYWwuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/Shared/_ProductCard.cshtml]
+[C:/Users/Windows 11/Desktop/New folder/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/Shared/_ProductCard.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9Qcm9kdWN0Q2FyZC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/Shared/_ProductScripts.cshtml]
+[C:/Users/Windows 11/Desktop/New folder/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/Shared/_ProductScripts.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9Qcm9kdWN0U2NyaXB0cy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/Shared/_ValidationScriptsPartial.cshtml]
+[C:/Users/Windows 11/Desktop/New folder/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/Shared/_ValidationScriptsPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/User/Cart.cshtml]
+[C:/Users/Windows 11/Desktop/New folder/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/User/Cart.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXNlclxDYXJ0LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/User/Dashboard.cshtml]
+[C:/Users/Windows 11/Desktop/New folder/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/User/Dashboard.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXNlclxEYXNoYm9hcmQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/User/Favorites.cshtml]
+[C:/Users/Windows 11/Desktop/New folder/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/User/Favorites.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXNlclxGYXZvcml0ZXMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/User/Orders.cshtml]
+[C:/Users/Windows 11/Desktop/New folder/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/User/Orders.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXNlclxPcmRlcnMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/_ViewImports.cshtml]
+[C:/Users/Windows 11/Desktop/New folder/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/_ViewImports.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdJbXBvcnRzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/_ViewStart.cshtml]
+[C:/Users/Windows 11/Desktop/New folder/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/_ViewStart.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdTdGFydC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/Shared/_Layout.cshtml]
+[C:/Users/Windows 11/Desktop/New folder/laptrinhweb/Web Quản Lí Nhà Thuốc/Views/Shared/_Layout.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MYXlvdXQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = b-3lmfxuveux

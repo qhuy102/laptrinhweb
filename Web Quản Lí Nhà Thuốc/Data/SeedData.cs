@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Web_Quản_Lí_Nhà_Thuốc.Models;
@@ -134,6 +135,29 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Data
 
         private static async Task SeedMedicines(PharmacyDbContext context)
         {
+            // Copy generated images from the conversation brain directory to wwwroot/images/drugs/
+            try
+            {
+                string srcDir = @"C:\Users\Windows 11\.gemini\antigravity-ide\brain\6c52834e-066b-4753-ae9a-b0334fc2256b";
+                string destDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "drugs");
+                if (Directory.Exists(srcDir))
+                {
+                    Directory.CreateDirectory(destDir);
+                    foreach (var file in Directory.GetFiles(srcDir, "*.png"))
+                    {
+                        string name = Path.GetFileName(file);
+                        // Remove the generated timestamp suffix from the image name, e.g., paracetamol_1781457021977.png -> paracetamol.png
+                        string cleanName = System.Text.RegularExpressions.Regex.Replace(name, @"_\d+\.png$", ".png");
+                        string destPath = Path.Combine(destDir, cleanName);
+                        File.Copy(file, destPath, true);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Lỗi sao chép ảnh thuốc: " + ex.Message);
+            }
+
             // Ensure all 7 categories are seeded
             var catNames = new List<string> { "Thuốc kê đơn", "Thuốc không kê đơn", "Thực phẩm chức năng", "Dược mỹ phẩm", "Mẹ và bé", "Thiết bị y tế", "Sản phẩm tiện lợi" };
             foreach (var name in catNames)
@@ -194,7 +218,8 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Data
                         CongDung = "Giảm đau đầu, đau răng, đau cơ, hạ sốt do cảm lạnh hoặc cảm cúm.",
                         ChongChiDinh = "Người có tiền sử mẫn cảm với paracetamol, bệnh nhân suy gan nặng.",
                         LieuLuong = "Uống 1-2 viên/lần, cách nhau 4-6 giờ. Không quá 4g/ngày.",
-                        NhomDieuTri = "Hạ sốt - Giảm đau"
+                        NhomDieuTri = "Hạ sốt - Giảm đau",
+                        HinhAnh = "/images/drugs/paracetamol.png"
                     },
                     new Thuoc
                     {
@@ -212,7 +237,8 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Data
                         LieuLuong = "Uống 1-2 viên/lần, cách nhau 4-6 giờ. Tối đa 8 viên/ngày.",
                         NhomDieuTri = "Hạ sốt - Giảm đau",
                         IsDeal = true,
-                        DiscountPercent = 15
+                        DiscountPercent = 15,
+                        HinhAnh = "/images/drugs/panadol.png"
                     },
                     new Thuoc
                     {
@@ -228,7 +254,8 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Data
                         CongDung = "Điều trị các triệu chứng cảm cúm, sổ mũi, nghẹt mũi, viêm mũi dị ứng, sốt.",
                         ChongChiDinh = "Suy gan, suy thận nặng, người có bệnh mạch vành hoặc huyết áp cao.",
                         LieuLuong = "Uống 1 viên/lần, ngày 3-4 lần sau bữa ăn.",
-                        NhomDieuTri = "Hô hấp - Cảm cúm"
+                        NhomDieuTri = "Hô hấp - Cảm cúm",
+                        HinhAnh = "/images/drugs/decolgen.png"
                     },
                     new Thuoc
                     {
@@ -244,7 +271,8 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Data
                         CongDung = "Điều trị nhiễm khuẩn tai mũi họng, nhiễm khuẩn đường hô hấp dưới, nhiễm khuẩn tiết niệu.",
                         ChongChiDinh = "Người có tiền sử dị ứng với kháng sinh nhóm Penicillin hoặc Cephalosporin.",
                         LieuLuong = "Uống 1 viên/lần, cách nhau 8 giờ. Dùng theo chỉ định của bác sĩ.",
-                        NhomDieuTri = "Kháng sinh - Kháng viêm"
+                        NhomDieuTri = "Kháng sinh - Kháng viêm",
+                        HinhAnh = "/images/drugs/amoxicillin.png"
                     },
                     new Thuoc
                     {
@@ -262,7 +290,8 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Data
                         LieuLuong = "Uống 1 viên mỗi ngày sau bữa ăn sáng.",
                         NhomDieuTri = "Tăng đề kháng & Miễn dịch",
                         IsDeal = true,
-                        DiscountPercent = 20
+                        DiscountPercent = 20,
+                        HinhAnh = "/images/drugs/vitaminc.png"
                     },
                     new Thuoc
                     {
@@ -278,7 +307,8 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Data
                         CongDung = "Cải thiện trí nhớ, giảm căng thẳng, tăng cường lưu thông máu não.",
                         ChongChiDinh = "Người chuẩn bị phẫu thuật, phụ nữ mang thai hoặc đang trong kỳ kinh nguyệt.",
                         LieuLuong = "Uống 1-2 viên/ngày sau bữa ăn.",
-                        NhomDieuTri = "Bổ não & Giảm căng thẳng"
+                        NhomDieuTri = "Bổ não & Giảm căng thẳng",
+                        HinhAnh = "/images/drugs/ginkgo.png"
                     },
                     new Thuoc
                     {
@@ -294,7 +324,8 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Data
                         CongDung = "Hỗ trợ tim mạch khỏe mạnh, giảm mỏi mắt, khô mắt, phát triển trí não.",
                         ChongChiDinh = "Mẫn cảm với dầu cá hoặc các thành phần của sản phẩm.",
                         LieuLuong = "Uống 1 viên/lần, ngày 2 lần sau ăn.",
-                        NhomDieuTri = "Bổ mắt & Tim mạch"
+                        NhomDieuTri = "Bổ mắt & Tim mạch",
+                        HinhAnh = "/images/drugs/omega3.png"
                     },
                     new Thuoc
                     {
@@ -310,7 +341,8 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Data
                         CongDung = "Tăng độ dẻo dai của khớp, giảm đau khớp, tái tạo sụn.",
                         ChongChiDinh = "Người dưới 18 tuổi, phụ nữ có thai hoặc đang cho con bú.",
                         LieuLuong = "Uống 1 viên mỗi ngày sau bữa ăn.",
-                        NhomDieuTri = "Xương khớp chắc khỏe"
+                        NhomDieuTri = "Xương khớp chắc khỏe",
+                        HinhAnh = "/images/drugs/glucosamine.png"
                     },
                     new Thuoc
                     {
@@ -326,7 +358,8 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Data
                         CongDung = "Bổ sung lợi khuẩn, cải thiện các rối loạn tiêu hóa, tăng khả năng hấp thu.",
                         ChongChiDinh = "Không có chống chỉ định đặc biệt.",
                         LieuLuong = "Hòa 1 gói với nước nguội uống mỗi buổi sáng.",
-                        NhomDieuTri = "Hỗ trợ tiêu hóa"
+                        NhomDieuTri = "Hỗ trợ tiêu hóa",
+                        HinhAnh = "/images/drugs/optibac.png"
                     },
                     new Thuoc
                     {
@@ -342,7 +375,8 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Data
                         CongDung = "Làm chậm quá trình lão hóa da, dưỡng sáng da, giảm thâm nám, giúp tóc móng chắc khỏe.",
                         ChongChiDinh = "Mẫn cảm với các thành phần của sản phẩm.",
                         LieuLuong = "Uống 2 viên mỗi ngày trước khi đi ngủ.",
-                        NhomDieuTri = "Đẹp da & Chống lão hóa"
+                        NhomDieuTri = "Đẹp da & Chống lão hóa",
+                        HinhAnh = "/images/drugs/collagen.png"
                     },
                     new Thuoc
                     {
@@ -358,7 +392,8 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Data
                         CongDung = "Làm sạch dịu nhẹ da mặt, giữ ẩm, ngăn ngừa mụn.",
                         ChongChiDinh = "Không có chong chỉ định đặc biệt, dùng ngoài da.",
                         LieuLuong = "Dùng rửa mặt ngày 2 lần Sáng và Tối.",
-                        NhomDieuTri = "Chăm sóc da - Dược mỹ phẩm"
+                        NhomDieuTri = "Chăm sóc da - Dược mỹ phẩm",
+                        HinhAnh = "/images/drugs/cetaphil.png"
                     },
                     new Thuoc
                     {
@@ -374,7 +409,8 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Data
                         CongDung = "Thay thế bữa ăn phụ hoặc bổ sung dinh dưỡng thiếu hụt cho bé sơ sinh.",
                         ChongChiDinh = "Trẻ bị dị ứng đạm sữa bò.",
                         LieuLuong = "Pha theo bảng hướng dẫn trên vỏ hộp sữa bột.",
-                        NhomDieuTri = "Trẻ sơ sinh (0 - 6 tháng)"
+                        NhomDieuTri = "Trẻ sơ sinh (0 - 6 tháng)",
+                        HinhAnh = "/images/drugs/similac.png"
                     },
                     new Thuoc
                     {
@@ -390,7 +426,8 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Data
                         CongDung = "Thấm hút chất thải, giữ vệ sinh cho em bé.",
                         ChongChiDinh = "Không dùng khi da trẻ đang bị viêm nhiễm nặng vùng tã.",
                         LieuLuong = "Thay tã sau mỗi 3-4 tiếng hoặc sau khi bé tiêu bẩn.",
-                        NhomDieuTri = "Trẻ sơ sinh (0 - 6 tháng)"
+                        NhomDieuTri = "Trẻ sơ sinh (0 - 6 tháng)",
+                        HinhAnh = "/images/drugs/bobby.png"
                     },
                     new Thuoc
                     {
@@ -406,7 +443,8 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Data
                         CongDung = "Bổ sung vitamin tổng hợp và DHA cho phụ nữ chuẩn bị mang thai, đang mang thai và cho con bú.",
                         ChongChiDinh = "Người mẫn cảm với bất cứ thành phần nào của thuốc.",
                         LieuLuong = "Uống 1 viên mỗi ngày sau bữa ăn.",
-                        NhomDieuTri = "Dành cho Mẹ bầu"
+                        NhomDieuTri = "Dành cho Mẹ bầu",
+                        HinhAnh = "/images/drugs/prenatal.png"
                     },
                     new Thuoc
                     {
@@ -422,7 +460,8 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Data
                         CongDung = "Theo dõi huyết áp và nhịp tim tự động tại nhà.",
                         ChongChiDinh = "Không đo trên tay có vết thương hở hoặc đang truyền dịch.",
                         LieuLuong = "Đo ngày 1-2 lần vào buổi sáng trước khi ăn và tối trước khi đi ngủ.",
-                        NhomDieuTri = "Máy đo huyết áp"
+                        NhomDieuTri = "Máy đo huyết áp",
+                        HinhAnh = "/images/drugs/omron.png"
                     },
                     new Thuoc
                     {
@@ -438,7 +477,8 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Data
                         CongDung = "Đo thân nhiệt cơ thể, nhiệt độ nước tắm, sữa cho trẻ.",
                         ChongChiDinh = "Không có chong chỉ định.",
                         LieuLuong = "Để đầu dò cách trán 1-3cm, bấm nút đo trong 1 giây.",
-                        NhomDieuTri = "Nhiệt kế"
+                        NhomDieuTri = "Nhiệt kế",
+                        HinhAnh = "/images/drugs/microlife.png"
                     },
                     new Thuoc
                     {
@@ -454,7 +494,8 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Data
                         CongDung = "Kiểm tra nhanh nhịp tim và độ bão hòa oxy SpO2 cơ thể tại nhà.",
                         ChongChiDinh = "Không dùng trên ngón tay có sơn móng tay quá dày hoặc bị thương nặng.",
                         LieuLuong = "Kẹp vào ngón tay, giữ yên tay trong 10-15 giây để đọc kết quả.",
-                        NhomDieuTri = "Máy đo SpO2"
+                        NhomDieuTri = "Máy đo SpO2",
+                        HinhAnh = "/images/drugs/spo2.png"
                     },
                     new Thuoc
                     {
@@ -472,7 +513,8 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Data
                         LieuLuong = "Sử dụng khẩu trang 1 lần khi đi ra ngoài hoặc làm việc môi trường khói bụi.",
                         NhomDieuTri = "Khẩu trang & Sát khuẩn",
                         IsDeal = true,
-                        DiscountPercent = 10
+                        DiscountPercent = 10,
+                        HinhAnh = "/images/drugs/mask.png"
                     },
                     new Thuoc
                     {
@@ -488,7 +530,8 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Data
                         CongDung = "Làm sạch tay, sát khuẩn bảo vệ sức khỏe gia đình.",
                         ChongChiDinh = "Tránh tiếp xúc trực tiếp với mắt. Nếu dính vào mắt phải rửa bằng nước sạch.",
                         LieuLuong = "Lấy một lượng vừa đủ xoa đều tay trong 20 giây rồi rửa lại bằng nước sạch.",
-                        NhomDieuTri = "Khẩu trang & Sát khuẩn"
+                        NhomDieuTri = "Khẩu trang & Sát khuẩn",
+                        HinhAnh = "/images/drugs/lifebuoy.svg"
                     },
                     new Thuoc
                     {
@@ -504,11 +547,49 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Data
                         CongDung = "Giảm rát họng, giảm ho, thông mũi mát họng.",
                         ChongChiDinh = "Trẻ em dưới 6 tuổi.",
                         LieuLuong = "Ngậm 1 viên cách nhau 2-3 giờ. Tối đa 12 viên/ngày.",
-                        NhomDieuTri = "Kẹo ngậm & Đồ uống"
+                        NhomDieuTri = "Kẹo ngậm & Đồ uống",
+                        HinhAnh = "/images/drugs/strepsils.svg"
                     }
                 };
 
                 await context.Thuocs.AddRangeAsync(drugs);
+                await context.SaveChangesAsync();
+            }
+            else
+            {
+                // Fallback loop to update existing drug entries' images if the clean up failed
+                var imageMapping = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+                {
+                    { "Paracetamol 500mg", "/images/drugs/paracetamol.png" },
+                    { "Panadol Extra", "/images/drugs/panadol.png" },
+                    { "Decolgen Forte", "/images/drugs/decolgen.png" },
+                    { "Amoxicillin 500mg", "/images/drugs/amoxicillin.png" },
+                    { "Vitamin C 1000mg Enervon", "/images/drugs/vitaminc.png" },
+                    { "Ginkgo Biloba 120mg", "/images/drugs/ginkgo.png" },
+                    { "Viên uống Dầu Cá Omega-3", "/images/drugs/omega3.png" },
+                    { "Glucosamine Chondroitin 1500mg", "/images/drugs/glucosamine.png" },
+                    { "Men vi sinh Optibac Probiotics", "/images/drugs/optibac.png" },
+                    { "Viên uống Collagen Glow & White", "/images/drugs/collagen.png" },
+                    { "Sữa rửa mặt Cetaphil Gentle 125ml", "/images/drugs/cetaphil.png" },
+                    { "Sữa bột Similac Newborn 400g", "/images/drugs/similac.png" },
+                    { "Tã dán Bobby Size S 56 miếng", "/images/drugs/bobby.png" },
+                    { "Vitamin Prenatal DHA cho mẹ bầu", "/images/drugs/prenatal.png" },
+                    { "Máy đo huyết áp Omron HEM-7121", "/images/drugs/omron.png" },
+                    { "Nhiệt kế hồng ngoại Microlife FR1MF1", "/images/drugs/microlife.png" },
+                    { "Máy đo SpO2 cầm tay thông minh", "/images/drugs/spo2.png" },
+                    { "Khẩu trang y tế 4 lớp kháng khuẩn", "/images/drugs/mask.png" },
+                    { "Nước rửa tay Lifebuoy 500ml", "/images/drugs/lifebuoy.svg" },
+                    { "Kẹo ngậm ho thảo dược Strepsils Cool", "/images/drugs/strepsils.svg" }
+                };
+
+                foreach (var drug in existingDrugs)
+                {
+                    if (imageMapping.TryGetValue(drug.TenThuoc, out var imgPath))
+                    {
+                        drug.HinhAnh = imgPath;
+                        context.Entry(drug).State = EntityState.Modified;
+                    }
+                }
                 await context.SaveChangesAsync();
             }
 

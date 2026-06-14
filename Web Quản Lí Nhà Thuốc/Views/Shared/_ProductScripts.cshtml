@@ -14,7 +14,7 @@
 		var imgEl    = area.querySelector('.drug-loaded-img');
 		var holder   = area.querySelector('.drug-placeholder');
 
-		if (!imgEl) return; // has manual image already — skip
+		if (!imgEl || imgEl.getAttribute('src')) return; // has manual image already — skip
 
 		function showImg(url) {
 			var testImg = new Image();

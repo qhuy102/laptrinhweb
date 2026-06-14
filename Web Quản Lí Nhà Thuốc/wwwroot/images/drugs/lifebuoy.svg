@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fee2e2" />
+      <stop offset="100%" stop-color="#fca5a5" />
+    </linearGradient>
+    <linearGradient id="bottle" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="30%" stop-color="#f3f4f6" />
+      <stop offset="70%" stop-color="#e5e7eb" />
+      <stop offset="100%" stop-color="#d1d5db" />
+    </linearGradient>
+    <linearGradient id="labelGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#dc2626" />
+      <stop offset="100%" stop-color="#991b1b" />
+    </linearGradient>
+  </defs>
+  <circle cx="100" cy="100" r="90" fill="url(#bg)" opacity="0.3"/>
+  <path d="M90 40h20v10H90z" fill="#374151" />
+  <path d="M85 30h15c5 0 8 3 8 8v2h-8v-2c0-2-2-4-5-4h-10v-4z" fill="#1f2937" />
+  <path d="M97 50h6v15h-6z" fill="#9ca3af" />
+  <path d="M80 65h40c8 0 15 7 15 15v75c0 10-8 18-18 18H83c-10 0-18-8-18-18V80c0-8 7-15 15-15z" fill="url(#bottle)" />
+  <rect x="70" y="90" width="60" height="55" rx="5" fill="url(#labelGrad)" />
+  <circle cx="100" cy="110" r="12" fill="#ffffff" />
+  <path d="M97 104h6v12h-6zm-3 3h12v6H94z" fill="#dc2626" />
+  <text x="100" y="137" font-family="sans-serif" font-size="7" font-weight="bold" fill="#ffffff" text-anchor="middle">LIFEBUOY</text>
+  <text x="100" y="143" font-family="sans-serif" font-size="5" fill="#fee2e2" text-anchor="middle">Hand Wash</text>
+</svg>

@@ -8,6 +8,8 @@ wwwroot\css\templatemo-medic-care.css
 wwwroot\favicon.ico
 wwwroot\fonts\bootstrap-icons.woff
 wwwroot\fonts\bootstrap-icons.woff2
+wwwroot\images\drugs\lifebuoy.svg
+wwwroot\images\drugs\strepsils.svg
 wwwroot\images\gallery\female-doctor-with-presenting-hand-gesture.jpg
 wwwroot\images\gallery\medium-shot-man-getting-vaccine.jpg
 wwwroot\images\reviews\beautiful-woman-face-portrait-brown-background.jpeg

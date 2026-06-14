@@ -216,11 +216,18 @@
                                  style="height: 180px;" 
                                  data-drug-name="@item.TenThuoc" 
                                  data-hoatChat="@item.HoatChat">
-                                <div class="drug-spinner spinner-border text-teal position-absolute" role="status" style="width: 2rem; height: 2rem;"></div>
-                                <img class="img-fluid drug-loaded-img" src="" alt="@item.TenThuoc" style="max-height: 140px; display: none; object-fit: contain;">
-                                <div class="drug-placeholder d-none align-items-center justify-content-center text-muted" style="width: 100%; height: 100%;">
-                                    <i class="bi bi-capsule fs-1"></i>
-                                </div>
+                                @if (!string.IsNullOrEmpty(item.HinhAnh))
+                                {
+                                    <img class="img-fluid product-img drug-loaded-img" src="@item.HinhAnh" alt="@item.TenThuoc" style="max-height: 140px; object-fit: contain;" />
+                                }
+                                else
+                                {
+                                    <div class="drug-spinner spinner-border text-teal position-absolute" role="status" style="width: 2rem; height: 2rem;"></div>
+                                    <img class="img-fluid drug-loaded-img" src="" alt="@item.TenThuoc" style="max-height: 140px; display: none; object-fit: contain;">
+                                    <div class="drug-placeholder d-none align-items-center justify-content-center text-muted" style="width: 100%; height: 100%;">
+                                        <i class="bi bi-capsule fs-1"></i>
+                                    </div>
+                                }
                             </div>
                         </div>
                         
@@ -274,7 +281,7 @@
         var imgEl    = area.querySelector('.drug-loaded-img');
         var holder   = area.querySelector('.drug-placeholder');
 
-        if (!imgEl) return; // has manual image already — skip
+        if (!imgEl || imgEl.getAttribute('src')) return; // has manual image already — skip
 
         function showImg(url) {
             var testImg = new Image();
