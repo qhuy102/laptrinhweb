@@ -98,6 +98,17 @@
     </div>
     <h3 class="fw-bold text-dark mb-4">Thêm Thuốc Mới Vào Kho</h3>
 
+    <!-- Tip Banner for Import -->
+    <div class="alert alert-info border-0 shadow-sm d-flex align-items-center justify-content-between p-3 mb-4" style="border-radius: 12px; background-color: #f0fdfa; border-left: 4px solid #0d9488;">
+        <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-info-circle-fill text-teal fs-5" style="color: #0d9488;"></i>
+            <span class="text-dark small">Bạn có danh sách nhiều thuốc cần nhập kho? Hãy sử dụng tính năng <strong>nhập hàng loạt từ Excel / CSV</strong> tại trang quản lý để tiết kiệm thời gian.</span>
+        </div>
+        <a asp-action="Index" class="btn btn-sm btn-outline-teal text-teal fw-semibold rounded-pill px-3" style="color: #0d9488; border-color: #0d9488;" onclick="setTimeout(() => showImportModal(), 100)">
+            <i class="bi bi-file-earmark-excel-fill me-1"></i> Sử dụng Excel Import
+        </a>
+    </div>
+
     <div class="card med-form-card p-4">
         <form asp-action="Create">
             <div class="row">

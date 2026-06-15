@@ -302,7 +302,11 @@
             <h2 class="fw-bold mb-0 text-dark">Quản lý Kho Thuốc</h2>
             <p class="text-muted small mb-0">Theo dõi, kiểm tra hạn sử dụng và số lượng thuốc tồn kho tiện lợi.</p>
         </div>
-        <div class="col-md-6 col-12 d-flex justify-content-md-end justify-content-start">
+        <div class="col-md-6 col-12 d-flex justify-content-md-end justify-content-start gap-2">
+            <button class="btn btn-outline-success d-flex align-items-center gap-2 py-2 px-3" onclick="showImportModal()" style="border-radius: 12px; font-weight: 500;">
+                <i class="bi bi-file-earmark-excel-fill"></i>
+                Nhập từ Excel / CSV
+            </button>
             <a asp-action="Create" class="btn btn-med-primary d-flex align-items-center gap-2">
                 <i class="bi bi-plus-circle-fill"></i>
                 Thêm thuốc mới
@@ -841,4 +845,213 @@
             }
         }
     });
+</script>
+
+<!-- Modal: Import Medicines Excel/CSV -->
+<div class="modal fade" id="importMedicineModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content border-0" style="border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.1);">
+            <div class="modal-header bg-teal text-white p-3 border-0" style="background-color: var(--teal-primary);">
+                <h5 class="modal-title fw-bold text-white"><i class="bi bi-file-earmark-excel-fill me-2 text-white"></i>Nhập Thuốc Tồn Kho Từ Excel / CSV</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close" onclick="resetImportModal()"></button>
+            </div>
+            <div class="modal-body p-4">
+                <!-- Step 1: Upload Area -->
+                <div id="importUploadArea" class="p-5 border-2 border-dashed rounded text-center bg-light" style="cursor: pointer;" onclick="document.getElementById('importFile').click()">
+                    <i class="bi bi-cloud-arrow-up text-teal mb-3" style="font-size: 3.5rem; display: block; color: var(--teal-primary);"></i>
+                    <h5 class="fw-bold text-dark">Kéo thả hoặc Click để tải file Excel (.xlsx) / CSV (.csv)</h5>
+                    <p class="text-muted small">Hệ thống sẽ tự động đọc tên cột và xác thực dữ liệu trước khi lưu.</p>
+                    <a href="/Medicine/DownloadTemplate" class="btn btn-link text-teal fw-semibold mt-2" onclick="event.stopPropagation();" style="color: var(--teal-primary);"><i class="bi bi-download me-1"></i>Tải file mẫu nhập kho (.csv)</a>
+                    <input type="file" id="importFile" style="display: none;" accept=".xlsx,.csv" onchange="handleImportFileSelect()" />
+                </div>
+
+                <!-- Processing Spinner -->
+                <div id="importProcessing" class="text-center py-5" style="display: none;">
+                    <div class="spinner-border text-teal mb-3" style="width: 3rem; height: 3rem; color: var(--teal-primary);" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <h5 class="fw-bold text-dark">Đang đọc và xác thực dữ liệu từ file...</h5>
+                </div>
+
+                <!-- Results Output -->
+                <div id="importResult" style="display: none;">
+                    <div id="importStatsAlert" class="alert alert-info d-flex align-items-center mb-3">
+                        <i class="bi bi-info-circle-fill me-2 fs-5"></i>
+                        <div id="importStatsText">Tìm thấy 0 dòng dữ liệu. Hợp lệ: 0, Bị lỗi: 0.</div>
+                    </div>
+                    
+                    <h6 class="fw-bold mb-3 border-bottom pb-2 text-dark">Xem Trước Danh Sách Thuốc Tải Lên</h6>
+                    <div class="table-responsive" style="max-height: 350px; overflow-y: auto;">
+                        <table class="table table-bordered table-hover align-middle">
+                            <thead class="table-light sticky-top">
+                                <tr>
+                                    <th style="width: 60px;">Dòng</th>
+                                    <th>Tên thuốc</th>
+                                    <th>Loại thuốc</th>
+                                    <th class="text-end">Đơn Giá</th>
+                                    <th class="text-center">Số lượng</th>
+                                    <th class="text-center">Hạn Dùng</th>
+                                    <th>Vị trí kệ</th>
+                                    <th>Trạng Thái / Lỗi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="importPreviewTableBody">
+                                <!-- Dynamic rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0 p-3 bg-light" style="border-radius: 0 0 16px 16px;">
+                <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal" onclick="resetImportModal()">Đóng</button>
+                <button type="button" id="btnSaveImport" class="btn btn-teal-btn text-white rounded-pill px-4" style="background-color: var(--teal-primary); display: none;" onclick="saveImportedMedicines()">Lưu vào kho hàng <i class="bi bi-save me-1"></i></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let importModal;
+    let parsedImportRows = [];
+
+    function showImportModal() {
+        resetImportModal();
+        importModal = new bootstrap.Modal(document.getElementById('importMedicineModal'));
+        importModal.show();
+    }
+
+    function resetImportModal() {
+        document.getElementById("importUploadArea").style.display = "block";
+        document.getElementById("importProcessing").style.display = "none";
+        document.getElementById("importResult").style.display = "none";
+        document.getElementById("btnSaveImport").style.display = "none";
+        document.getElementById("importFile").value = "";
+        parsedImportRows = [];
+    }
+
+    function handleImportFileSelect() {
+        const fileInput = document.getElementById("importFile");
+        if (fileInput.files.length === 0) return;
+
+        document.getElementById("importUploadArea").style.display = "none";
+        document.getElementById("importProcessing").style.display = "block";
+
+        const formData = new FormData();
+        formData.append("file", fileInput.files[0]);
+
+        fetch('/Medicine/PreviewImport', {
+            method: 'POST',
+            body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById("importProcessing").style.display = "none";
+            if (data.success) {
+                parsedImportRows = data.rows;
+                
+                // Display Stats
+                document.getElementById("importStatsText").innerHTML = `Tổng số dòng: <strong>${data.totalRows}</strong> | Hợp lệ: <strong class="text-success">${data.validRows}</strong> | Lỗi: <strong class="text-danger">${data.invalidRows}</strong>`;
+                
+                // Class alert style
+                const alertEl = document.getElementById("importStatsAlert");
+                if (data.invalidRows > 0) {
+                    alertEl.className = "alert alert-warning d-flex align-items-center mb-3";
+                } else {
+                    alertEl.className = "alert alert-success d-flex align-items-center mb-3";
+                }
+
+                // Render rows
+                const tbody = document.getElementById("importPreviewTableBody");
+                tbody.innerHTML = "";
+                
+                parsedImportRows.forEach(row => {
+                    let statusHtml = "";
+                    let rowClass = "";
+                    if (row.isValid) {
+                        statusHtml = `<span class="badge bg-success-subtle text-success"><i class="bi bi-check-circle-fill me-1"></i>Hợp lệ</span>`;
+                    } else {
+                        rowClass = "table-danger-subtle";
+                        statusHtml = `<div class="text-danger small fw-semibold">${row.errorMessages.join("<br/>")}</div>`;
+                    }
+
+                    const formattedPrice = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(row.donGia);
+                    const formattedDate = new Date(row.hanSuDung).toLocaleDateString('vi-VN');
+
+                    const tr = `
+                        <tr class="${rowClass}">
+                            <td class="text-center font-monospace">${row.rowIndex}</td>
+                            <td class="fw-semibold text-dark">${row.tenThuoc}</td>
+                            <td>${row.tenLoaiThuoc}</td>
+                            <td class="text-end fw-bold text-teal">${formattedPrice}</td>
+                            <td class="text-center">${row.soLuong} ${row.donViCoBan}</td>
+                            <td class="text-center">${formattedDate}</td>
+                            <td>${row.viTriKe || '-'}</td>
+                            <td>${statusHtml}</td>
+                        </tr>
+                    `;
+                    tbody.innerHTML += tr;
+                });
+
+                document.getElementById("importResult").style.display = "block";
+                
+                // Only show Save button if there are valid rows and no errors (or prompt confirm)
+                const saveBtn = document.getElementById("btnSaveImport");
+                saveBtn.style.display = "inline-block";
+                if (data.validRows === 0 || data.invalidRows > 0) {
+                    saveBtn.disabled = true;
+                    saveBtn.title = "Vui lòng sửa các dòng lỗi trong file trước khi nhập kho.";
+                } else {
+                    saveBtn.disabled = false;
+                    saveBtn.title = "";
+                }
+            } else {
+                alert("Lỗi đọc file: " + data.message);
+                resetImportModal();
+            }
+        })
+        .catch(err => {
+            alert("Lỗi kết nối máy chủ.");
+            console.error(err);
+            resetImportModal();
+        });
+    }
+
+    function saveImportedMedicines() {
+        const validRows = parsedImportRows.filter(r => r.isValid);
+        if (validRows.length === 0) return;
+
+        if (!confirm(`Bạn có chắc chắn muốn lưu ${validRows.length} thuốc vào kho không?`)) {
+            return;
+        }
+
+        const saveBtn = document.getElementById("btnSaveImport");
+        saveBtn.disabled = true;
+        saveBtn.innerHTML = `<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Đang lưu...`;
+
+        fetch('/Medicine/SaveImport', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(validRows)
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                alert(`Nhập kho thành công ${data.count} thuốc!`);
+                importModal.hide();
+                window.location.reload();
+            } else {
+                alert("Lỗi lưu kho: " + data.message);
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = `Lưu vào kho hàng <i class="bi bi-save me-1"></i>`;
+            }
+        })
+        .catch(err => {
+            alert("Lỗi kết nối máy chủ.");
+            console.error(err);
+            saveBtn.disabled = false;
+            saveBtn.innerHTML = `Lưu vào kho hàng <i class="bi bi-save me-1"></i>`;
+        });
+    }
 </script>

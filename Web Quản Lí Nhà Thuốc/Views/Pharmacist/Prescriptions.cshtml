@@ -215,7 +215,11 @@
             <h2 class="fw-bold mb-0 text-dark">Nhận Diện & Quản Lý Tư Vấn</h2>
             <p class="text-muted small mb-0">Tiếp nhận đơn thuốc hoặc yêu cầu tư vấn do khách hàng tải lên để lên hóa đơn POS và gọi điện tư vấn nhanh chóng.</p>
         </div>
-        <div class="col-md-5 col-12 d-flex justify-content-md-end justify-content-start">
+        <div class="col-md-5 col-12 d-flex justify-content-md-end justify-content-start gap-2">
+            <button class="btn btn-outline-primary d-flex align-items-center gap-2 py-2 px-3 rounded-3" style="border: 1px solid var(--indigo-primary); color: var(--indigo-primary); background: transparent;" onclick="showImportPresModal()">
+                <i class="bi bi-file-earmark-excel-fill"></i>
+                Nhập đơn từ Excel
+            </button>
             <button class="btn btn-teal-btn d-flex align-items-center gap-2 py-2 px-3 rounded-3" style="background-color: var(--teal-primary); color:white; border:none;" onclick="showScanModal()">
                 <i class="bi bi-camera-fill"></i>
                 Quét đơn / yêu cầu tư vấn mới (AI)
@@ -688,4 +692,223 @@
         }
     </script>
 }
+
+<!-- Modal: Import Prescriptions Excel/CSV -->
+<div class="modal fade" id="importPresModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content border-0" style="border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.1);">
+            <div class="modal-header text-white p-3 border-0" style="background-color: var(--indigo-primary);">
+                <h5 class="modal-title fw-bold text-white"><i class="bi bi-file-earmark-excel-fill me-2 text-white"></i>Nhập Đơn Thuốc Từ Excel / CSV</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close" onclick="resetImportPresModal()"></button>
+            </div>
+            <div class="modal-body p-4">
+                <!-- Step 1: Upload Area -->
+                <div id="importPresUploadArea" class="p-5 border-2 border-dashed rounded text-center bg-light" style="cursor: pointer;" onclick="document.getElementById('importPresFile').click()">
+                    <i class="bi bi-cloud-arrow-up text-indigo mb-3" style="font-size: 3.5rem; display: block; color: var(--indigo-primary);"></i>
+                    <h5 class="fw-bold text-dark">Kéo thả hoặc Click để tải file Excel (.xlsx) / CSV (.csv)</h5>
+                    <p class="text-muted small">Hệ thống sẽ gom nhóm các hàng trùng Tên bệnh nhân, Bác sĩ, Ngày thành một đơn thuốc và xác thực.</p>
+                    <a href="/Pharmacist/DownloadPrescriptionTemplate" class="btn btn-link text-indigo fw-semibold mt-2" onclick="event.stopPropagation();" style="color: var(--indigo-primary);"><i class="bi bi-download me-1"></i>Tải file mẫu đơn thuốc (.csv)</a>
+                    <input type="file" id="importPresFile" style="display: none;" accept=".xlsx,.csv" onchange="handleImportPresFileSelect()" />
+                </div>
+
+                <!-- Processing Spinner -->
+                <div id="importPresProcessing" class="text-center py-5" style="display: none;">
+                    <div class="spinner-border text-indigo mb-3" style="width: 3rem; height: 3rem; color: var(--indigo-primary);" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <h5 class="fw-bold text-dark">Đang đọc và xác thực dữ liệu từ file đơn thuốc...</h5>
+                </div>
+
+                <!-- Results Output -->
+                <div id="importPresResult" style="display: none;">
+                    <div id="importPresStatsAlert" class="alert alert-info d-flex align-items-center mb-3">
+                        <i class="bi bi-info-circle-fill me-2 fs-5"></i>
+                        <div id="importPresStatsText">Tìm thấy 0 đơn thuốc. Hợp lệ: 0, Bị lỗi: 0.</div>
+                    </div>
+                    
+                    <h6 class="fw-bold mb-3 border-bottom pb-2 text-dark">Xem Trước Danh Sách Đơn Thuốc Gom Nhóm</h6>
+                    <div class="table-responsive" style="max-height: 350px; overflow-y: auto;">
+                        <table class="table table-bordered table-hover align-middle">
+                            <thead class="table-light sticky-top">
+                                <tr>
+                                    <th>Thông Tin Bệnh Nhân & Bác Sĩ</th>
+                                    <th>Chẩn Đoán</th>
+                                    <th>Ngày Kê</th>
+                                    <th>Trạng Thái</th>
+                                    <th>Thuốc Kê & Liều Dùng</th>
+                                    <th>Xác Thực</th>
+                                </tr>
+                            </thead>
+                            <tbody id="importPresPreviewTableBody">
+                                <!-- Dynamic rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0 p-3 bg-light" style="border-radius: 0 0 16px 16px;">
+                <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal" onclick="resetImportPresModal()">Đóng</button>
+                <button type="button" id="btnSavePresImport" class="btn btn-primary text-white rounded-pill px-4" style="background-color: var(--indigo-primary); border-color: var(--indigo-primary); display: none;" onclick="saveImportedPrescriptions()">Lưu đơn thuốc <i class="bi bi-save me-1"></i></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let importPresModal;
+    let parsedPresGroups = [];
+
+    function showImportPresModal() {
+        resetImportPresModal();
+        importPresModal = new bootstrap.Modal(document.getElementById('importPresModal'));
+        importPresModal.show();
+    }
+
+    function resetImportPresModal() {
+        document.getElementById("importPresUploadArea").style.display = "block";
+        document.getElementById("importPresProcessing").style.display = "none";
+        document.getElementById("importPresResult").style.display = "none";
+        document.getElementById("btnSavePresImport").style.display = "none";
+        document.getElementById("importPresFile").value = "";
+        parsedPresGroups = [];
+    }
+
+    function handleImportPresFileSelect() {
+        const fileInput = document.getElementById("importPresFile");
+        if (fileInput.files.length === 0) return;
+
+        document.getElementById("importPresUploadArea").style.display = "none";
+        document.getElementById("importPresProcessing").style.display = "block";
+
+        const formData = new FormData();
+        formData.append("file", fileInput.files[0]);
+
+        fetch('/Pharmacist/PreviewImportPrescriptions', {
+            method: 'POST',
+            body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById("importPresProcessing").style.display = "none";
+            if (data.success) {
+                parsedPresGroups = data.groups;
+                
+                // Display Stats
+                document.getElementById("importPresStatsText").innerHTML = `Tổng số đơn thuốc: <strong>${data.totalGroups}</strong> | Hợp lệ: <strong class="text-success">${data.validGroups}</strong> | Lỗi: <strong class="text-danger">${data.invalidGroups}</strong>`;
+                
+                // Alert class
+                const alertEl = document.getElementById("importPresStatsAlert");
+                if (data.invalidGroups > 0) {
+                    alertEl.className = "alert alert-warning d-flex align-items-center mb-3";
+                } else {
+                    alertEl.className = "alert alert-success d-flex align-items-center mb-3";
+                }
+
+                // Render rows
+                const tbody = document.getElementById("importPresPreviewTableBody");
+                tbody.innerHTML = "";
+                
+                parsedPresGroups.forEach(group => {
+                    let statusHtml = "";
+                    let rowClass = "";
+                    if (group.isValid) {
+                        statusHtml = `<span class="badge bg-success-subtle text-success"><i class="bi bi-check-circle-fill me-1"></i>Hợp lệ</span>`;
+                    } else {
+                        rowClass = "table-danger-subtle";
+                        statusHtml = `<div class="text-danger small fw-semibold">${group.errorMessages.join("<br/>")}</div>`;
+                    }
+
+                    // Render drug items list
+                    let drugsListHtml = "<ul class='mb-0 ps-3 small'>";
+                    group.items.forEach(item => {
+                        let itemError = item.isValid ? "" : ` <span class="text-danger">(${item.errorMessages.join(", ")})</span>`;
+                        drugsListHtml += `<li><strong>${item.tenThuoc}</strong> x${item.soLuong} - <em>${item.lieuDung || 'Không có liều dùng'}</em>${itemError}</li>`;
+                    });
+                    drugsListHtml += "</ul>";
+
+                    const formattedDate = new Date(group.ngayKeDon).toLocaleDateString('vi-VN');
+                    
+                    let translatedStatus = "Chờ tư vấn";
+                    if (group.trangThai === "DaDuyet") translatedStatus = "Đã duyệt";
+                    else if (group.trangThai === "DaBan") translatedStatus = "Đã bán";
+                    else if (group.trangThai === "DaHuy") translatedStatus = "Đã hủy";
+
+                    const tr = `
+                        <tr class="${rowClass}">
+                            <td>
+                                <div class="fw-bold text-dark">${group.tenBenhNhan}</div>
+                                <div class="text-muted small"><i class="bi bi-person-workspace me-1"></i>${group.bacSiKeDon}</div>
+                            </td>
+                            <td>${group.chanDoan}</td>
+                            <td>${formattedDate}</td>
+                            <td><span class="badge bg-secondary-subtle text-secondary">${translatedStatus}</span></td>
+                            <td>${drugsListHtml}</td>
+                            <td>${statusHtml}</td>
+                        </tr>
+                    `;
+                    tbody.innerHTML += tr;
+                });
+
+                document.getElementById("importPresResult").style.display = "block";
+                
+                const saveBtn = document.getElementById("btnSavePresImport");
+                saveBtn.style.display = "inline-block";
+                if (data.validGroups === 0 || data.invalidGroups > 0) {
+                    saveBtn.disabled = true;
+                    saveBtn.title = "Vui lòng sửa các dòng thuốc bị lỗi (không tồn tại trong kho) trước khi nhập đơn.";
+                } else {
+                    saveBtn.disabled = false;
+                    saveBtn.title = "";
+                }
+            } else {
+                alert("Lỗi đọc file: " + data.message);
+                resetImportPresModal();
+            }
+        })
+        .catch(err => {
+            alert("Lỗi kết nối máy chủ.");
+            console.error(err);
+            resetImportPresModal();
+        });
+    }
+
+    function saveImportedPrescriptions() {
+        const validGroups = parsedPresGroups.filter(g => g.isValid);
+        if (validGroups.length === 0) return;
+
+        if (!confirm(`Bạn có chắc chắn muốn lưu ${validGroups.length} đơn thuốc này không?`)) {
+            return;
+        }
+
+        const saveBtn = document.getElementById("btnSavePresImport");
+        saveBtn.disabled = true;
+        saveBtn.innerHTML = `<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Đang lưu...`;
+
+        fetch('/Pharmacist/SaveImportedPrescriptions', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(validGroups)
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                alert(`Lưu thành công ${data.count} đơn thuốc!`);
+                importPresModal.hide();
+                window.location.reload();
+            } else {
+                alert("Lỗi lưu đơn thuốc: " + data.message);
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = `Lưu đơn thuốc <i class="bi bi-save me-1"></i>`;
+            }
+        })
+        .catch(err => {
+            alert("Lỗi kết nối máy chủ.");
+            console.error(err);
+            saveBtn.disabled = false;
+            saveBtn.innerHTML = `Lưu đơn thuốc <i class="bi bi-save me-1"></i>`;
+        });
+    }
+</script>
 

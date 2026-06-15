@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Web_Quản_Lí_Nhà_Thuốc.Data;
 using Web_Quản_Lí_Nhà_Thuốc.Models;
 using Web_Quản_Lí_Nhà_Thuốc.Hubs;
+using Web_Quản_Lí_Nhà_Thuốc.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -39,6 +40,7 @@ builder.Services.ConfigureApplicationCookie(options =>
 
 builder.Services.AddRazorPages();
 builder.Services.AddSignalR();
+builder.Services.AddTransient<IEmailService, EmailService>();
 
 var app = builder.Build();
 

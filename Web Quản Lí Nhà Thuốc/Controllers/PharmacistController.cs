@@ -946,6 +946,114 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Controllers
                 percentToNext = tier == "VIP Kim Cương" ? 100 : (int)((currentUser.DiemTichLuy % 500) / 5.0)
             });
         }
+
+        // --- EXCEL/CSV IMPORT FOR PRESCRIPTIONS ---
+        [HttpGet]
+        public IActionResult DownloadPrescriptionTemplate()
+        {
+            var csvBytes = ExcelHelper.GeneratePrescriptionTemplateCsv();
+            return File(csvBytes, "text/csv; charset=utf-8", "Mau_Nhap_Don_Thuoc.csv");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> PreviewImportPrescriptions(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+            {
+                return Json(new { success = false, message = "Vui lòng chọn file tải lên." });
+            }
+
+            try
+            {
+                var existingDrugs = await _context.Thuocs.ToListAsync();
+                using (var stream = file.OpenReadStream())
+                {
+                    var rawRows = ExcelHelper.ReadFileRows(stream, file.FileName);
+                    var parsedGroups = ExcelHelper.ParsePrescriptions(rawRows, existingDrugs);
+                    
+                    int totalGroups = parsedGroups.Count;
+                    int validGroups = parsedGroups.Count(g => g.IsValid);
+                    int invalidGroups = parsedGroups.Count(g => !g.IsValid);
+
+                    return Json(new { 
+                        success = true, 
+                        groups = parsedGroups,
+                        totalGroups = totalGroups,
+                        validGroups = validGroups,
+                        invalidGroups = invalidGroups
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Lỗi đọc file: " + ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SaveImportedPrescriptions([FromBody] List<PrescriptionImportGroup> groups)
+        {
+            if (groups == null || !groups.Any())
+            {
+                return Json(new { success = false, message = "Danh sách đơn thuốc rỗng." });
+            }
+
+            var invalidGroups = groups.Where(g => !g.IsValid).ToList();
+            if (invalidGroups.Any())
+            {
+                return Json(new { success = false, message = "Vui lòng sửa toàn bộ lỗi trước khi lưu." });
+            }
+
+            using (var transaction = await _context.Database.BeginTransactionAsync())
+            {
+                try
+                {
+                    foreach (var grp in groups)
+                    {
+                        var newDon = new DonThuoc
+                        {
+                            TenBenhNhan = grp.TenBenhNhan,
+                            BacSiKeDon = grp.BacSiKeDon,
+                            ChanDoan = grp.ChanDoan,
+                            NgayKeDon = grp.NgayKeDon,
+                            TrangThai = grp.TrangThai,
+                            HinhAnhDonThuoc = null,
+                            ChiTietDonThuocs = new List<ChiTietDonThuoc>()
+                        };
+
+                        _context.DonThuocs.Add(newDon);
+                        await _context.SaveChangesAsync(); // Generates Id
+
+                        foreach (var item in grp.Items)
+                        {
+                            if (!item.MaThuoc.HasValue)
+                            {
+                                return Json(new { success = false, message = $"Thuốc '{item.TenThuoc}' không hợp lệ." });
+                            }
+
+                            var newDetail = new ChiTietDonThuoc
+                            {
+                                DonThuocId = newDon.Id,
+                                MaThuoc = item.MaThuoc.Value,
+                                SoLuong = item.SoLuong,
+                                LieuDung = item.LieuDung
+                            };
+                            _context.ChiTietDonThuocs.Add(newDetail);
+                        }
+                    }
+
+                    await _context.SaveChangesAsync();
+                    await transaction.CommitAsync();
+
+                    return Json(new { success = true, count = groups.Count });
+                }
+                catch (Exception ex)
+                {
+                    await transaction.RollbackAsync();
+                    return Json(new { success = false, message = "Lỗi lưu dữ liệu: " + ex.Message });
+                }
+            }
+        }
     }
 
     // ViewModels & Request models

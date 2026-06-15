@@ -1,11 +1,14 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Web_Quản_Lí_Nhà_Thuốc.Data;
+using Web_Quản_Lí_Nhà_Thuốc.Helpers;
 using Web_Quản_Lí_Nhà_Thuốc.Models;
 
 namespace Web_Quản_Lí_Nhà_Thuốc.Controllers
@@ -111,6 +114,107 @@ namespace Web_Quản_Lí_Nhà_Thuốc.Controllers
             }
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
+        }
+
+        // --- EXCEL/CSV IMPORT ACTIONS ---
+        [HttpGet]
+        public IActionResult DownloadTemplate()
+        {
+            var csvBytes = ExcelHelper.GenerateMedicineTemplateCsv();
+            return File(csvBytes, "text/csv; charset=utf-8", "Mau_Nhap_Thuoc.csv");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> PreviewImport(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+            {
+                return Json(new { success = false, message = "Vui lòng chọn file tải lên." });
+            }
+
+            try
+            {
+                var categories = await _context.LoaiThuocs.ToListAsync();
+                using (var stream = file.OpenReadStream())
+                {
+                    var rawRows = ExcelHelper.ReadFileRows(stream, file.FileName);
+                    var parsedRows = ExcelHelper.ParseMedicines(rawRows, categories);
+                    
+                    return Json(new { 
+                        success = true, 
+                        rows = parsedRows,
+                        totalRows = parsedRows.Count,
+                        validRows = parsedRows.Count(r => r.IsValid),
+                        invalidRows = parsedRows.Count(r => !r.IsValid)
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Lỗi đọc file: " + ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SaveImport([FromBody] List<MedicineImportRow> rows)
+        {
+            if (rows == null || !rows.Any())
+            {
+                return Json(new { success = false, message = "Danh sách thuốc rỗng." });
+            }
+
+            var invalidRows = rows.Where(r => !r.IsValid).ToList();
+            if (invalidRows.Any())
+            {
+                return Json(new { success = false, message = "Vui lòng sửa toàn bộ lỗi trước khi lưu." });
+            }
+
+            using (var transaction = await _context.Database.BeginTransactionAsync())
+            {
+                try
+                {
+                    var categories = await _context.LoaiThuocs.ToListAsync();
+
+                    foreach (var row in rows)
+                    {
+                        var matchingCat = categories.FirstOrDefault(l => l.TenLoai.Equals(row.TenLoaiThuoc, StringComparison.OrdinalIgnoreCase));
+                        if (matchingCat == null)
+                        {
+                            return Json(new { success = false, message = $"Loại thuốc '{row.TenLoaiThuoc}' ở dòng {row.RowIndex} không tồn tại." });
+                        }
+
+                        var newThuoc = new Thuoc
+                        {
+                            TenThuoc = row.TenThuoc,
+                            LoaiThuocId = matchingCat.Id,
+                            DonViCoBan = row.DonViCoBan,
+                            DonGia = row.DonGia,
+                            SoLuong = row.SoLuong,
+                            HanSuDung = row.HanSuDung,
+                            ViTriKe = row.ViTriKe,
+                            HoatChat = row.HoatChat,
+                            NhomDieuTri = row.NhomDieuTri,
+                            CongDung = row.CongDung,
+                            ChongChiDinh = row.ChongChiDinh,
+                            LieuLuong = row.LieuLuong,
+                            IsDeal = false,
+                            DiscountPercent = 0
+                        };
+
+                        _context.Thuocs.Add(newThuoc);
+                    }
+
+                    await _context.SaveChangesAsync();
+                    await transaction.CommitAsync();
+
+                    return Json(new { success = true, count = rows.Count });
+                }
+                catch (Exception ex)
+                {
+                    await transaction.RollbackAsync();
+                    return Json(new { success = false, message = "Lỗi lưu dữ liệu: " + ex.Message });
+                }
+            }
         }
 
         private bool ThuocExists(int id)
